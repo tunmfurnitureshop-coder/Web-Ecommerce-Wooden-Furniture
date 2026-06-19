@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "cart": "Giỏ hàng"
+  },
+  "product": {
+    "addToCart": "Thêm vào giỏ",
+    "outOfStock": "Hết hàng",
+    "woodType": "Loại gỗ",
+    "finish": "Bề mặt",
+    "size": "Kích thước",
+    "specifications": "Thông số kỹ thuật",
+    "priceBreakdown": "Chi tiết giá",
+    "basePrice": "Giá cơ bản",
+    "woodTypeDelta": "Phụ phí loại gỗ",
+    "finishDelta": "Phụ phí bề mặt",
+    "sizeDelta": "Phụ phí kích thước",
+    "totalPrice": "Tổng giá",
+    "quantity": "Số lượng"
+  },
+  "cart": {
+    "title": "Giỏ hàng",
+    "empty": "Giỏ hàng trống",
+    "emptyDesc": "Hãy khám phá sản phẩm và thêm vào giỏ hàng",
+    "checkout": "Thanh toán",
+    "remove": "Xóa",
+    "total": "Tổng cộng",
+    "subtotal": "Tạm tính",
+    "continueShopping": "Tiếp tục mua sắm",
+    "updateQuantity": "Cập nhật số lượng"
+  },
+  "checkout": {
+    "title": "Thanh toán",
+    "name": "Họ tên",
+    "namePlaceholder": "Nguyễn Văn A",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "0900000000",
+    "email": "Email (không bắt buộc)",
+    "emailPlaceholder": "email@example.com",
+    "address": "Địa chỉ giao hàng",
+    "addressPlaceholder": "Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành",
+    "note": "Ghi chú (không bắt buộc)",
+    "notePlaceholder": "Giao giờ hành chính...",
+    "paymentMethod": "Phương thức thanh toán",
+    "submit": "Đặt hàng",
+    "submitting": "Đang xử lý...",
+    "orderSummary": "Tóm tắt đơn hàng"
+  },
+  "success": {
+    "title": "Đặt hàng thành công!",
+    "subtitle": "Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được tiếp nhận.",
+    "orderCode": "Mã đơn hàng",
+    "orderStatus": "Trạng thái đơn hàng",
+    "paymentStatus": "Trạng thái thanh toán",
+    "items": "Sản phẩm",
+    "total": "Tổng cộng",
+    "backToShop": "Tiếp tục mua sắm"
+  },
+  "admin": {
+    "login": "Đăng nhập",
+    "loginTitle": "Đăng nhập quản trị",
+    "dashboard": "Tổng quan",
+    "products": "Sản phẩm",
+    "orders": "Đơn hàng",
+    "inventory": "Kho hàng",
+    "logout": "Đăng xuất",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "loggingIn": "Đang đăng nhập...",
+    "totalOrders": "Tổng đơn hàng",
+    "totalRevenue": "Doanh thu",
+    "pendingOrders": "Đơn chờ xử lý",
+    "paidOrders": "Đơn đã thanh toán",
+    "lowStock": "Sản phẩm sắp hết hàng",
+    "createProduct": "Tạo sản phẩm",
+    "editProduct": "Chỉnh sửa sản phẩm",
+    "saveProduct": "Lưu sản phẩm",
+    "saving": "Đang lưu...",
+    "updateInventory": "Cập nhật kho",
+    "updateStatus": "Cập nhật trạng thái",
+    "orderDetail": "Chi tiết đơn hàng",
+    "customerInfo": "Thông tin khách hàng",
+    "shippingAddress": "Địa chỉ giao hàng",
+    "orderItems": "Sản phẩm",
+    "orderStatus": "Trạng thái đơn hàng",
+    "paymentStatus": "Trạng thái thanh toán",
+    "viewDetail": "Xem chi tiết",
+    "edit": "Chỉnh sửa"
+  },
+  "payment": {
+    "COD": "Thanh toán khi nhận hàng",
+    "BANK_TRANSFER": "Chuyển khoản ngân hàng",
+    "MOCK_PROVIDER": "Thanh toán online (Demo)"
+  },
+  "filters": {
+    "room": "Phòng",
+    "woodType": "Loại gỗ",
+    "priceRange": "Giá",
+    "all": "Tất cả",
+    "minPrice": "Giá tối thiểu",
+    "maxPrice": "Giá tối đa",
+    "apply": "Áp dụng",
+    "reset": "Đặt lại"
+  },
+  "home": {
+    "heroTitle": "Nội thất gỗ tự nhiên cao cấp",
+    "heroSubtitle": "Crafted with passion, built to last",
+    "heroCtaShop": "Khám phá sản phẩm",
+    "featuredTitle": "Sản phẩm nổi bật",
+    "categoriesTitle": "Danh mục phòng",
+    "categories": {
+      "living_room": "Phòng khách",
+      "bedroom": "Phòng ngủ",
+      "dining_room": "Phòng ăn",
+      "office": "Văn phòng",
+      "outdoor": "Ngoài trời"
+    }
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "retry": "Thử lại",
+    "back": "Quay lại",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "search": "Tìm kiếm",
+    "page": "Trang",
+    "of": "trong",
+    "previous": "Trước",
+    "next": "Tiếp"
+  },
+  "orderStatus": {
+    "PENDING_PAYMENT": "Chờ thanh toán",
+    "PAID": "Đã thanh toán",
+    "PROCESSING": "Đang xử lý",
+    "SHIPPING": "Đang giao",
+    "DELIVERED": "Đã giao",
+    "CANCELLED": "Đã hủy"
+  },
+  "paymentStatus": {
+    "UNPAID": "Chưa thanh toán",
+    "PENDING": "Đang chờ",
+    "PAID": "Đã thanh toán",
+    "FAILED": "Thất bại",
+    "CANCELLED": "Đã hủy"
+  }
+}

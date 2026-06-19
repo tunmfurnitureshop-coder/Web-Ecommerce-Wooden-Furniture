@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wood_furniture_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wood_furniture
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: wood_furniture_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/wood_furniture
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    container_name: wood_furniture_frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      WATCHPACK_POLLING: "true"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev"
+
+volumes:
+  postgres_data:
