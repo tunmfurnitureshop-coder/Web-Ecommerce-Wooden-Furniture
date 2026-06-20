@@ -129,3 +129,30 @@ async def send_order_cancelled_email(db: AsyncSession, order):
         await _send_and_log(db, order.customer_email,
                             f"Đơn hàng {order.order_code} đã bị huỷ",
                             "order_cancelled_customer", ctx, order_id=order.id)
+
+
+async def send_verification_email(db: AsyncSession, customer, verification_url: str):
+    ctx = {
+        "customer_name": customer.full_name or customer.email,
+        "verification_url": verification_url,
+    }
+    await _send_and_log(db, customer.email,
+                        "Xác minh địa chỉ email của bạn",
+                        "customer_verify_email", ctx)
+
+
+async def send_password_reset_email(db: AsyncSession, customer, reset_url: str):
+    ctx = {
+        "customer_name": customer.full_name or customer.email,
+        "reset_url": reset_url,
+    }
+    await _send_and_log(db, customer.email,
+                        "Đặt lại mật khẩu của bạn",
+                        "customer_reset_password", ctx)
+
+
+async def send_password_changed_email(db: AsyncSession, customer):
+    ctx = {"customer_name": customer.full_name or customer.email}
+    await _send_and_log(db, customer.email,
+                        "Mật khẩu của bạn đã được thay đổi",
+                        "customer_password_changed", ctx)

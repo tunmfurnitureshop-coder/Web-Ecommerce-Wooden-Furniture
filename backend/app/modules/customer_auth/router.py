@@ -10,8 +10,15 @@ from app.modules.customer_auth.models import Customer
 from app.modules.customer_auth.schemas import (
     RegisterRequest, LoginRequest,
     RegisterResponse, TokenResponse, RefreshTokenResponse,
+    VerifyEmailRequest, ForgotPasswordRequest, ResetPasswordRequest, MessageResponse,
 )
-from app.modules.customer_auth.service import _create_customer_access_token, _customer_to_out
+from app.modules.customer_auth.service import (
+    _create_customer_access_token, _customer_to_out, create_one_time_token,
+)
+from app.modules.notification.service import (
+    send_verification_email, send_password_reset_email, send_password_changed_email,
+)
+from app.shared.enums import CustomerTokenType
 
 router = APIRouter(prefix="/customer/auth", tags=["customer-auth"])
 
@@ -40,6 +47,15 @@ def _clear_refresh_cookie(response: Response) -> None:
 @router.post("/register", response_model=RegisterResponse, status_code=201)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     customer = await service.register_customer(db, body)
+    raw_token = await create_one_time_token(
+        db, customer.id, CustomerTokenType.EMAIL_VERIFICATION,
+        settings.EMAIL_VERIFICATION_EXPIRE_HOURS,
+    )
+    verification_url = f"{settings.FRONTEND_BASE_URL}/vi/verify-email?token={raw_token}"
+    try:
+        await send_verification_email(db, customer, verification_url)
+    except Exception:
+        pass
     await db.commit()
     return RegisterResponse(
         customer=_customer_to_out(customer),
@@ -78,3 +94,37 @@ async def logout(
     await service.logout_customer(db, customer.id, raw_token)
     await db.commit()
     _clear_refresh_cookie(response)
+
+
+@router.post("/verify-email", response_model=MessageResponse)
+async def verify_email(body: VerifyEmailRequest, db: AsyncSession = Depends(get_db)):
+    await service.verify_email(db, body.token)
+    await db.commit()
+    return MessageResponse(message="Email verified successfully.")
+
+
+@router.post("/forgot-password", response_model=MessageResponse)
+async def forgot_password(body: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
+    result = await service.forgot_password(db, body.email)
+    if result:
+        customer, raw_token = result
+        reset_url = f"{settings.FRONTEND_BASE_URL}/vi/reset-password?token={raw_token}"
+        try:
+            await send_password_reset_email(db, customer, reset_url)
+        except Exception:
+            pass
+        await db.commit()
+    return MessageResponse(
+        message="If the email exists, password reset instructions have been sent."
+    )
+
+
+@router.post("/reset-password", response_model=MessageResponse)
+async def reset_password(body: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+    customer = await service.reset_password(db, body.token, body.newPassword)
+    try:
+        await send_password_changed_email(db, customer)
+    except Exception:
+        pass
+    await db.commit()
+    return MessageResponse(message="Password has been reset successfully.")

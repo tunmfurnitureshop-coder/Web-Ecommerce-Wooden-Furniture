@@ -36,3 +36,20 @@ class TokenResponse(BaseModel):
 class RefreshTokenResponse(BaseModel):
     accessToken: str
     tokenType: str = "bearer"
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    newPassword: str
+
+
+class MessageResponse(BaseModel):
+    message: str

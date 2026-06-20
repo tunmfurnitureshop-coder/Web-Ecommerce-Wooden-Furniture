@@ -13,7 +13,7 @@ from app.core.security import hash_password, verify_password, create_access_toke
 from app.core.exceptions import conflict, unauthorized, AppException
 from app.modules.customer_auth.models import Customer, CustomerAuthToken
 from app.modules.customer_auth.schemas import RegisterRequest, LoginRequest, CustomerPublicOut
-from app.shared.enums import CustomerStatus, CustomerTokenType
+from app.shared.enums import CustomerStatus, CustomerTokenType, OrderStatus
 
 
 def _validate_password(password: str) -> None:
@@ -140,3 +140,103 @@ async def logout_customer(db: AsyncSession, customer_id: str, raw_token: Optiona
         )
         .values(revoked_at=datetime.now(timezone.utc))
     )
+
+
+async def create_one_time_token(
+    db: AsyncSession,
+    customer_id: str,
+    token_type: CustomerTokenType,
+    expire_hours: int,
+) -> str:
+    raw = secrets.token_urlsafe(32)
+    token = CustomerAuthToken(
+        id=str(uuid.uuid4()),
+        customer_id=customer_id,
+        token_type=token_type,
+        token_hash=_hash_token(raw),
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=expire_hours),
+    )
+    db.add(token)
+    return raw
+
+
+async def _find_valid_one_time_token(
+    db: AsyncSession, raw_token: str, token_type: CustomerTokenType
+) -> CustomerAuthToken:
+    token_hash = _hash_token(raw_token)
+    result = await db.execute(
+        select(CustomerAuthToken).where(
+            CustomerAuthToken.token_hash == token_hash,
+            CustomerAuthToken.token_type == token_type,
+            CustomerAuthToken.used_at.is_(None),
+            CustomerAuthToken.revoked_at.is_(None),
+            CustomerAuthToken.expires_at > datetime.now(timezone.utc),
+        )
+    )
+    row = result.scalar_one_or_none()
+    if not row:
+        raise AppException(400, "INVALID_TOKEN", "Token is invalid or has expired.")
+    return row
+
+
+async def _auto_claim_guest_orders(db: AsyncSession, customer: Customer) -> int:
+    from app.modules.order.models import Order
+    result = await db.execute(
+        select(Order).where(
+            Order.customer_id.is_(None),
+            Order.guest_email == customer.email,
+            Order.guest_order_claimed_at.is_(None),
+        )
+    )
+    orders = result.scalars().all()
+    now = datetime.now(timezone.utc)
+    for order in orders:
+        order.customer_id = customer.id
+        order.guest_order_claimed_at = now
+    return len(orders)
+
+
+async def verify_email(db: AsyncSession, raw_token: str) -> Customer:
+    token_row = await _find_valid_one_time_token(db, raw_token, CustomerTokenType.EMAIL_VERIFICATION)
+    customer = await db.get(Customer, token_row.customer_id)
+    if not customer:
+        raise AppException(400, "INVALID_TOKEN", "Token is invalid or has expired.")
+
+    customer.is_email_verified = True
+    token_row.used_at = datetime.now(timezone.utc)
+    await _auto_claim_guest_orders(db, customer)
+    return customer
+
+
+async def forgot_password(db: AsyncSession, email: str) -> Optional[Tuple[Customer, str]]:
+    customer = await _find_by_email(db, email)
+    if not customer:
+        return None
+    raw = await create_one_time_token(
+        db, customer.id, CustomerTokenType.PASSWORD_RESET,
+        settings.PASSWORD_RESET_EXPIRE_HOURS,
+    )
+    return customer, raw
+
+
+async def reset_password(db: AsyncSession, raw_token: str, new_password: str) -> Customer:
+    _validate_password(new_password)
+    token_row = await _find_valid_one_time_token(db, raw_token, CustomerTokenType.PASSWORD_RESET)
+    customer = await db.get(Customer, token_row.customer_id)
+    if not customer:
+        raise AppException(400, "INVALID_TOKEN", "Token is invalid or has expired.")
+
+    customer.password_hash = hash_password(new_password)
+    token_row.used_at = datetime.now(timezone.utc)
+
+    # Revoke all active refresh tokens (force re-login on all devices)
+    await db.execute(
+        update(CustomerAuthToken)
+        .where(
+            CustomerAuthToken.customer_id == customer.id,
+            CustomerAuthToken.token_type == CustomerTokenType.REFRESH,
+            CustomerAuthToken.revoked_at.is_(None),
+        )
+        .values(revoked_at=datetime.now(timezone.utc))
+    )
+    return customer
