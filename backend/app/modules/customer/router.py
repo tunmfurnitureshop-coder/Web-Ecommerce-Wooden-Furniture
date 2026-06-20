@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.modules.customer import service
+from app.modules.customer import order_service
 from app.modules.customer.schemas import (
     ProfileOut, UpdateProfileRequest,
     AddressOut, CreateAddressRequest, UpdateAddressRequest,
+)
+from app.modules.customer.order_schemas import (
+    CustomerOrderListResponse, CustomerOrderDetailOut,
+    ReorderResponse, ClaimOrdersResponse,
 )
 from app.modules.customer_auth.dependencies import require_customer
 from app.modules.customer_auth.models import Customer
@@ -79,3 +85,43 @@ async def set_default(
     address = await service.set_default_address(db, customer.id, address_id)
     await db.commit()
     return address
+
+
+@router.get("/orders", response_model=CustomerOrderListResponse)
+async def list_my_orders(
+    page: int = Query(1, ge=1),
+    pageSize: int = Query(10, ge=1, le=50),
+    status: Optional[str] = Query(None),
+    customer: Customer = Depends(require_customer),
+    db: AsyncSession = Depends(get_db),
+):
+    return await order_service.list_customer_orders(db, customer.id, page, pageSize, status)
+
+
+# NOTE: /orders/claim MUST come before /orders/{order_code} to avoid route shadowing
+@router.post("/orders/claim", response_model=ClaimOrdersResponse)
+async def claim_orders(
+    customer: Customer = Depends(require_customer),
+    db: AsyncSession = Depends(get_db),
+):
+    count = await order_service.claim_guest_orders(db, customer)
+    await db.commit()
+    return ClaimOrdersResponse(claimedOrderCount=count)
+
+
+@router.get("/orders/{order_code}", response_model=CustomerOrderDetailOut)
+async def get_my_order(
+    order_code: str,
+    customer: Customer = Depends(require_customer),
+    db: AsyncSession = Depends(get_db),
+):
+    return await order_service.get_customer_order_detail(db, customer.id, order_code)
+
+
+@router.post("/orders/{order_code}/reorder", response_model=ReorderResponse)
+async def reorder(
+    order_code: str,
+    customer: Customer = Depends(require_customer),
+    db: AsyncSession = Depends(get_db),
+):
+    return await order_service.reorder(db, customer.id, order_code)
