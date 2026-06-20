@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
+from app.core.security import decode_token
 from app.modules.order.schemas import CreateOrderRequest, CreateOrderResponse, OrderSummaryResponse, UpdateOrderStatusRequest
 from app.modules.order import service
 from app.modules.auth.dependencies import require_admin
@@ -9,10 +11,21 @@ from app.modules.auth.dependencies import require_admin
 router = APIRouter(tags=["orders"])
 admin_router = APIRouter(tags=["admin-orders"])
 
+_optional_bearer = HTTPBearer(auto_error=False)
+
 
 @router.post("/orders", response_model=CreateOrderResponse)
-async def create_order(body: CreateOrderRequest, db: AsyncSession = Depends(get_db)):
-    return await service.create_order(db, body)
+async def create_order(
+    body: CreateOrderRequest,
+    db: AsyncSession = Depends(get_db),
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(_optional_bearer),
+):
+    customer_id = None
+    if credentials:
+        payload = decode_token(credentials.credentials)
+        if payload and payload.get("role") == "customer":
+            customer_id = payload.get("sub")
+    return await service.create_order(db, body, customer_id=customer_id)
 
 
 @router.get("/orders/{order_code}", response_model=OrderSummaryResponse)

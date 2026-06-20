@@ -49,7 +49,9 @@ def _initial_statuses(payment_method: str) -> tuple:
     raise AppException(422, "VALIDATION_ERROR", "Invalid payment method.")
 
 
-async def create_order(db: AsyncSession, req: CreateOrderRequest) -> CreateOrderResponse:
+async def create_order(
+    db: AsyncSession, req: CreateOrderRequest, customer_id: Optional[str] = None
+) -> CreateOrderResponse:
     if not req.items:
         raise AppException(422, "VALIDATION_ERROR", "Cart cannot be empty.")
     if req.paymentMethod not in [m.value for m in PaymentMethod]:
@@ -101,6 +103,8 @@ async def create_order(db: AsyncSession, req: CreateOrderRequest) -> CreateOrder
         customer_email=req.customerEmail, shipping_address=req.shippingAddress, note=req.note,
         subtotal_vnd=subtotal, shipping_fee_vnd=0, total_vnd=subtotal,
         order_status=order_status, payment_status=payment_status, payment_method=req.paymentMethod,
+        customer_id=customer_id,
+        guest_email=req.customerEmail.lower() if not customer_id and req.customerEmail else None,
     )
     db.add(order)
     for d in order_items_data:
