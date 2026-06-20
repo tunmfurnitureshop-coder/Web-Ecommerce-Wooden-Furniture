@@ -1,5 +1,9 @@
 import asyncio
+import sys
 from logging.config import fileConfig
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -16,6 +20,10 @@ import app.modules.auth.models  # noqa
 import app.modules.product.models  # noqa
 import app.modules.inventory.models  # noqa
 import app.modules.order.models  # noqa
+import app.modules.customer_auth.models  # noqa
+import app.modules.customer.models  # noqa
+import app.modules.wishlist.models  # noqa
+import app.modules.review.models  # noqa
 
 target_metadata = Base.metadata
 

@@ -32,6 +32,11 @@ class Order(Base):
     latest_payment_transaction_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     payment_completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    customer_id: Mapped[Optional[str]] = mapped_column(String, ForeignKey("customers.id"), nullable=True)
+    guest_email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    guest_order_claim_token_hash: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    guest_order_claimed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

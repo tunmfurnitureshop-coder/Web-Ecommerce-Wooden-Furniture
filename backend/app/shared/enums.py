@@ -78,3 +78,21 @@ class OrderEventActorType(str, enum.Enum):
     SYSTEM = "SYSTEM"
     ADMIN = "ADMIN"
     WEBHOOK = "WEBHOOK"
+
+
+class CustomerStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    BLOCKED = "BLOCKED"
+
+
+class CustomerTokenType(str, enum.Enum):
+    REFRESH = "REFRESH"
+    PASSWORD_RESET = "PASSWORD_RESET"
+    EMAIL_VERIFICATION = "EMAIL_VERIFICATION"
+
+
+class ReviewStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    HIDDEN = "HIDDEN"

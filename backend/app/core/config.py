@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 1440
 
+    CUSTOMER_JWT_EXPIRE_MINUTES: int = 15
+    CUSTOMER_REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+    REFRESH_TOKEN_COOKIE_NAME: str = "refresh_token"
+
+    FRONTEND_BASE_URL: str = "http://localhost:3000"
+    EMAIL_VERIFICATION_EXPIRE_HOURS: int = 24
+    PASSWORD_RESET_EXPIRE_HOURS: int = 1
+
     ADMIN_EMAIL: str
     ADMIN_PASSWORD: str
 
