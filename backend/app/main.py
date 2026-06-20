@@ -15,6 +15,7 @@ from app.modules.webhook.router import router as webhook_router
 from app.modules.media.router import router as admin_media_router
 from app.modules.customer_auth.router import router as customer_auth_router
 from app.modules.customer.router import router as customer_router
+from app.modules.wishlist.router import router as wishlist_router
 # Ensure all v0.3 models are imported so SQLAlchemy can resolve string-based relationships
 import app.modules.customer.models  # noqa: F401
 import app.modules.wishlist.models  # noqa: F401
@@ -60,3 +61,4 @@ app.include_router(admin_payment_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(admin_media_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(customer_auth_router, prefix=API_PREFIX)
 app.include_router(customer_router, prefix=API_PREFIX)
+app.include_router(wishlist_router, prefix=f"{API_PREFIX}/customer")
