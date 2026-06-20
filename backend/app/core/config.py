@@ -17,6 +17,28 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: str = "http://localhost:3000"
 
+    # payOS
+    PAYOS_CLIENT_ID: str = ""
+    PAYOS_API_KEY: str = ""
+    PAYOS_CHECKSUM_KEY: str = ""
+    PAYOS_RETURN_URL: str = "http://localhost:3000/vi/checkout/return"
+    PAYOS_CANCEL_URL: str = "http://localhost:3000/vi/checkout/cancel"
+    PAYOS_WEBHOOK_URL: str = "http://localhost:8000/api/v1/webhooks/payos"
+
+    # R2
+    R2_ACCOUNT_ID: str = ""
+    R2_ACCESS_KEY_ID: str = ""
+    R2_SECRET_ACCESS_KEY: str = ""
+    R2_BUCKET_NAME: str = ""
+    R2_ENDPOINT_URL: str = ""
+    R2_PUBLIC_BASE_URL: str = ""
+
+    # Email
+    EMAIL_PROVIDER: str = "console"
+    RESEND_API_KEY: str = ""
+    EMAIL_FROM: str = "Wood Furniture <no-reply@example.com>"
+    ADMIN_NOTIFICATION_EMAIL: str = "admin@example.com"
+
     @property
     def cors_origins_list(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",")]

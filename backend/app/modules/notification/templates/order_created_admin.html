@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Đơn hàng mới</title></head>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+<h2 style="color:#5C4033">Đơn hàng mới {{ order_code }}</h2>
+<p>Bạn có một đơn hàng mới.</p>
+<table style="width:100%;border-collapse:collapse">
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Mã đơn hàng</strong></td><td style="padding:8px;border:1px solid #ddd">{{ order_code }}</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Khách hàng</strong></td><td style="padding:8px;border:1px solid #ddd">{{ customer_name }}</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Tổng tiền</strong></td><td style="padding:8px;border:1px solid #ddd">{{ total_vnd }} VND</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Phương thức thanh toán</strong></td><td style="padding:8px;border:1px solid #ddd">{{ payment_method }}</td></tr>
+</table>
+<p><a href="{{ admin_order_url }}">Xem chi tiết đơn hàng</a></p>
+</body>
+</html>

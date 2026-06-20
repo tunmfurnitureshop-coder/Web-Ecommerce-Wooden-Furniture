@@ -44,6 +44,7 @@ services:
       - ./frontend/.env.local
     environment:
       WATCHPACK_POLLING: "true"
+      BACKEND_API_URL: http://wood_furniture_backend:8000
     depends_on:
       - backend
     volumes:

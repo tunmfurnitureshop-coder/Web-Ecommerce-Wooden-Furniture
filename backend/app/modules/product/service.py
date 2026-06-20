@@ -154,6 +154,19 @@ async def get_product_detail(db: AsyncSession, slug: str, locale: str = "vi") ->
             priceDeltaVnd=so.price_delta_vnd
         ))
 
+    from app.modules.media.models import ProductImage
+    from app.modules.product.schemas import ProductImageItem
+    img_rows = (await db.execute(
+        select(ProductImage).where(ProductImage.product_id == product.id).order_by(ProductImage.sort_order)
+    )).scalars().all()
+    image_items = [
+        ProductImageItem(
+            id=img.id, imageUrl=img.image_url, altText=img.alt_text,
+            sortOrder=img.sort_order, isPrimary=img.is_primary, linkedFinishCode=img.linked_finish_code,
+        )
+        for img in img_rows
+    ]
+
     return ProductDetailOut(
         id=product.id, sku=product.sku,
         name=display_trans.name, slug=display_trans.slug,
@@ -162,6 +175,7 @@ async def get_product_detail(db: AsyncSession, slug: str, locale: str = "vi") ->
         basePriceVnd=product.base_price_vnd,
         primaryImageUrl=product.primary_image_url,
         availableOptions=AvailableOptions(woodTypes=wood_outs, finishes=finish_outs, sizes=size_outs),
+        images=image_items,
     )
 
 
@@ -189,6 +203,31 @@ async def admin_list_products(db: AsyncSession) -> AdminProductListResponse:
             ),
         ))
     return AdminProductListResponse(items=items)
+
+
+async def admin_get_product(db: AsyncSession, product_id: str) -> AdminProductItem:
+    result = await db.execute(
+        select(Product).where(Product.id == product_id).options(
+            selectinload(Product.translations),
+            selectinload(Product.inventory),
+        )
+    )
+    product = result.scalar_one_or_none()
+    if not product:
+        raise not_found("Product")
+    vi_trans = _get_translation(product.translations, "vi")
+    inv = product.inventory
+    return AdminProductItem(
+        id=product.id, sku=product.sku,
+        nameVi=vi_trans.name if vi_trans else product.sku,
+        basePriceVnd=product.base_price_vnd,
+        status=product.status,
+        inventory=InventoryOut(
+            totalQty=inv.total_qty if inv else 0,
+            reservedQty=inv.reserved_qty if inv else 0,
+            availableQty=inv.available_qty if inv else 0,
+        ),
+    )
 
 
 async def create_product(db: AsyncSession, body: CreateProductRequest) -> dict:

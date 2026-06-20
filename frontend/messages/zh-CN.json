@@ -86,12 +86,14 @@
     "orderStatus": "订单状态",
     "paymentStatus": "支付状态",
     "viewDetail": "查看详情",
-    "edit": "编辑"
+    "edit": "编辑",
+    "payments": "支付"
   },
   "payment": {
     "COD": "货到付款",
     "BANK_TRANSFER": "银行转账",
-    "MOCK_PROVIDER": "在线支付（演示）"
+    "MOCK_PROVIDER": "在线支付（演示）",
+    "PAYOS": "PayOS支付"
   },
   "filters": {
     "room": "房间",
@@ -144,6 +146,7 @@
     "PENDING": "待处理",
     "PAID": "已付款",
     "FAILED": "失败",
-    "CANCELLED": "已取消"
+    "CANCELLED": "已取消",
+    "EXPIRED": "已过期"
   }
 }

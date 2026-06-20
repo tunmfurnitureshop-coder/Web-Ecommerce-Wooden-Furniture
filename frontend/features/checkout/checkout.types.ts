@@ -1,4 +1,4 @@
-export type PaymentMethod = "COD" | "BANK_TRANSFER" | "MOCK_PROVIDER";
+export type PaymentMethod = "COD" | "BANK_TRANSFER" | "MOCK_PROVIDER" | "PAYOS";
 
 export interface CheckoutFormData {
   customerName: string;
@@ -27,8 +27,25 @@ export interface CreateOrderResponse {
   orderCode: string;
   orderStatus: string;
   paymentStatus: string;
+  paymentMethod: string;
   totalVnd: number;
   currency: string;
+  checkoutUrl?: string;
+  paymentTransactionId?: string;
+}
+
+export interface OrderPaymentStatus {
+  orderCode: string;
+  paymentStatus: string;
+  orderStatus: string;
+  paymentMethod: string;
+  latestTransaction: {
+    id: string;
+    provider: string;
+    status: string;
+    amountVnd: number;
+    paidAt: string | null;
+  } | null;
 }
 
 export interface OrderSummary {

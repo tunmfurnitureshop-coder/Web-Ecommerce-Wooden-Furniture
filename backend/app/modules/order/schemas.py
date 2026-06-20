@@ -23,8 +23,11 @@ class CreateOrderResponse(BaseModel):
     orderCode: str
     orderStatus: str
     paymentStatus: str
+    paymentMethod: str
     totalVnd: int
     currency: str = "VND"
+    checkoutUrl: Optional[str] = None
+    paymentTransactionId: Optional[str] = None
 
 
 class OrderItemOut(BaseModel):
@@ -52,3 +55,7 @@ class OrderSummaryResponse(BaseModel):
 class UpdateOrderStatusRequest(BaseModel):
     orderStatus: Optional[str] = None
     paymentStatus: Optional[str] = None
+
+
+class ConfirmManualPaymentRequest(BaseModel):
+    note: Optional[str] = None

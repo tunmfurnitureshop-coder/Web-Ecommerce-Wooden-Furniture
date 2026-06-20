@@ -10,8 +10,11 @@ from app.modules.cart.router import router as cart_router
 from app.modules.order.router import router as order_router, admin_router as admin_order_router
 from app.modules.inventory.router import router as admin_inventory_router
 from app.modules.admin.router import router as admin_dashboard_router
+from app.modules.payment.router import router as admin_payment_router
+from app.modules.webhook.router import router as webhook_router
+from app.modules.media.router import router as admin_media_router
 
-app = FastAPI(title=settings.APP_NAME, version="0.1.0")
+app = FastAPI(title=settings.APP_NAME, version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,8 +44,11 @@ app.include_router(product_router, prefix=API_PREFIX)
 app.include_router(pricing_router, prefix=API_PREFIX)
 app.include_router(cart_router, prefix=API_PREFIX)
 app.include_router(order_router, prefix=API_PREFIX)
+app.include_router(webhook_router, prefix=API_PREFIX)
 app.include_router(auth_router, prefix=API_PREFIX)
 app.include_router(admin_product_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(admin_order_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(admin_inventory_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(admin_dashboard_router, prefix=f"{API_PREFIX}/admin")
+app.include_router(admin_payment_router, prefix=f"{API_PREFIX}/admin")
+app.include_router(admin_media_router, prefix=f"{API_PREFIX}/admin")

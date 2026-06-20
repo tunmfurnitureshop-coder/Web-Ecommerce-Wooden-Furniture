@@ -86,12 +86,14 @@
     "orderStatus": "Trạng thái đơn hàng",
     "paymentStatus": "Trạng thái thanh toán",
     "viewDetail": "Xem chi tiết",
-    "edit": "Chỉnh sửa"
+    "edit": "Chỉnh sửa",
+    "payments": "Thanh toán"
   },
   "payment": {
     "COD": "Thanh toán khi nhận hàng",
     "BANK_TRANSFER": "Chuyển khoản ngân hàng",
-    "MOCK_PROVIDER": "Thanh toán online (Demo)"
+    "MOCK_PROVIDER": "Thanh toán online (Demo)",
+    "PAYOS": "Thanh toán qua PayOS"
   },
   "filters": {
     "room": "Phòng",
@@ -144,6 +146,7 @@
     "PENDING": "Đang chờ",
     "PAID": "Đã thanh toán",
     "FAILED": "Thất bại",
-    "CANCELLED": "Đã hủy"
+    "CANCELLED": "Đã hủy",
+    "EXPIRED": "Hết hạn"
   }
 }

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Xác nhận đơn hàng</title></head>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+<h2 style="color:#5C4033">Xác nhận đơn hàng {{ order_code }}</h2>
+<p>Kính chào {{ customer_name }},</p>
+<p>Chúng tôi đã nhận được đơn hàng của bạn.</p>
+<table style="width:100%;border-collapse:collapse">
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Mã đơn hàng</strong></td><td style="padding:8px;border:1px solid #ddd">{{ order_code }}</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Tổng tiền</strong></td><td style="padding:8px;border:1px solid #ddd">{{ total_vnd }} VND</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Phương thức thanh toán</strong></td><td style="padding:8px;border:1px solid #ddd">{{ payment_method }}</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Trạng thái đơn hàng</strong></td><td style="padding:8px;border:1px solid #ddd">{{ order_status }}</td></tr>
+</table>
+<p>Cảm ơn bạn đã tin tưởng Wood Furniture!</p>
+</body>
+</html>

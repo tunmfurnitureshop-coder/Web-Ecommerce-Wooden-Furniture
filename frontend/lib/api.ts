@@ -1,4 +1,8 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+// Server-side uses BACKEND_API_URL (internal Docker hostname); browser uses NEXT_PUBLIC_API_BASE_URL
+const BASE_URL =
+  typeof window === "undefined"
+    ? (process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000")
+    : (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000");
 
 export class ApiError extends Error {
   constructor(
@@ -54,4 +58,7 @@ export const api = {
       body: JSON.stringify(body),
       headers,
     }),
+
+  delete: <T = void>(path: string, headers?: Record<string, string>) =>
+    request<T>(path, { method: "DELETE", headers }),
 };

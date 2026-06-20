@@ -89,6 +89,37 @@ export interface AdminOrderListResponse {
   total: number;
 }
 
+export interface AdminPaymentTx {
+  id: string;
+  provider: string;
+  status: string;
+  amountVnd: number;
+  providerOrderCode: string | null;
+  checkoutUrl: string | null;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminOrderEvent {
+  id: string;
+  eventType: string;
+  actorType: string;
+  oldValue: Record<string, unknown> | null;
+  newValue: Record<string, unknown> | null;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface AdminEmailLog {
+  id: string;
+  recipientEmail: string;
+  subject: string;
+  templateKey: string;
+  status: string;
+  sentAt: string | null;
+  createdAt: string;
+}
+
 export interface AdminOrderDetail {
   id: string;
   orderCode: string;
@@ -105,6 +136,9 @@ export interface AdminOrderDetail {
   paymentMethod: string;
   createdAt: string;
   items: AdminOrderItem[];
+  paymentTransactions: AdminPaymentTx[];
+  orderEvents: AdminOrderEvent[];
+  emailLogs: AdminEmailLog[];
 }
 
 export interface AdminOrderItem {
@@ -123,6 +157,10 @@ export interface DashboardSummary {
   pendingOrders: number;
   paidOrders: number;
   lowStockProducts: number;
+  cancelledOrders: number;
+  newOrdersToday: number;
+  revenueTodayVnd: number;
+  failedPayments: number;
 }
 
 export interface AdminOrderFilters {

@@ -1,24 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "@/lib/i18n";
+import { useRouter, usePathname } from "@/lib/i18n";
 import { getAdminToken } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/admin/login";
+  // null = pending check, false = no token (redirecting), true = authenticated
+  const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (isLoginPage) {
+      // Reset auth state so navigating away from login always re-validates
+      setAuthed(null);
+      return;
+    }
     if (!getAdminToken()) {
+      setAuthed(false);
       router.push("/admin/login");
     } else {
-      setChecked(true);
+      setAuthed(true);
     }
-  }, [router]);
+  }, [router, isLoginPage]);
 
-  if (!checked) return null;
+  // Login page renders directly — no auth gate needed
+  if (isLoginPage) return <>{children}</>;
+
+  // Block children until token is confirmed to prevent unauthenticated API calls
+  if (authed !== true) return null;
 
   return (
     <div className="flex h-screen overflow-hidden">

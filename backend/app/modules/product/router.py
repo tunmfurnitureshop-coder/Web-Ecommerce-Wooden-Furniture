@@ -6,7 +6,7 @@ from app.modules.product import service
 from app.modules.product.schemas import (
     ProductCatalogResponse, ProductDetailOut,
     CreateProductRequest, UpdateProductRequest,
-    AdminProductListResponse
+    AdminProductListResponse, AdminProductItem
 )
 from app.modules.auth.dependencies import require_admin
 
@@ -39,6 +39,15 @@ async def admin_list_products(
     _: dict = Depends(require_admin),
 ):
     return await service.admin_list_products(db)
+
+
+@admin_router.get("/products/{product_id}", response_model=AdminProductItem)
+async def admin_get_product(
+    product_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
+):
+    return await service.admin_get_product(db, product_id)
 
 
 @admin_router.post("/products")

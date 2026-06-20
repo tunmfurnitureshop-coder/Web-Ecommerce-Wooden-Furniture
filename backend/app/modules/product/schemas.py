@@ -53,6 +53,15 @@ class AvailableOptions(BaseModel):
     sizes: List[SizeOptionOut]
 
 
+class ProductImageItem(BaseModel):
+    id: str
+    imageUrl: str
+    altText: Optional[str] = None
+    sortOrder: int
+    isPrimary: bool
+    linkedFinishCode: Optional[str] = None
+
+
 class ProductDetailOut(BaseModel):
     id: str
     sku: str
@@ -64,6 +73,7 @@ class ProductDetailOut(BaseModel):
     basePriceVnd: int
     primaryImageUrl: Optional[str] = None
     availableOptions: AvailableOptions
+    images: List["ProductImageItem"] = []
 
 
 class TranslationIn(BaseModel):

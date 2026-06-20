@@ -13,15 +13,26 @@ import type { ProductDetail, PricingQuoteResponse } from "@/features/product/pro
 interface Props {
   product: ProductDetail;
   locale: string;
+  onImageChange?: (url: string | null) => void;
+  onFinishChange?: (finishCode: string) => void;
 }
 
-export function ProductOptionSelector({ product, locale }: Props) {
+export function ProductOptionSelector({ product, locale, onImageChange, onFinishChange }: Props) {
   const t = useTranslations("product");
   const addItem = useCartStore((s) => s.addItem);
 
   const [woodType, setWoodType] = useState(product.availableOptions.woodTypes[0]?.code ?? "");
   const [finish, setFinish] = useState(product.availableOptions.finishes[0]?.code ?? "");
   const [size, setSize] = useState(product.availableOptions.sizes[0]?.code ?? "");
+
+  function handleFinishChange(code: string) {
+    setFinish(code);
+    onFinishChange?.(code);
+    if (onImageChange) {
+      const selected = product.availableOptions.finishes.find((f) => f.code === code);
+      onImageChange(selected?.imageUrl ?? product.primaryImageUrl ?? null);
+    }
+  }
   const [quantity, setQuantity] = useState(1);
   const [quote, setQuote] = useState<PricingQuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,7 +82,7 @@ export function ProductOptionSelector({ product, locale }: Props) {
 
       <div className="space-y-2">
         <Label>{t("finish")}</Label>
-        <Select value={finish} onValueChange={setFinish}>
+        <Select value={finish} onValueChange={handleFinishChange}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             {product.availableOptions.finishes.map((fo) => (

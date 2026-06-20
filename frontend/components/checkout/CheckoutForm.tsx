@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 
-const PAYMENT_METHODS = ["COD", "BANK_TRANSFER", "MOCK_PROVIDER"] as const;
+const PAYMENT_METHODS = ["COD", "BANK_TRANSFER", "PAYOS"] as const;
 
 export function CheckoutForm() {
   const t = useTranslations("checkout");
@@ -63,7 +63,14 @@ export function CheckoutForm() {
         })),
       });
       clearCart();
-      router.push(`/success?orderCode=${res.orderCode}`);
+      if (res.checkoutUrl) {
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("pendingOrderCode", res.orderCode);
+        }
+        window.location.href = res.checkoutUrl;
+      } else {
+        router.push(`/success?orderCode=${res.orderCode}`);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Đặt hàng thất bại";
       setErrors({ submit: msg });
@@ -114,10 +121,15 @@ export function CheckoutForm() {
           {PAYMENT_METHODS.map((m) => (
             <div key={m} className="flex items-center gap-2">
               <RadioGroupItem value={m} id={m} />
-              <Label htmlFor={m}>{tPayment(m)}</Label>
+              <Label htmlFor={m}>{tPayment(m as never)}</Label>
             </div>
           ))}
         </RadioGroup>
+        {form.paymentMethod === "PAYOS" && (
+          <p className="text-xs text-muted-foreground">
+            Bạn sẽ được chuyển đến trang thanh toán PayOS an toàn.
+          </p>
+        )}
       </div>
 
       {errors.cart && <p className="text-destructive text-sm">{errors.cart}</p>}

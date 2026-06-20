@@ -28,6 +28,10 @@ class Order(Base):
     payment_status: Mapped[str] = mapped_column(String, nullable=False)
     payment_method: Mapped[str] = mapped_column(String, nullable=False)
 
+    payment_provider: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    latest_payment_transaction_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    payment_completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

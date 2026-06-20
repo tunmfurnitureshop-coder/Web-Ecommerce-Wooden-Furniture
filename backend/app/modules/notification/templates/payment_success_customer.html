@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Thanh toán thành công</title></head>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+<h2 style="color:#2e7d32">Thanh toán thành công cho đơn hàng {{ order_code }}</h2>
+<p>Kính chào {{ customer_name }},</p>
+<p>Thanh toán của bạn đã được xác nhận thành công.</p>
+<table style="width:100%;border-collapse:collapse">
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Mã đơn hàng</strong></td><td style="padding:8px;border:1px solid #ddd">{{ order_code }}</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Số tiền</strong></td><td style="padding:8px;border:1px solid #ddd">{{ total_vnd }} VND</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd"><strong>Trạng thái thanh toán</strong></td><td style="padding:8px;border:1px solid #ddd">ĐÃ THANH TOÁN</td></tr>
+</table>
+<p>Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất!</p>
+</body>
+</html>

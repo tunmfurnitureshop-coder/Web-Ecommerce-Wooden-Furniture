@@ -44,3 +44,13 @@ async def admin_update_order_status(
     db: AsyncSession = Depends(get_db), _: dict = Depends(require_admin),
 ):
     return await service.admin_update_order_status(db, order_id, body)
+
+
+@router.get("/orders/{order_code}/payment-status")
+async def get_order_payment_status(order_code: str, db: AsyncSession = Depends(get_db)):
+    return await service.get_order_payment_status(db, order_code)
+
+
+@router.post("/orders/{order_code}/payments/retry")
+async def retry_payment(order_code: str, db: AsyncSession = Depends(get_db)):
+    return await service.retry_payment(db, order_code)

@@ -43,6 +43,15 @@ export interface SizeOption {
   priceDeltaVnd: number;
 }
 
+export interface ProductImageItem {
+  id: string;
+  imageUrl: string;
+  altText: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+  linkedFinishCode: string | null;
+}
+
 export interface ProductDetail {
   id: string;
   sku: string;
@@ -57,6 +66,7 @@ export interface ProductDetail {
     finishes: FinishOption[];
     sizes: SizeOption[];
   };
+  images: ProductImageItem[];
 }
 
 export interface PricingQuoteRequest {

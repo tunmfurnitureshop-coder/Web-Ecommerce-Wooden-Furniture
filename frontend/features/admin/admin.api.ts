@@ -84,3 +84,14 @@ export async function adminUpdateOrderStatus(
     getAuthHeaders()
   );
 }
+
+export async function adminConfirmManualPayment(
+  orderId: string,
+  note?: string
+): Promise<{ orderCode: string; paymentStatus: string; orderStatus: string }> {
+  return api.post(
+    `/api/v1/admin/orders/${orderId}/confirm-manual-payment`,
+    { note },
+    getAuthHeaders()
+  );
+}

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class DashboardSummaryResponse(BaseModel):
@@ -7,3 +8,7 @@ class DashboardSummaryResponse(BaseModel):
     pendingOrders: int
     paidOrders: int
     lowStockProducts: int
+    cancelledOrders: int
+    newOrdersToday: int
+    revenueTodayVnd: int
+    failedPayments: int
