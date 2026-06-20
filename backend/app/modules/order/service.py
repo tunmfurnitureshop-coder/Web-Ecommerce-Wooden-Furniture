@@ -206,6 +206,8 @@ async def retry_payment(db: AsyncSession, order_code: str) -> dict:
         raise AppException(422, "PAYMENT_STATUS_INVALID_TRANSITION", "Order already paid.")
     if order.order_status == OrderStatus.CANCELLED:
         raise AppException(422, "PAYMENT_STATUS_INVALID_TRANSITION", "Cannot retry cancelled order.")
+    if order.order_status == OrderStatus.DELIVERED:
+        raise AppException(422, "PAYMENT_STATUS_INVALID_TRANSITION", "Cannot retry delivered order.")
     from app.modules.payment.service import create_payment_transaction
     from app.modules.payment.payos_provider import PayOSProvider
     from app.shared.enums import PaymentTransactionStatus, OrderEventActorType
@@ -220,10 +222,18 @@ async def retry_payment(db: AsyncSession, order_code: str) -> dict:
     tx.provider_order_code = result.provider_order_code
     tx.raw_response = result.raw_response
     order.latest_payment_transaction_id = tx.id
-    await create_order_event(db, order.id, "PAYMENT_LINK_CREATED", OrderEventActorType.SYSTEM,
-                             new_value={"paymentLinkId": result.provider_payment_link_id, "retry": True})
+    order.order_status = OrderStatus.PENDING_PAYMENT
+    order.payment_status = PaymentStatus.PENDING
+    await create_order_event(db, order.id, "PAYMENT_RETRY_CREATED", OrderEventActorType.SYSTEM,
+                             new_value={"paymentLinkId": result.provider_payment_link_id})
     await db.commit()
-    return {"orderCode": order.order_code, "checkoutUrl": result.checkout_url, "paymentTransactionId": tx.id}
+    return {
+        "orderCode": order.order_code,
+        "paymentTransactionId": tx.id,
+        "checkoutUrl": result.checkout_url,
+        "paymentStatus": order.payment_status,
+        "orderStatus": order.order_status,
+    }
 
 
 async def admin_get_orders(db: AsyncSession, order_status=None, payment_status=None, payment_method=None, page=1, page_size=20):

@@ -10,7 +10,9 @@ interface Props {
 }
 
 export function ProductDetailClient({ product, locale }: Props) {
-  const [activeImage, setActiveImage] = useState<string | null>(product.primaryImageUrl);
+  const [activeImage, setActiveImage] = useState<string | null>(
+    product.primaryImageUrl ?? product.images[0]?.imageUrl ?? null
+  );
 
   function handleFinishChange(finishCode: string) {
     const linked = product.images.find((img) => img.linkedFinishCode === finishCode);

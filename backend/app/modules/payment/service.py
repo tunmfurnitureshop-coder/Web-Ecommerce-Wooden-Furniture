@@ -75,10 +75,16 @@ async def apply_payment_cancelled(db: AsyncSession, tx: PaymentTransaction, orde
         new_value={"paymentStatus": PaymentStatus.CANCELLED, "orderStatus": OrderStatus.CANCELLED},
     )
     from app.modules.inventory.models import InventoryItem
+    released = []
     for item in order.items:
         inv = (await db.execute(select(InventoryItem).where(InventoryItem.product_id == item.product_id))).scalar_one_or_none()
         if inv:
             inv.reserved_qty = max(0, inv.reserved_qty - item.quantity)
+            released.append({"productId": item.product_id, "quantity": item.quantity})
+    await create_order_event(
+        db, order.id, "INVENTORY_RESERVATION_RELEASED", OrderEventActorType.WEBHOOK,
+        new_value={"items": released},
+    )
 
 
 async def apply_payment_failed(db: AsyncSession, tx: PaymentTransaction, order: Order):

@@ -72,6 +72,13 @@ async def payos_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         await db.commit()
         return JSONResponse(status_code=200, content={"received": True})
 
+    already_cancelled = await webhook_service.check_already_cancelled(db, order)
+    if already_cancelled and parsed.status == "CANCELLED":
+        webhook_event.processing_status = WebhookProcessingStatus.IGNORED
+        webhook_event.error_message = "Already cancelled"
+        await db.commit()
+        return JSONResponse(status_code=200, content={"received": True})
+
     if parsed.status == "PAID":
         await apply_payment_success(db, tx, order)
         try:

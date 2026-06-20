@@ -98,21 +98,20 @@ async def send_order_created_emails(db: AsyncSession, order):
 
 
 async def send_payment_success_emails(db: AsyncSession, order, tx=None):
-    if await _check_already_sent(db, order.id, "payment_success_customer"):
-        return
     ctx = {
         "order_code": order.order_code, "customer_name": order.customer_name,
         "total_vnd": f"{order.total_vnd:,}", "payment_status": "PAID",
         "admin_order_url": f"http://localhost:3000/vi/admin/orders/{order.id}",
     }
     tx_id = tx.id if tx else None
-    if order.customer_email:
+    if order.customer_email and not await _check_already_sent(db, order.id, "payment_success_customer"):
         await _send_and_log(db, order.customer_email,
                             f"Thanh toán thành công cho đơn hàng {order.order_code}",
                             "payment_success_customer", ctx, order_id=order.id, tx_id=tx_id)
-    await _send_and_log(db, settings.ADMIN_NOTIFICATION_EMAIL,
-                        f"Đã nhận thanh toán cho đơn hàng {order.order_code}",
-                        "payment_success_admin", ctx, order_id=order.id, tx_id=tx_id)
+    if not await _check_already_sent(db, order.id, "payment_success_admin"):
+        await _send_and_log(db, settings.ADMIN_NOTIFICATION_EMAIL,
+                            f"Đã nhận thanh toán cho đơn hàng {order.order_code}",
+                            "payment_success_admin", ctx, order_id=order.id, tx_id=tx_id)
 
 
 async def send_payment_failed_email(db: AsyncSession, order, reason: str = "failed"):
@@ -126,7 +125,7 @@ async def send_payment_failed_email(db: AsyncSession, order, reason: str = "fail
 
 async def send_order_cancelled_email(db: AsyncSession, order):
     ctx = {"order_code": order.order_code, "customer_name": order.customer_name}
-    if order.customer_email:
+    if order.customer_email and not await _check_already_sent(db, order.id, "order_cancelled_customer"):
         await _send_and_log(db, order.customer_email,
                             f"Đơn hàng {order.order_code} đã bị huỷ",
                             "order_cancelled_customer", ctx, order_id=order.id)

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from app.modules.webhook.models import WebhookEvent
 from app.modules.order.models import Order
-from app.shared.enums import WebhookProcessingStatus, PaymentStatus
+from app.shared.enums import WebhookProcessingStatus, PaymentStatus, OrderStatus
 
 
 async def store_webhook_event(
@@ -30,3 +30,7 @@ async def store_webhook_event(
 
 async def check_already_paid(db: AsyncSession, order: Order) -> bool:
     return order.payment_status == PaymentStatus.PAID
+
+
+async def check_already_cancelled(db: AsyncSession, order: Order) -> bool:
+    return order.order_status == OrderStatus.CANCELLED
