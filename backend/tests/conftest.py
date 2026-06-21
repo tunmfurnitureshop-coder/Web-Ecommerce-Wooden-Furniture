@@ -1,11 +1,16 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
+import uuid
 import pytest
 import pytest_asyncio
+from datetime import datetime, timezone
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from app.main import app
 from app.core.database import Base, get_db
 from app.core.security import hash_password
-import uuid
 
 TEST_DB_URL = "sqlite+aiosqlite:///:memory:"
 
@@ -51,7 +56,7 @@ async def seeded_db(db_session: AsyncSession):
         SizeOption, SizeOptionTranslation, InventoryItem,
         ProductWoodType, ProductFinishOption, ProductSizeOption,
     )
-    from datetime import datetime, timezone
+    from app.modules.customer_auth.models import Customer
 
     def uid(): return str(uuid.uuid4())
     def now(): return datetime.now(timezone.utc)
@@ -83,5 +88,14 @@ async def seeded_db(db_session: AsyncSession):
     db_session.add(ProductSizeOption(id=uid(), product_id="prod1", size_option_id="so1"))
     db_session.add(InventoryItem(id=uid(), product_id="prod1", total_qty=20, reserved_qty=0, created_at=now(), updated_at=now()))
 
+    # Two verified customers + one blocked
+    cust_a = Customer(id="cust_a", email="a@example.com", password_hash=hash_password("PasswordA1"), full_name="Nguyễn Văn A", status="ACTIVE", is_email_verified=True, created_at=now(), updated_at=now())
+    cust_b = Customer(id="cust_b", email="b@example.com", password_hash=hash_password("PasswordB1"), full_name="Trần Thị B", status="ACTIVE", is_email_verified=True, created_at=now(), updated_at=now())
+    cust_blocked = Customer(id="cust_blocked", email="blocked@example.com", password_hash=hash_password("PasswordC1"), full_name="Blocked User", status="BLOCKED", is_email_verified=True, created_at=now(), updated_at=now())
+    db_session.add_all([cust_a, cust_b, cust_blocked])
+
     await db_session.commit()
-    return {"admin": admin, "product": product, "wt": wt, "fo": fo, "so": so}
+    return {"admin": admin, "product": product, "wt": wt, "fo": fo, "so": so,
+            "cust_a": cust_a, "cust_b": cust_b, "cust_blocked": cust_blocked}
+
+
