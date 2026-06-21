@@ -35,7 +35,10 @@
     "total": "合计",
     "subtotal": "小计",
     "continueShopping": "继续购物",
-    "updateQuantity": "更新数量"
+    "updateQuantity": "更新数量",
+    "securePayment": "安全支付与保障",
+    "returns30Days": "30天无忧退换",
+    "support247": "全天候客服支持"
   },
   "checkout": {
     "title": "结账",
@@ -307,7 +310,10 @@
         "timeline": "订单历史",
         "reorder": "再次购买",
         "reordering": "处理中...",
-        "reorderError": "再次购买失败"
+        "reorderError": "再次购买失败",
+        "subtotal": "小计",
+        "shippingFee": "运费",
+        "total": "合计"
       }
     }
   },

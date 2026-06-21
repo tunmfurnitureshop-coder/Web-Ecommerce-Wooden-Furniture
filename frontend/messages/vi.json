@@ -35,7 +35,10 @@
     "total": "Tổng cộng",
     "subtotal": "Tạm tính",
     "continueShopping": "Tiếp tục mua sắm",
-    "updateQuantity": "Cập nhật số lượng"
+    "updateQuantity": "Cập nhật số lượng",
+    "securePayment": "Thanh toán an toàn & bảo mật",
+    "returns30Days": "Đổi trả trong 30 ngày",
+    "support247": "Hỗ trợ 24/7"
   },
   "checkout": {
     "title": "Thanh toán",
@@ -307,7 +310,10 @@
         "timeline": "Lịch sử đơn hàng",
         "reorder": "Đặt lại",
         "reordering": "Đang xử lý...",
-        "reorderError": "Đặt lại thất bại"
+        "reorderError": "Đặt lại thất bại",
+        "subtotal": "Tạm tính",
+        "shippingFee": "Phí ship",
+        "total": "Tổng"
       }
     }
   },

@@ -122,15 +122,15 @@ export default function CartPage() {
           <div className="rounded-lg border border-border-default bg-surface p-4 flex flex-col gap-3 text-xs text-text-muted">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-success shrink-0" aria-hidden />
-              <span>Thanh toán an toàn & bảo mật</span>
+              <span>{t("securePayment")}</span>
             </div>
             <div className="flex items-center gap-2">
               <RefreshCw className="h-4 w-4 text-brand shrink-0" aria-hidden />
-              <span>Đổi trả trong 30 ngày</span>
+              <span>{t("returns30Days")}</span>
             </div>
             <div className="flex items-center gap-2">
               <HeadphonesIcon className="h-4 w-4 text-info shrink-0" aria-hidden />
-              <span>Hỗ trợ 24/7</span>
+              <span>{t("support247")}</span>
             </div>
           </div>
 

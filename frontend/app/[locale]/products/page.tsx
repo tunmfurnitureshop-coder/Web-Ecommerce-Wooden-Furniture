@@ -53,7 +53,7 @@ export default async function ProductsPage({
   const { locale } = await params;
   const sp = await searchParams;
   const t = await getTranslations("search");
-  const tHome = await getTranslations("home");
+  const tNav = await getTranslations("nav");
   const result = await getProducts(locale, sp);
   const currentPage = Number(sp.page ?? 1);
   const totalPages = Math.ceil(result.total / PAGE_SIZE);
@@ -73,7 +73,7 @@ export default async function ProductsPage({
   }));
 
   const breadcrumbs = [
-    { label: "Trang chủ", href: "/" },
+    { label: tNav("home"), href: "/" },
     { label: sp.q ? `"${sp.q}"` : t("allProducts") },
   ];
 

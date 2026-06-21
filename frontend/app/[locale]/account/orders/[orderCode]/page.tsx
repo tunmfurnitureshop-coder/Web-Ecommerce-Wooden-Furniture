@@ -91,15 +91,15 @@ export default function OrderDetailPage({ params }: Props) {
         <Divider />
         <div className="flex flex-col gap-1">
           <div className="flex justify-between text-text-secondary">
-            <span>Tạm tính</span>
+            <span>{t("subtotal")}</span>
             <span>{formatCurrency(order.subtotalVnd)}</span>
           </div>
           <div className="flex justify-between text-text-secondary">
-            <span>Phí ship</span>
+            <span>{t("shippingFee")}</span>
             <span>{formatCurrency(order.shippingFeeVnd)}</span>
           </div>
           <div className="flex justify-between font-semibold text-text-primary pt-1">
-            <span>Tổng</span>
+            <span>{t("total")}</span>
             <span>{formatCurrency(order.totalVnd)}</span>
           </div>
         </div>
