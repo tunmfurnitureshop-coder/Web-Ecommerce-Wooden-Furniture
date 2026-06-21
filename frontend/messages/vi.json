@@ -87,7 +87,8 @@
     "paymentStatus": "Trạng thái thanh toán",
     "viewDetail": "Xem chi tiết",
     "edit": "Chỉnh sửa",
-    "payments": "Thanh toán"
+    "payments": "Thanh toán",
+    "reviews": "Đánh giá"
   },
   "payment": {
     "COD": "Thanh toán khi nhận hàng",
@@ -131,7 +132,8 @@
     "page": "Trang",
     "of": "trong",
     "previous": "Trước",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "results": "sản phẩm"
   },
   "orderStatus": {
     "PENDING_PAYMENT": "Chờ thanh toán",
@@ -249,5 +251,83 @@
         "reorderError": "Đặt lại thất bại"
       }
     }
+  },
+  "wishlist": {
+    "title": "Danh sách yêu thích",
+    "add": "Thêm vào yêu thích",
+    "remove": "Xóa khỏi yêu thích",
+    "empty": "Danh sách yêu thích trống",
+    "emptyHint": "Nhấn vào icon trái tim để thêm sản phẩm yêu thích",
+    "viewProduct": "Xem sản phẩm",
+    "loginRequired": "Vui lòng đăng nhập để lưu sản phẩm yêu thích"
+  },
+  "reviews": {
+    "title": "Đánh giá sản phẩm",
+    "noReviews": "Chưa có đánh giá nào",
+    "verifiedPurchase": "Đã mua hàng",
+    "loginToReview": "Đăng nhập để viết đánh giá",
+    "notEligible": "Bạn chưa mua sản phẩm này.",
+    "alreadyReviewed": "Bạn đã đánh giá sản phẩm này.",
+    "count": "đánh giá",
+    "form": {
+      "submit": "Viết đánh giá",
+      "rating": "Điểm đánh giá",
+      "ratingRequired": "Vui lòng chọn điểm đánh giá",
+      "title": "Tiêu đề (không bắt buộc)",
+      "titlePlaceholder": "Tóm tắt đánh giá của bạn",
+      "content": "Nội dung (không bắt buộc)",
+      "contentPlaceholder": "Chia sẻ trải nghiệm chi tiết...",
+      "submitLabel": "Gửi đánh giá",
+      "submitting": "Đang gửi...",
+      "success": "Đánh giá đã được gửi và đang chờ phê duyệt.",
+      "error": "Gửi đánh giá thất bại"
+    }
+  },
+  "search": {
+    "placeholder": "Tìm kiếm sản phẩm...",
+    "resultsFor": "Kết quả cho",
+    "allProducts": "Tất cả sản phẩm",
+    "noResults": "Không tìm thấy sản phẩm",
+    "noResultsFor": "Không tìm thấy kết quả cho",
+    "noResultsHint": "Hãy thử từ khóa khác hoặc xóa bộ lọc",
+    "clearFilters": "Xóa tất cả bộ lọc",
+    "sort": {
+      "label": "Sắp xếp",
+      "newest": "Mới nhất",
+      "priceAsc": "Giá thấp đến cao",
+      "priceDesc": "Giá cao đến thấp",
+      "ratingDesc": "Đánh giá cao nhất",
+      "relevance": "Phù hợp nhất"
+    },
+    "suggestions": {
+      "products": "Sản phẩm",
+      "categories": "Danh mục",
+      "woodTypes": "Loại gỗ"
+    }
+  },
+  "reviewStatus": {
+    "PENDING": "Chờ duyệt",
+    "APPROVED": "Đã duyệt",
+    "REJECTED": "Từ chối",
+    "HIDDEN": "Đã ẩn"
+  },
+  "adminReviews": {
+    "title": "Quản lý đánh giá",
+    "all": "Tất cả",
+    "filter": "Lọc trạng thái",
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+    "hide": "Ẩn",
+    "restore": "Hiện lại",
+    "customer": "Khách hàng",
+    "product": "Sản phẩm",
+    "rating": "Điểm",
+    "content": "Nội dung",
+    "status": "Trạng thái",
+    "date": "Ngày",
+    "actions": "Hành động",
+    "empty": "Không có đánh giá nào",
+    "updateSuccess": "Cập nhật thành công",
+    "updateError": "Cập nhật thất bại"
   }
 }

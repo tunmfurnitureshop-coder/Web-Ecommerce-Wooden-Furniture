@@ -87,7 +87,8 @@
     "paymentStatus": "支付状态",
     "viewDetail": "查看详情",
     "edit": "编辑",
-    "payments": "支付"
+    "payments": "支付",
+    "reviews": "评价"
   },
   "payment": {
     "COD": "货到付款",
@@ -131,7 +132,8 @@
     "page": "页",
     "of": "共",
     "previous": "上一页",
-    "next": "下一页"
+    "next": "下一页",
+    "results": "件商品"
   },
   "orderStatus": {
     "PENDING_PAYMENT": "待付款",
@@ -249,5 +251,83 @@
         "reorderError": "再次购买失败"
       }
     }
+  },
+  "wishlist": {
+    "title": "收藏夹",
+    "add": "加入收藏",
+    "remove": "取消收藏",
+    "empty": "收藏夹为空",
+    "emptyHint": "点击爱心图标将商品加入收藏",
+    "viewProduct": "查看商品",
+    "loginRequired": "请登录后收藏商品"
+  },
+  "reviews": {
+    "title": "商品评价",
+    "noReviews": "暂无评价",
+    "verifiedPurchase": "已购买",
+    "loginToReview": "登录后发表评价",
+    "notEligible": "您尚未购买此商品。",
+    "alreadyReviewed": "您已评价过此商品。",
+    "count": "条评价",
+    "form": {
+      "submit": "写评价",
+      "rating": "评分",
+      "ratingRequired": "请选择评分",
+      "title": "标题（选填）",
+      "titlePlaceholder": "总结您的评价",
+      "content": "内容（选填）",
+      "contentPlaceholder": "分享您的详细体验...",
+      "submitLabel": "提交评价",
+      "submitting": "提交中...",
+      "success": "评价已提交，等待审核。",
+      "error": "提交失败"
+    }
+  },
+  "search": {
+    "placeholder": "搜索商品...",
+    "resultsFor": "搜索结果",
+    "allProducts": "所有商品",
+    "noResults": "未找到商品",
+    "noResultsFor": "未找到相关结果",
+    "noResultsHint": "请尝试其他关键词或清除筛选条件",
+    "clearFilters": "清除筛选",
+    "sort": {
+      "label": "排序",
+      "newest": "最新",
+      "priceAsc": "价格从低到高",
+      "priceDesc": "价格从高到低",
+      "ratingDesc": "评分最高",
+      "relevance": "最相关"
+    },
+    "suggestions": {
+      "products": "商品",
+      "categories": "分类",
+      "woodTypes": "木材类型"
+    }
+  },
+  "reviewStatus": {
+    "PENDING": "待审核",
+    "APPROVED": "已通过",
+    "REJECTED": "已拒绝",
+    "HIDDEN": "已隐藏"
+  },
+  "adminReviews": {
+    "title": "评价管理",
+    "all": "全部",
+    "filter": "状态筛选",
+    "approve": "通过",
+    "reject": "拒绝",
+    "hide": "隐藏",
+    "restore": "恢复",
+    "customer": "客户",
+    "product": "商品",
+    "rating": "评分",
+    "content": "内容",
+    "status": "状态",
+    "date": "日期",
+    "actions": "操作",
+    "empty": "暂无评价",
+    "updateSuccess": "更新成功",
+    "updateError": "更新失败"
   }
 }

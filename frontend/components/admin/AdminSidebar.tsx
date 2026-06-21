@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/orders", key: "orders" },
   { href: "/admin/payments", key: "payments" },
   { href: "/admin/inventory", key: "inventory" },
+  { href: "/admin/reviews", key: "reviews" },
 ] as const;
 
 export function AdminSidebar() {

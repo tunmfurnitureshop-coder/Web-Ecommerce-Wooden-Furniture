@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ProductOptionSelector } from "./ProductOptionSelector";
+import { ProductReviewsSection } from "@/components/review/ProductReviewsSection";
 import type { ProductDetail, ProductImageItem } from "@/features/product/product.types";
 
 interface Props {
@@ -16,13 +17,7 @@ export function ProductDetailClient({ product, locale }: Props) {
 
   function handleFinishChange(finishCode: string) {
     const linked = product.images.find((img) => img.linkedFinishCode === finishCode);
-    if (linked) {
-      setActiveImage(linked.imageUrl);
-    }
-  }
-
-  function handleImageChange(url: string | null) {
-    setActiveImage(url);
+    if (linked) setActiveImage(linked.imageUrl);
   }
 
   const galleryImages: ProductImageItem[] = product.images.length > 0
@@ -32,67 +27,71 @@ export function ProductDetailClient({ product, locale }: Props) {
     : [];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div className="space-y-3">
-        <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-          {activeImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={activeImage}
-              alt={product.name}
-              className="w-full h-full object-cover transition-opacity duration-300"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-              No image
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="space-y-3">
+          <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+            {activeImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={activeImage}
+                alt={product.name}
+                className="w-full h-full object-cover transition-opacity duration-300"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                No image
+              </div>
+            )}
+          </div>
+
+          {galleryImages.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {galleryImages.map((img) => (
+                <button
+                  key={img.id}
+                  onClick={() => setActiveImage(img.imageUrl)}
+                  className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-colors ${
+                    activeImage === img.imageUrl ? "border-primary" : "border-transparent"
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.imageUrl} alt={img.altText ?? product.name} className="w-full h-full object-cover" />
+                </button>
+              ))}
             </div>
           )}
         </div>
 
-        {galleryImages.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {galleryImages.map((img) => (
-              <button
-                key={img.id}
-                onClick={() => setActiveImage(img.imageUrl)}
-                className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-colors ${
-                  activeImage === img.imageUrl ? "border-primary" : "border-transparent"
-                }`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.imageUrl} alt={img.altText ?? product.name} className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
+        <div>
+          <p className="text-sm text-muted-foreground mb-1">{product.sku}</p>
+          <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
+          {product.description && (
+            <p className="text-muted-foreground mb-6">{product.description}</p>
+          )}
+          {product.specifications && (
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2 text-sm">Thông số kỹ thuật</h3>
+              <dl className="space-y-1">
+                {Object.entries(product.specifications).map(([k, v]) => (
+                  <div key={k} className="flex gap-2 text-sm">
+                    <dt className="text-muted-foreground capitalize">{k}:</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+          <ProductOptionSelector
+            product={product}
+            locale={locale}
+            onImageChange={setActiveImage}
+            onFinishChange={handleFinishChange}
+          />
+        </div>
       </div>
 
-      <div>
-        <p className="text-sm text-muted-foreground mb-1">{product.sku}</p>
-        <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
-        {product.description && (
-          <p className="text-muted-foreground mb-6">{product.description}</p>
-        )}
-        {product.specifications && (
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2 text-sm">Thông số kỹ thuật</h3>
-            <dl className="space-y-1">
-              {Object.entries(product.specifications).map(([k, v]) => (
-                <div key={k} className="flex gap-2 text-sm">
-                  <dt className="text-muted-foreground capitalize">{k}:</dt>
-                  <dd>{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
-        <ProductOptionSelector
-          product={product}
-          locale={locale}
-          onImageChange={handleImageChange}
-          onFinishChange={handleFinishChange}
-        />
-      </div>
-    </div>
+      <ProductReviewsSection productId={product.id} locale={locale} />
+    </>
   );
 }

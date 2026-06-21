@@ -14,11 +14,27 @@ export interface ProductListItem {
   room: RoomCategory;
 }
 
+export interface AppliedFilters {
+  room?: string | null;
+  woodType?: string | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  sort?: string | null;
+}
+
 export interface ProductListResponse {
   items: ProductListItem[];
   page: number;
   pageSize: number;
   total: number;
+  query?: string | null;
+  appliedFilters?: AppliedFilters | null;
+}
+
+export interface SuggestionsResponse {
+  products: Array<{ slug: string; name: string; primaryImageUrl: string | null }>;
+  categories: Array<{ code: string; name: string }>;
+  woodTypes: Array<{ code: string; name: string }>;
 }
 
 export interface WoodTypeOption {
@@ -94,6 +110,8 @@ export interface PricingQuoteResponse {
 
 export interface ProductCatalogFilters {
   locale: string;
+  q?: string;
+  sort?: string;
   room?: string;
   woodType?: string;
   minPrice?: number;

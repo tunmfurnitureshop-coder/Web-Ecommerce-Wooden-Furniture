@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "@/lib/i18n";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ export function ProductFilters({ currentFilters }: ProductFiltersProps) {
   const t = useTranslations("filters");
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [room, setRoom] = useState(currentFilters.room ?? "");
   const [woodType, setWoodType] = useState(currentFilters.woodType ?? "");
   const [minPrice, setMinPrice] = useState(currentFilters.minPrice ?? "");
@@ -43,6 +45,10 @@ export function ProductFilters({ currentFilters }: ProductFiltersProps) {
 
   function apply() {
     const params = new URLSearchParams();
+    const q = searchParams.get("q");
+    const sort = searchParams.get("sort");
+    if (q) params.set("q", q);
+    if (sort) params.set("sort", sort);
     if (room) params.set("room", room);
     if (woodType) params.set("woodType", woodType);
     if (minPrice) params.set("minPrice", minPrice);
@@ -51,8 +57,11 @@ export function ProductFilters({ currentFilters }: ProductFiltersProps) {
   }
 
   function reset() {
+    const params = new URLSearchParams();
+    const q = searchParams.get("q");
+    if (q) params.set("q", q);
     setRoom(""); setWoodType(""); setMinPrice(""); setMaxPrice("");
-    router.push(pathname);
+    router.push(params.toString() ? `${pathname}?${params.toString()}` : pathname);
   }
 
   return (

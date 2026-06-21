@@ -5,6 +5,7 @@ import { Link } from "@/lib/i18n";
 import { ShoppingCart, TreePine } from "lucide-react";
 import { useCartStore } from "@/features/cart/cart.store";
 import { Button } from "@/components/ui/button";
+import { SearchBar } from "@/components/search/SearchBar";
 
 export function Header() {
   const t = useTranslations();
@@ -13,8 +14,8 @@ export function Header() {
 
   return (
     <header className="border-b bg-background sticky top-0 z-40">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+      <div className="container flex h-16 items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2 font-bold text-lg shrink-0">
           <TreePine className="h-6 w-6 text-primary" />
           <span>Vin Furniture</span>
         </Link>
@@ -28,17 +29,21 @@ export function Header() {
           </Link>
         </nav>
 
-        <Link href="/cart">
-          <Button variant="outline" size="sm" className="relative">
-            <ShoppingCart className="h-4 w-4" />
-            <span className="ml-2">{t("nav.cart")}</span>
-            {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3 ml-auto">
+          <SearchBar />
+
+          <Link href="/cart">
+            <Button variant="outline" size="sm" className="relative">
+              <ShoppingCart className="h-4 w-4" />
+              <span className="ml-2">{t("nav.cart")}</span>
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+        </div>
       </div>
     </header>
   );
