@@ -19,6 +19,7 @@ from app.modules.wishlist.router import router as wishlist_router
 from app.modules.review.router import router as review_router, admin_router as admin_review_router
 from app.modules.taxonomy.router import router as taxonomy_router, admin_router as admin_taxonomy_router
 from app.modules.collection.router import router as collection_router, admin_router as admin_collection_router
+from app.modules.content.router import router as content_router, admin_router as admin_content_router
 # Ensure all models are imported so SQLAlchemy can resolve string-based relationships
 import app.modules.customer.models  # noqa: F401
 import app.modules.wishlist.models  # noqa: F401
@@ -75,3 +76,5 @@ app.include_router(taxonomy_router, prefix=API_PREFIX)
 app.include_router(admin_taxonomy_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(collection_router, prefix=API_PREFIX)
 app.include_router(admin_collection_router, prefix=f"{API_PREFIX}/admin")
+app.include_router(content_router, prefix=API_PREFIX)
+app.include_router(admin_content_router, prefix=f"{API_PREFIX}/admin")
