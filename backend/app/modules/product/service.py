@@ -386,6 +386,10 @@ async def create_product(db: AsyncSession, body: CreateProductRequest) -> dict:
 
     db.add(InventoryItem(id=str(uuid.uuid4()), product_id=product.id, total_qty=body.inventory.totalQty))
 
+    if body.tagCodes:
+        from app.modules.taxonomy.service import assign_tags_to_product
+        await assign_tags_to_product(db, product.id, body.tagCodes)
+
     await db.commit()
     return {"id": product.id, "sku": product.sku}
 
@@ -439,6 +443,12 @@ async def update_product(db: AsyncSession, product_id: str, body: UpdateProductR
 
     if body.inventory and product.inventory:
         product.inventory.total_qty = body.inventory.totalQty
+
+    if body.tagCodes is not None:
+        from app.modules.taxonomy.service import assign_tags_to_product, remove_all_product_tags
+        await remove_all_product_tags(db, product_id)
+        if body.tagCodes:
+            await assign_tags_to_product(db, product_id, body.tagCodes)
 
     await db.commit()
     return {"id": product.id}

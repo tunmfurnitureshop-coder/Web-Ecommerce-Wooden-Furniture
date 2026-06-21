@@ -113,6 +113,7 @@ class CreateProductRequest(BaseModel):
     translations: Dict[str, TranslationIn]
     optionCodes: OptionCodesIn
     inventory: InventoryIn
+    tagCodes: List[str] = []
 
 
 class UpdateProductRequest(BaseModel):
@@ -124,6 +125,7 @@ class UpdateProductRequest(BaseModel):
     translations: Optional[Dict[str, TranslationIn]] = None
     optionCodes: Optional[OptionCodesIn] = None
     inventory: Optional[InventoryIn] = None
+    tagCodes: Optional[List[str]] = None
 
 
 class InventoryOut(BaseModel):
