@@ -48,6 +48,7 @@ docker exec wood_furniture_backend python -m app.seed
 | Backend API | http://localhost:8000 |
 | API Docs | http://localhost:8000/docs |
 | Admin Panel | http://localhost:3000/vi/admin |
+| Design Tokens (dev only) | http://localhost:3000/vi/design-tokens |
 
 **Default admin credentials:** `admin@example.com` / `admin123`
 
