@@ -2,6 +2,45 @@
 
 ---
 
+## [0.4.0] — 2026-06-22
+
+### Added
+
+#### Backend
+- **Taxonomy module**: Tag system with 8 types (STYLE/MATERIAL/ROOM/USAGE/CAPACITY/PRICE_TIER/FEATURE/AVAILABILITY), admin CRUD, public listing, product assignment
+- **Collection module**: Curated product groups with DRAFT/PUBLISHED/ARCHIVED workflow, sort_order, cover images, SEO fields per locale, publish validation (≥1 active product)
+- **Content module**: Buying/material/style/care guides with Markdown body, bleach HTML sanitization, cover images, author, scheduled publishing, product/category linking
+- **Discovery module**: 5-tier related-products fallback (MANUAL_RELATED → same category → shared tags → price tier → latest), recently-viewed hydration endpoint (max 12 IDs), search synonym expansion, category/material landing pages
+- **SEO Foundation**: robots.txt (`PlainTextResponse`), sitemap.xml with hreflang alternates for vi+zh-CN, product/breadcrumb/article JSON-LD builders, canonical URL generator, `SITE_BASE_URL` config
+- **Search enhancements**: Tag filter (AND semantics per tag code), availability filter (in-stock check), rating filter (avg_rating ≥ threshold), zero-result fallback suggestions
+
+#### Frontend
+- **Discovery pages**: `/collections`, `/collections/[slug]`, `/categories/[slug]`, `/materials/[slug]`, `/guides`, `/guides/[slug]` — all with `generateMetadata` + JSON-LD
+- **Product detail page**: Added `generateMetadata`, JSON-LD, `ProductTagList`, `RelatedProductCarousel`, `RecentlyViewedSection`
+- **Design system components**: `CollectionCard/Grid`, `ProductTagList`, `RelatedProductCarousel`, `RecentlyViewedSection`, `ArticleCard/Grid/Hero/Meta`, `MarkdownRenderer`, `RelatedGuideCard`, `JsonLd`
+- **Recently-viewed**: Zustand persist store (localStorage, max 12 IDs) + API hydration client
+- **SEO infrastructure**: `frontend/app/robots.ts` and `frontend/app/sitemap.ts` (Next.js App Router conventions)
+- **Admin pages**: Tags CRUD, Collections CRUD + product picker, Content CRUD with markdown live preview
+- **`SeoMetadataForm`**: Character counters (50–60 ideal/180 max title, 140–160 ideal/320 max description)
+- **`ContentEditor`**: Locale tabs (vi/zh-CN), `MarkdownRenderer` live preview toggle
+- **Admin sidebar**: Added tags, collections, content nav links
+- **i18n**: Added `discovery` namespace (14 keys) + admin namespace extensions (35 keys) to vi.json and zh-CN.json
+
+#### Domain Package
+- Zod schemas: `TagSchema`, `TagTypeSchema`, `SeoMetadataSchema`, `SearchFilterSchema`, `RelatedProductSchema`, `RecentlyViewedHydrationSchema`
+- View models: `TagViewModel`, `CollectionCardViewModel`, `GuideCardViewModel`, `GuideDetailViewModel`, `SeoMetadataViewModel`, `RelatedProductViewModel`, `RecentlyViewedItemViewModel`, `MaterialLandingViewModel`, `CategoryLandingViewModel`
+- Mappers: taxonomy, collection, content (guide), SEO, discovery
+
+#### API Contracts
+- Regenerated OpenAPI schema and TypeScript types
+- New DTOs: `TagListResponseDTO`, `CollectionListItemDTO`, `CollectionDetailDTO`, `CollectionListResponseDTO`, `ContentListItemDTO`, `ContentDetailDTO`, `ContentListResponseDTO`, `CategoryLandingDTO`, `MaterialLandingDTO`, `SynonymDTO`
+
+#### Testing
+- 22 new backend tests: `test_taxonomy.py` (8), `test_collections.py` (7), `test_content.py` (7)
+- All 83 backend tests passing, no regressions
+
+---
+
 ## [0.3.1] — 2026-06-21
 
 ### Added
