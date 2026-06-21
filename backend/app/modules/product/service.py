@@ -13,6 +13,7 @@ from app.modules.product.schemas import (
     RoomOut, CreateProductRequest, UpdateProductRequest,
     AdminProductItem, AdminProductListResponse, InventoryOut,
     AvailableFilters, TagFilterItem, PriceRangeOut, FallbackSuggestions,
+    ProductSeoOut,
 )
 from app.core.exceptions import not_found, conflict, validation_error
 from app.shared.enums import ProductStatus, ReviewStatus
@@ -432,6 +433,36 @@ async def get_product_detail(db: AsyncSession, slug: str, locale: str = "vi") ->
         for img in img_rows
     ]
 
+    from app.modules.seo.service import resolve_seo_metadata, build_canonical_url, build_product_jsonld
+    from app.modules.review.models import ProductReview
+    seo_meta = resolve_seo_metadata(
+        display_trans, display_trans.name, display_trans.short_description, product.primary_image_url
+    )
+    canonical = build_canonical_url(locale, "products", display_trans.slug)
+    seo_meta.canonical_url = canonical
+
+    inv = product.inventory
+    in_stock = inv.available_qty > 0 if inv else False
+
+    avg_r = (await db.execute(
+        select(func.avg(ProductReview.rating), func.count(ProductReview.id))
+        .where(ProductReview.product_id == product.id, ProductReview.status == ReviewStatus.APPROVED)
+    )).first()
+    avg_rating = float(avg_r[0]) if avg_r and avg_r[0] else None
+    review_count = int(avg_r[1]) if avg_r else 0
+
+    json_ld = build_product_jsonld(
+        product_name=display_trans.name,
+        description=display_trans.short_description,
+        image_url=product.primary_image_url,
+        sku=product.sku,
+        price_vnd=product.base_price_vnd,
+        in_stock=in_stock,
+        avg_rating=avg_rating,
+        review_count=review_count,
+        canonical_url=canonical,
+    )
+
     return ProductDetailOut(
         id=product.id, sku=product.sku,
         name=display_trans.name, slug=display_trans.slug,
@@ -441,6 +472,12 @@ async def get_product_detail(db: AsyncSession, slug: str, locale: str = "vi") ->
         primaryImageUrl=product.primary_image_url,
         availableOptions=AvailableOptions(woodTypes=wood_outs, finishes=finish_outs, sizes=size_outs),
         images=image_items,
+        seo=ProductSeoOut(
+            meta_title=seo_meta.meta_title, meta_description=seo_meta.meta_description,
+            og_title=seo_meta.og_title, og_description=seo_meta.og_description,
+            og_image_url=seo_meta.og_image_url, canonical_url=seo_meta.canonical_url,
+        ),
+        jsonLd=json_ld,
     )
 
 

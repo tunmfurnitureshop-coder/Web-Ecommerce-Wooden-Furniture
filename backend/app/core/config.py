@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str
     ADMIN_PASSWORD: str
 
+    SITE_BASE_URL: str = "https://vinfurniture.vn"
     CORS_ORIGINS: str = "http://localhost:3000"
 
     # payOS

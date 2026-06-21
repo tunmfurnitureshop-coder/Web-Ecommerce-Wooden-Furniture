@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response, PlainTextResponse
 from app.core.config import settings
 from app.core.exceptions import AppException
 from app.modules.auth.router import router as auth_router
@@ -52,6 +52,161 @@ async def app_exception_handler(request: Request, exc: AppException):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/robots.txt", response_class=PlainTextResponse)
+async def robots_txt():
+    base = settings.SITE_BASE_URL.rstrip("/")
+    lines = [
+        "User-agent: *",
+        "Disallow: /vi/admin/",
+        "Disallow: /zh-CN/admin/",
+        "Disallow: /vi/account/",
+        "Disallow: /zh-CN/account/",
+        "Disallow: /vi/cart",
+        "Disallow: /zh-CN/cart",
+        "Disallow: /vi/checkout/",
+        "Disallow: /zh-CN/checkout/",
+        "Disallow: /vi/success",
+        "Disallow: /zh-CN/success",
+        f"Sitemap: {base}/sitemap.xml",
+    ]
+    return "\n".join(lines)
+
+
+@app.get("/sitemap.xml")
+async def sitemap_xml(request: Request):
+    from datetime import datetime, timezone
+    from sqlalchemy import select, and_
+    from app.core.database import get_db as _get_db
+    from app.modules.product.models import Product, ProductTranslation
+    from app.modules.product.models import RoomCategory, RoomCategoryTranslation
+    from app.modules.collection.models import Collection, CollectionTranslation
+    from app.modules.taxonomy.models import Tag, TagTranslation
+    from app.modules.content.models import ContentPost, ContentPostTranslation
+    from app.shared.enums import ProductStatus, CollectionStatus, ContentStatus
+
+    base = settings.SITE_BASE_URL.rstrip("/")
+    locales = ["vi", "zh-CN"]
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+
+    async for db in _get_db():
+        urls: list[str] = []
+
+        def _url(loc: str, lastmod: str, priority: str, changefreq: str = "weekly", alts: list = []) -> str:
+            alt_tags = "".join(
+                f'<xhtml:link rel="alternate" hreflang="{lang}" href="{href}"/>'
+                for lang, href in alts
+            )
+            return (
+                f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod>"
+                f"<changefreq>{changefreq}</changefreq><priority>{priority}</priority>"
+                f"{alt_tags}</url>"
+            )
+
+        # Active products
+        products = (await db.execute(
+            select(Product).where(Product.status == ProductStatus.ACTIVE)
+        )).scalars().all()
+        for p in products:
+            alts = []
+            for locale in locales:
+                t = (await db.execute(
+                    select(ProductTranslation).where(
+                        ProductTranslation.product_id == p.id,
+                        ProductTranslation.locale == locale,
+                    )
+                )).scalar_one_or_none()
+                if t:
+                    alts.append((locale, f"{base}/{locale}/products/{t.slug}"))
+            if alts:
+                lastmod = p.updated_at.strftime("%Y-%m-%d") if p.updated_at else today
+                urls.append(_url(alts[0][1], lastmod, "0.8", alts=alts))
+
+        # Categories
+        cats = (await db.execute(select(RoomCategory).where(RoomCategory.is_active == True))).scalars().all()  # noqa: E712
+        for cat in cats:
+            alts = []
+            for locale in locales:
+                t = (await db.execute(
+                    select(RoomCategoryTranslation).where(
+                        RoomCategoryTranslation.category_id == cat.id,
+                        RoomCategoryTranslation.locale == locale,
+                    )
+                )).scalar_one_or_none()
+                if t:
+                    alts.append((locale, f"{base}/{locale}/room/{t.slug}"))
+            if alts:
+                urls.append(_url(alts[0][1], today, "0.7", alts=alts))
+
+        # Collections
+        cols = (await db.execute(
+            select(Collection).where(Collection.status == CollectionStatus.PUBLISHED)
+        )).scalars().all()
+        for col in cols:
+            alts = []
+            for locale in locales:
+                t = (await db.execute(
+                    select(CollectionTranslation).where(
+                        CollectionTranslation.collection_id == col.id,
+                        CollectionTranslation.locale == locale,
+                    )
+                )).scalar_one_or_none()
+                if t:
+                    alts.append((locale, f"{base}/{locale}/collections/{t.slug}"))
+            if alts:
+                lm = col.updated_at.strftime("%Y-%m-%d") if col.updated_at else today
+                urls.append(_url(alts[0][1], lm, "0.7", alts=alts))
+
+        # Material tags
+        material_tags = (await db.execute(
+            select(Tag).where(Tag.type == "MATERIAL", Tag.is_active == True)  # noqa: E712
+        )).scalars().all()
+        for tag in material_tags:
+            alts = []
+            for locale in locales:
+                t = (await db.execute(
+                    select(TagTranslation).where(
+                        TagTranslation.tag_id == tag.id,
+                        TagTranslation.locale == locale,
+                    )
+                )).scalar_one_or_none()
+                if t:
+                    alts.append((locale, f"{base}/{locale}/material/{t.slug}"))
+            if alts:
+                urls.append(_url(alts[0][1], today, "0.6", alts=alts))
+
+        # Content/guides
+        posts = (await db.execute(
+            select(ContentPost).where(
+                ContentPost.status == ContentStatus.PUBLISHED,
+                ContentPost.published_at <= now,
+            )
+        )).scalars().all()
+        for post in posts:
+            alts = []
+            for locale in locales:
+                t = (await db.execute(
+                    select(ContentPostTranslation).where(
+                        ContentPostTranslation.content_post_id == post.id,
+                        ContentPostTranslation.locale == locale,
+                    )
+                )).scalar_one_or_none()
+                if t:
+                    alts.append((locale, f"{base}/{locale}/guides/{t.slug}"))
+            if alts:
+                lm = post.updated_at.strftime("%Y-%m-%d") if post.updated_at else today
+                urls.append(_url(alts[0][1], lm, "0.6", alts=alts))
+
+        xml = (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+            ' xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+            + "".join(urls)
+            + "</urlset>"
+        )
+        return Response(content=xml, media_type="application/xml")
 
 
 API_PREFIX = "/api/v1"

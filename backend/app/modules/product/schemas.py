@@ -99,6 +99,15 @@ class ProductImageItem(BaseModel):
     linkedFinishCode: Optional[str] = None
 
 
+class ProductSeoOut(BaseModel):
+    meta_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    og_title: Optional[str] = None
+    og_description: Optional[str] = None
+    og_image_url: Optional[str] = None
+    canonical_url: Optional[str] = None
+
+
 class ProductDetailOut(BaseModel):
     id: str
     sku: str
@@ -111,6 +120,8 @@ class ProductDetailOut(BaseModel):
     primaryImageUrl: Optional[str] = None
     availableOptions: AvailableOptions
     images: List["ProductImageItem"] = []
+    seo: Optional[ProductSeoOut] = None
+    jsonLd: Optional[Dict[str, Any]] = None
 
 
 class TranslationIn(BaseModel):
