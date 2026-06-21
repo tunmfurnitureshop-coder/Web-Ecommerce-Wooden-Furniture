@@ -17,12 +17,16 @@ from app.modules.customer_auth.router import router as customer_auth_router
 from app.modules.customer.router import router as customer_router
 from app.modules.wishlist.router import router as wishlist_router
 from app.modules.review.router import router as review_router, admin_router as admin_review_router
-# Ensure all v0.3 models are imported so SQLAlchemy can resolve string-based relationships
+# Ensure all models are imported so SQLAlchemy can resolve string-based relationships
 import app.modules.customer.models  # noqa: F401
 import app.modules.wishlist.models  # noqa: F401
 import app.modules.review.models  # noqa: F401
+import app.modules.taxonomy.models  # noqa: F401
+import app.modules.collection.models  # noqa: F401
+import app.modules.content.models  # noqa: F401
+import app.modules.discovery.models  # noqa: F401
 
-app = FastAPI(title=settings.APP_NAME, version="0.3.0")
+app = FastAPI(title=settings.APP_NAME, version="0.4.0")
 
 app.add_middleware(
     CORSMiddleware,

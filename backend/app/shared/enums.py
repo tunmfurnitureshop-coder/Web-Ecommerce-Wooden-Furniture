@@ -96,3 +96,41 @@ class ReviewStatus(str, enum.Enum):
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
     HIDDEN = "HIDDEN"
+
+
+class TagType(str, enum.Enum):
+    STYLE = "STYLE"
+    MATERIAL = "MATERIAL"
+    ROOM = "ROOM"
+    USAGE = "USAGE"
+    CAPACITY = "CAPACITY"
+    PRICE_TIER = "PRICE_TIER"
+    FEATURE = "FEATURE"
+    AVAILABILITY = "AVAILABILITY"
+
+
+class CollectionStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    PUBLISHED = "PUBLISHED"
+    ARCHIVED = "ARCHIVED"
+
+
+class ContentType(str, enum.Enum):
+    BUYING_GUIDE = "BUYING_GUIDE"
+    MATERIAL_GUIDE = "MATERIAL_GUIDE"
+    CARE_GUIDE = "CARE_GUIDE"
+    ROOM_INSPIRATION = "ROOM_INSPIRATION"
+    NEWS = "NEWS"
+
+
+class ContentStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    SCHEDULED = "SCHEDULED"
+    PUBLISHED = "PUBLISHED"
+    ARCHIVED = "ARCHIVED"
+
+
+class ProductRelationType(str, enum.Enum):
+    MANUAL_RELATED = "MANUAL_RELATED"
+    CROSS_SELL = "CROSS_SELL"
+    UPSELL = "UPSELL"

@@ -34,6 +34,11 @@ class RoomCategoryTranslation(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     slug: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    meta_title: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    meta_description: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
+    og_title: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    og_description: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
+    og_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
@@ -75,6 +80,11 @@ class ProductTranslation(Base):
     short_description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     specifications: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    meta_title: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    meta_description: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
+    og_title: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    og_description: Mapped[Optional[str]] = mapped_column(String(320), nullable=True)
+    og_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
