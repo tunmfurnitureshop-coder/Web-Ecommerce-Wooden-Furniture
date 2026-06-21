@@ -395,5 +395,22 @@
     "empty": "暂无评价",
     "updateSuccess": "更新成功",
     "updateError": "更新失败"
+  },
+  "discovery": {
+    "relatedProducts": "相关产品",
+    "recentlyViewed": "最近浏览",
+    "collections": "精选系列",
+    "allCollections": "全部系列",
+    "materials": "材质",
+    "guides": "购物指南",
+    "allGuides": "所有指南",
+    "filterByTag": "按风格筛选",
+    "noResults": "未找到产品",
+    "viewAllCollections": "查看全部系列",
+    "readGuide": "阅读指南",
+    "publishedOn": "发布于",
+    "featuredProducts": "精选产品",
+    "relatedGuides": "相关指南",
+    "loadMore": "加载更多"
   }
 }

@@ -395,5 +395,22 @@
     "empty": "Không có đánh giá nào",
     "updateSuccess": "Cập nhật thành công",
     "updateError": "Cập nhật thất bại"
+  },
+  "discovery": {
+    "relatedProducts": "Sản phẩm liên quan",
+    "recentlyViewed": "Đã xem gần đây",
+    "collections": "Bộ sưu tập",
+    "allCollections": "Tất cả bộ sưu tập",
+    "materials": "Chất liệu",
+    "guides": "Hướng dẫn mua sắm",
+    "allGuides": "Tất cả hướng dẫn",
+    "filterByTag": "Lọc theo phong cách",
+    "noResults": "Không tìm thấy sản phẩm",
+    "viewAllCollections": "Xem tất cả bộ sưu tập",
+    "readGuide": "Đọc hướng dẫn",
+    "publishedOn": "Đăng ngày",
+    "featuredProducts": "Sản phẩm nổi bật",
+    "relatedGuides": "Hướng dẫn liên quan",
+    "loadMore": "Tải thêm"
   }
 }

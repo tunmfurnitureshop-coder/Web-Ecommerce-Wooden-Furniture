@@ -68,6 +68,27 @@ export interface ProductImageItem {
   linkedFinishCode: string | null;
 }
 
+export interface ProductSeoOut {
+  meta_title: string | null;
+  meta_description: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  canonical_url: string | null;
+}
+
+export interface ProductTagItem {
+  code: string;
+  type: string;
+  name: string;
+  slug: string;
+}
+
+export interface ProductBreadcrumbItem {
+  name: string;
+  href: string;
+}
+
 export interface ProductDetail {
   id: string;
   sku: string;
@@ -83,6 +104,10 @@ export interface ProductDetail {
     sizes: SizeOption[];
   };
   images: ProductImageItem[];
+  seo?: ProductSeoOut | null;
+  tags?: ProductTagItem[];
+  breadcrumbs?: ProductBreadcrumbItem[];
+  jsonLd?: Record<string, unknown> | null;
 }
 
 export interface PricingQuoteRequest {
