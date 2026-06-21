@@ -199,3 +199,114 @@ export interface AdminOptionsResponse {
 export type AdminProduct = AdminProductListItem;
 export type InventoryItem = AdminInventoryItem;
 export type AdminOrder = AdminOrderListItem;
+
+// Tags
+export interface AdminTagTranslation {
+  locale: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+export interface AdminTag {
+  id: string;
+  code: string;
+  type: string;
+  is_active: boolean;
+  sort_order: number;
+  translations: AdminTagTranslation[];
+}
+export interface AdminTagListResponse { items: AdminTag[]; }
+export interface CreateTagRequest {
+  code: string;
+  type: string;
+  sort_order?: number;
+  translations: AdminTagTranslation[];
+}
+
+// Collections
+export interface AdminCollectionTranslation {
+  locale: string;
+  name: string;
+  slug: string;
+  short_description?: string;
+  description_markdown?: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_title?: string;
+  og_description?: string;
+  og_image_url?: string;
+}
+export interface AdminCollectionProduct {
+  product_id: string;
+  sort_order: number;
+  name?: string;
+  sku?: string;
+}
+export interface AdminCollection {
+  id: string;
+  code: string;
+  status: string;
+  is_featured: boolean;
+  cover_image_url?: string | null;
+  published_at?: string | null;
+  translations: AdminCollectionTranslation[];
+  products: AdminCollectionProduct[];
+}
+export interface AdminCollectionListResponse { items: AdminCollection[]; total: number; }
+export interface CreateCollectionRequest {
+  code: string;
+  status: string;
+  is_featured: boolean;
+  cover_image_url?: string;
+  translations: AdminCollectionTranslation[];
+}
+
+// Content
+export interface AdminContentTranslation {
+  locale: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  body_markdown?: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_title?: string;
+  og_description?: string;
+  og_image_url?: string;
+}
+export interface AdminContent {
+  id: string;
+  type: string;
+  status: string;
+  cover_image_url?: string | null;
+  author_name?: string | null;
+  scheduled_at?: string | null;
+  published_at?: string | null;
+  translations: AdminContentTranslation[];
+  linked_products: Array<{ product_id: string; name?: string }>;
+  linked_categories: Array<{ category_code: string; name?: string }>;
+}
+export interface AdminContentListResponse { items: AdminContent[]; total: number; }
+export interface CreateContentRequest {
+  type: string;
+  status: string;
+  cover_image_url?: string;
+  author_name?: string;
+  scheduled_at?: string;
+  translations: AdminContentTranslation[];
+}
+
+// Product Relations
+export interface AdminProductRelation {
+  id: string;
+  related_product_id: string;
+  relation_type: string;
+  sort_order: number;
+  related_name?: string;
+  related_sku?: string;
+}
+export interface CreateRelationRequest {
+  related_product_id: string;
+  relation_type: string;
+  sort_order?: number;
+}

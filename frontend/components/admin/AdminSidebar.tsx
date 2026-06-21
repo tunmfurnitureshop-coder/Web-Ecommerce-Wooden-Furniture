@@ -11,6 +11,9 @@ const NAV = [
   { href: "/admin/payments", key: "payments" },
   { href: "/admin/inventory", key: "inventory" },
   { href: "/admin/reviews", key: "reviews" },
+  { href: "/admin/tags", key: "tags" },
+  { href: "/admin/collections", key: "collections" },
+  { href: "/admin/content", key: "content" },
 ] as const;
 
 export function AdminSidebar() {
