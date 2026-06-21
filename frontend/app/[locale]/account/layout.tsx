@@ -1,13 +1,18 @@
 import { CustomerAuthGuard } from "@/components/customer/CustomerAuthGuard";
-import { CustomerAccountSidebar } from "@/components/customer/CustomerAccountSidebar";
+import { AccountSidebar } from "@/design-system/layout/account-sidebar";
+import { Container } from "@/design-system/primitives/container";
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   return (
     <CustomerAuthGuard>
-      <div className="max-w-5xl mx-auto px-6 py-8 flex gap-8">
-        <CustomerAccountSidebar />
-        <div className="flex-1 min-w-0">{children}</div>
-      </div>
+      <Container className="py-8 pb-16">
+        <div className="flex gap-8 items-start">
+          <aside className="hidden md:block w-48 shrink-0">
+            <AccountSidebar />
+          </aside>
+          <main className="flex-1 min-w-0">{children}</main>
+        </div>
+      </Container>
     </CustomerAuthGuard>
   );
 }

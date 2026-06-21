@@ -52,7 +52,22 @@
     "paymentMethod": "支付方式",
     "submit": "提交订单",
     "submitting": "处理中...",
-    "orderSummary": "订单摘要"
+    "orderSummary": "订单摘要",
+    "cancelTitle": "付款已取消",
+    "cancelDesc": "订单已保留。您可以随时重新付款。",
+    "viewCart": "查看购物车",
+    "retryPayment": "重新付款",
+    "orderCode": "订单号",
+    "returnLoading": "正在检查付款状态...",
+    "returnNotFound": "找不到订单信息。",
+    "returnPaidTitle": "付款成功！",
+    "returnPaidDesc": "我们将尽快处理您的订单。",
+    "returnPendingTitle": "等待确认",
+    "returnPendingDesc": "付款正在处理中，请稍候。",
+    "returnFailedTitle": "付款失败",
+    "returnFailedDesc": "付款未成功。您可以重试或选择其他方式。",
+    "checkStatus": "重新检查",
+    "viewOrderDetail": "查看订单详情"
   },
   "success": {
     "title": "订单成功！",
@@ -62,7 +77,9 @@
     "paymentStatus": "支付状态",
     "items": "商品",
     "total": "合计",
-    "backToShop": "继续购物"
+    "backToShop": "继续购物",
+    "notFound": "找不到订单。",
+    "viewOrders": "查看我的订单"
   },
   "admin": {
     "login": "登录",

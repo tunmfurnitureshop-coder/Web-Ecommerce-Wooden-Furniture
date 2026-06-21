@@ -1,14 +1,14 @@
 "use client";
-
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useRouter, Link } from "@/lib/i18n";
+import { useRouter, Link } from "@/i18n/navigation";
 import { useCustomerAuth } from "@/components/customer/CustomerAuthContext";
-import { Button } from "@/components/ui/button";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { Button } from "@/design-system/components/button";
+import { InlineFieldError } from "@/design-system/components/inline-field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
@@ -37,53 +37,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("email")}</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("password")}</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </div>
-            {error && <p className="text-destructive text-sm">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t("loggingIn") : t("submit")}
-            </Button>
-            <div className="flex justify-between text-sm">
-              <Link href="/forgot-password" className="text-primary hover:underline">
-                {t("forgotPassword")}
-              </Link>
-              <span className="text-muted-foreground">
-                {t("noAccount")}{" "}
-                <Link href="/register" className="text-primary hover:underline">
-                  {t("register")}
-                </Link>
-              </span>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <AuthLayout title={t("title")}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="email">{t("email")}</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="password">{t("password")}</Label>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+        </div>
+        <InlineFieldError message={error} />
+        <Button type="submit" variant="primary" fullWidth isLoading={loading}>
+          {t("submit")}
+        </Button>
+        <div className="flex justify-between text-sm">
+          <Link
+            href="/forgot-password"
+            className="text-brand hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+          >
+            {t("forgotPassword")}
+          </Link>
+          <span className="text-text-muted">
+            {t("noAccount")}{" "}
+            <Link
+              href="/register"
+              className="text-brand hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+            >
+              {t("register")}
+            </Link>
+          </span>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

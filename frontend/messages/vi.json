@@ -52,7 +52,22 @@
     "paymentMethod": "Phương thức thanh toán",
     "submit": "Đặt hàng",
     "submitting": "Đang xử lý...",
-    "orderSummary": "Tóm tắt đơn hàng"
+    "orderSummary": "Tóm tắt đơn hàng",
+    "cancelTitle": "Thanh toán đã bị hủy",
+    "cancelDesc": "Đơn hàng vẫn được giữ lại. Bạn có thể thử thanh toán lại bất cứ lúc nào.",
+    "viewCart": "Xem giỏ hàng",
+    "retryPayment": "Thanh toán lại",
+    "orderCode": "Mã đơn hàng",
+    "returnLoading": "Đang kiểm tra trạng thái thanh toán...",
+    "returnNotFound": "Không tìm thấy thông tin đơn hàng.",
+    "returnPaidTitle": "Thanh toán thành công!",
+    "returnPaidDesc": "Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.",
+    "returnPendingTitle": "Đang chờ xác nhận",
+    "returnPendingDesc": "Thanh toán đang được xử lý. Vui lòng chờ trong giây lát.",
+    "returnFailedTitle": "Thanh toán thất bại",
+    "returnFailedDesc": "Thanh toán không thành công. Bạn có thể thử lại hoặc chọn phương thức khác.",
+    "checkStatus": "Kiểm tra lại",
+    "viewOrderDetail": "Xem chi tiết đơn hàng"
   },
   "success": {
     "title": "Đặt hàng thành công!",
@@ -62,7 +77,9 @@
     "paymentStatus": "Trạng thái thanh toán",
     "items": "Sản phẩm",
     "total": "Tổng cộng",
-    "backToShop": "Tiếp tục mua sắm"
+    "backToShop": "Tiếp tục mua sắm",
+    "notFound": "Không tìm thấy đơn hàng.",
+    "viewOrders": "Xem đơn hàng của tôi"
   },
   "admin": {
     "login": "Đăng nhập",

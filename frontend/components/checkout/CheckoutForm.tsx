@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/lib/i18n";
+import { useRouter } from "@/i18n/navigation";
 import { useCartStore } from "@/features/cart/cart.store";
 import { createOrder } from "@/features/checkout/checkout.api";
 import type { PaymentMethod } from "@/features/checkout/checkout.types";

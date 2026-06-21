@@ -4,3 +4,5 @@ export function formatVnd(amount: number): string {
     currency: "VND",
   }).format(amount);
 }
+
+export const formatCurrency = formatVnd;

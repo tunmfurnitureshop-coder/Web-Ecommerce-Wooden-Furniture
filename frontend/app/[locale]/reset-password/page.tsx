@@ -1,14 +1,15 @@
 "use client";
-
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Link, useRouter } from "@/lib/i18n";
+import { Link, useRouter } from "@/i18n/navigation";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/button";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { Button } from "@/design-system/components/button";
+import { InlineFieldError } from "@/design-system/components/inline-field-error";
+import { Alert } from "@/design-system/components/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ResetPasswordPage() {
   const t = useTranslations("auth.resetPassword");
@@ -37,51 +38,47 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {success ? (
-            <div className="space-y-4">
-              <p className="text-sm">{t("success")}</p>
-              <Link href="/login" className="text-primary hover:underline text-sm">
-                {t("backToLogin")}
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">{t("newPassword")}</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm">{t("confirmPassword")}</Label>
-                <Input
-                  id="confirm"
-                  type="password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-              {error && <p className="text-destructive text-sm">{error}</p>}
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? t("submitting") : t("submit")}
-              </Button>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    <AuthLayout title={t("title")}>
+      {success ? (
+        <div className="flex flex-col gap-4">
+          <Alert variant="success">{t("success")}</Alert>
+          <Link
+            href="/login"
+            className="text-sm text-brand hover:text-brand-hover text-center block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+          >
+            {t("backToLogin")}
+          </Link>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="newPassword">{t("newPassword")}</Label>
+            <Input
+              id="newPassword"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="confirm">{t("confirmPassword")}</Label>
+            <Input
+              id="confirm"
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+          </div>
+          <InlineFieldError message={error} />
+          <Button type="submit" variant="primary" fullWidth isLoading={loading}>
+            {t("submit")}
+          </Button>
+        </form>
+      )}
+    </AuthLayout>
   );
 }

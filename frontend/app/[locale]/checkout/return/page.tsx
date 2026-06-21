@@ -1,17 +1,21 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/lib/i18n";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { getOrderPaymentStatus, retryPayment } from "@/features/checkout/checkout.api";
 import type { OrderPaymentStatus } from "@/features/checkout/checkout.types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "@/lib/i18n";
+import { Container } from "@/design-system/primitives/container";
+import { EmptyState } from "@/design-system/components/empty-state";
+import { Button } from "@/design-system/components/button";
+import { Skeleton } from "@/design-system/components/skeleton";
+import { CheckCircle2, Clock, XCircle, AlertCircle } from "lucide-react";
 
 type State = "loading" | "paid" | "pending" | "failed" | "error";
 
 export default function CheckoutReturnPage() {
+  const t = useTranslations("checkout");
+  const tCart = useTranslations("cart");
   const searchParams = useSearchParams();
   const router = useRouter();
   const [state, setState] = useState<State>("loading");
@@ -19,7 +23,9 @@ export default function CheckoutReturnPage() {
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
-    const code = searchParams.get("orderCode") ?? (typeof window !== "undefined" ? sessionStorage.getItem("pendingOrderCode") : null);
+    const code =
+      searchParams.get("orderCode") ??
+      (typeof window !== "undefined" ? sessionStorage.getItem("pendingOrderCode") : null);
     if (!code) { setState("error"); return; }
     getOrderPaymentStatus(code)
       .then((data) => {
@@ -44,75 +50,80 @@ export default function CheckoutReturnPage() {
 
   if (state === "loading") {
     return (
-      <div className="max-w-lg mx-auto px-6 py-20 text-center">
-        <p className="text-muted-foreground">Đang kiểm tra trạng thái thanh toán...</p>
-      </div>
+      <Container className="py-16 max-w-lg">
+        <div className="flex flex-col items-center gap-4">
+          <Skeleton className="h-14 w-14 rounded-full" />
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+      </Container>
     );
   }
 
   if (state === "error") {
     return (
-      <div className="max-w-lg mx-auto px-6 py-20 text-center">
-        <p className="text-muted-foreground">Không tìm thấy thông tin đơn hàng.</p>
-        <Link href="/products" className="mt-4 inline-block">
-          <Button>Tiếp tục mua sắm</Button>
-        </Link>
-      </div>
+      <Container className="py-16 max-w-lg">
+        <EmptyState
+          icon={<AlertCircle className="h-14 w-14 text-danger" />}
+          title={t("returnNotFound")}
+          action={
+            <Button variant="primary" onClick={() => router.push("/products")}>
+              {tCart("continueShopping")}
+            </Button>
+          }
+        />
+      </Container>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto px-6 py-12">
+    <Container className="py-16 max-w-lg">
       {state === "paid" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-green-600">Thanh toán thành công!</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Mã đơn hàng: <span className="font-medium text-foreground">{order?.orderCode}</span></p>
-            <p className="text-sm">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
-            <Button className="w-full mt-4" onClick={() => router.push(`/success?orderCode=${order?.orderCode}`)}>
-              Xem chi tiết đơn hàng
+        <EmptyState
+          icon={<CheckCircle2 className="h-14 w-14 text-success" />}
+          title={t("returnPaidTitle")}
+          description={order ? `${t("orderCode")}: ${order.orderCode}` : t("returnPaidDesc")}
+          action={
+            <Button
+              variant="primary"
+              onClick={() => router.push(`/success?orderCode=${order?.orderCode}`)}
+            >
+              {t("viewOrderDetail")}
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       )}
 
       {state === "pending" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-yellow-600">Đang chờ xác nhận</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Mã đơn hàng: <span className="font-medium text-foreground">{order?.orderCode}</span></p>
-            <p className="text-sm">Thanh toán đang được xử lý. Vui lòng chờ trong giây lát.</p>
-            <div className="flex gap-2 mt-4">
-              <Button variant="outline" className="flex-1" onClick={() => router.refresh()}>Kiểm tra lại</Button>
-              <Button className="flex-1" onClick={handleRetry} disabled={retrying}>
-                {retrying ? "Đang xử lý..." : "Thanh toán lại"}
+        <EmptyState
+          icon={<Clock className="h-14 w-14 text-warning" />}
+          title={t("returnPendingTitle")}
+          description={order ? `${t("orderCode")}: ${order.orderCode}` : t("returnPendingDesc")}
+          action={
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Button variant="outline" onClick={() => router.refresh()}>
+                {t("checkStatus")}
+              </Button>
+              <Button variant="primary" onClick={handleRetry} isLoading={retrying}>
+                {t("retryPayment")}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          }
+        />
       )}
 
       {state === "failed" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-destructive">Thanh toán thất bại</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Mã đơn hàng: <span className="font-medium text-foreground">{order?.orderCode}</span></p>
-            <p className="text-sm">Thanh toán không thành công. Bạn có thể thử lại hoặc chọn phương thức khác.</p>
-            <Button className="w-full mt-4" onClick={handleRetry} disabled={retrying}>
-              {retrying ? "Đang xử lý..." : "Thử lại thanh toán"}
+        <EmptyState
+          icon={<XCircle className="h-14 w-14 text-danger" />}
+          title={t("returnFailedTitle")}
+          description={order ? `${t("orderCode")}: ${order.orderCode}` : t("returnFailedDesc")}
+          action={
+            <Button variant="primary" onClick={handleRetry} isLoading={retrying}>
+              {t("retryPayment")}
             </Button>
-            <Link href="/products" className="block mt-2 text-center text-sm text-muted-foreground underline">
-              Tiếp tục mua sắm
-            </Link>
-          </CardContent>
-        </Card>
+          }
+        />
       )}
-    </div>
+    </Container>
   );
 }

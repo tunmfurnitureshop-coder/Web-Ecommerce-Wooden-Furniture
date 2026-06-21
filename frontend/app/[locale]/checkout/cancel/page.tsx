@@ -1,15 +1,21 @@
 "use client";
-
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { retryPayment } from "@/features/checkout/checkout.api";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "@/lib/i18n";
+import { Link } from "@/i18n/navigation";
+import { Container } from "@/design-system/primitives/container";
+import { EmptyState } from "@/design-system/components/empty-state";
+import { Button } from "@/design-system/components/button";
+import { XCircle } from "lucide-react";
 
 export default function CheckoutCancelPage() {
+  const t = useTranslations("checkout");
+  const tCart = useTranslations("cart");
   const searchParams = useSearchParams();
-  const orderCode = searchParams.get("orderCode") ?? (typeof window !== "undefined" ? sessionStorage.getItem("pendingOrderCode") : null);
+  const orderCode =
+    searchParams.get("orderCode") ??
+    (typeof window !== "undefined" ? sessionStorage.getItem("pendingOrderCode") : null);
   const [retrying, setRetrying] = useState(false);
 
   async function handleRetry() {
@@ -24,35 +30,32 @@ export default function CheckoutCancelPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-6 py-12">
-      <Card>
-        <CardHeader>
-          <CardTitle>Thanh toán đã bị hủy</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {orderCode && (
-            <p className="text-sm text-muted-foreground">
-              Mã đơn hàng: <span className="font-medium text-foreground">{orderCode}</span>
-            </p>
-          )}
-          <p className="text-sm">
-            Bạn đã hủy quá trình thanh toán. Đơn hàng vẫn được giữ lại — bạn có thể thử thanh toán lại bất cứ lúc nào.
-          </p>
-          <div className="flex gap-2 mt-4">
-            <Link href="/cart" className="flex-1">
-              <Button variant="outline" className="w-full">Xem giỏ hàng</Button>
+    <Container className="py-16">
+      <EmptyState
+        icon={<XCircle className="h-14 w-14 text-danger" />}
+        title={t("cancelTitle")}
+        description={orderCode ? `${t("orderCode")}: ${orderCode}` : t("cancelDesc")}
+        action={
+          <div className="flex gap-3 justify-center flex-wrap">
+            <Link href="/cart">
+              <Button variant="outline">{t("viewCart")}</Button>
             </Link>
             {orderCode && (
-              <Button className="flex-1" onClick={handleRetry} disabled={retrying}>
-                {retrying ? "Đang xử lý..." : "Thanh toán lại"}
+              <Button variant="primary" onClick={handleRetry} isLoading={retrying}>
+                {t("retryPayment")}
               </Button>
             )}
           </div>
-          <Link href="/products" className="block mt-2 text-center text-sm text-muted-foreground underline">
-            Tiếp tục mua sắm
-          </Link>
-        </CardContent>
-      </Card>
-    </div>
+        }
+      />
+      <div className="text-center mt-4">
+        <Link
+          href="/products"
+          className="text-sm text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+        >
+          {tCart("continueShopping")}
+        </Link>
+      </div>
+    </Container>
   );
 }
