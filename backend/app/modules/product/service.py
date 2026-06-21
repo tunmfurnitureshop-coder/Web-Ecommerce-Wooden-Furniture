@@ -11,7 +11,8 @@ from app.modules.product.schemas import (
     ProductCatalogItem, ProductCatalogResponse, AppliedFilters, ProductDetailOut,
     AvailableOptions, WoodTypeOptionOut, FinishOptionOut, SizeOptionOut,
     RoomOut, CreateProductRequest, UpdateProductRequest,
-    AdminProductItem, AdminProductListResponse, InventoryOut
+    AdminProductItem, AdminProductListResponse, InventoryOut,
+    AvailableFilters, TagFilterItem, PriceRangeOut, FallbackSuggestions,
 )
 from app.core.exceptions import not_found, conflict, validation_error
 from app.shared.enums import ProductStatus, ReviewStatus
@@ -39,8 +40,13 @@ async def get_catalog(
     sort: str = "newest",
     page: int = 1,
     page_size: int = 12,
+    tags: Optional[List[str]] = None,
+    availability: Optional[str] = None,
+    rating_min: Optional[float] = None,
 ) -> ProductCatalogResponse:
     from app.modules.review.models import ProductReview
+    from app.modules.taxonomy.models import ProductTag, Tag, TagTranslation
+    from app.modules.inventory.models import InventoryItem as InvItem
 
     query = (
         select(Product)
@@ -54,17 +60,20 @@ async def get_catalog(
     )
 
     if q:
+        # synonym expansion
+        from app.modules.discovery.service import expand_query
+        terms = await expand_query(db, q, locale)
+        or_conditions = []
+        for term in terms:
+            or_conditions.extend([
+                ProductTranslation.name.ilike(f"%{term}%"),
+                ProductTranslation.short_description.ilike(f"%{term}%"),
+            ])
         query = query.join(
             ProductTranslation,
             and_(ProductTranslation.product_id == Product.id, ProductTranslation.locale == locale),
             isouter=True,
-        ).where(
-            or_(
-                ProductTranslation.name.ilike(f"%{q}%"),
-                ProductTranslation.short_description.ilike(f"%{q}%"),
-                ProductTranslation.description.ilike(f"%{q}%"),
-            )
-        )
+        ).where(or_(*or_conditions))
 
     if room:
         cat_sub = select(RoomCategory.id).join(
@@ -79,16 +88,28 @@ async def get_catalog(
         )
         query = query.where(Product.id.in_(wt_sub))
 
+    if tags:
+        for tag_code in tags:
+            tag_sub = (
+                select(ProductTag.product_id)
+                .join(Tag, Tag.id == ProductTag.tag_id)
+                .where(Tag.code == tag_code, Tag.is_active == True)  # noqa: E712
+            )
+            query = query.where(Product.id.in_(tag_sub))
+
+    if availability == "in_stock":
+        in_stock_sub = select(InvItem.product_id).where(
+            InvItem.total_qty > InvItem.reserved_qty
+        )
+        query = query.where(Product.id.in_(in_stock_sub))
+
     if min_price is not None:
         query = query.where(Product.base_price_vnd >= min_price)
     if max_price is not None:
         query = query.where(Product.base_price_vnd <= max_price)
 
-    if sort == "price_asc":
-        query = query.order_by(Product.base_price_vnd.asc())
-    elif sort == "price_desc":
-        query = query.order_by(Product.base_price_vnd.desc())
-    elif sort == "rating_desc":
+    avg_rating_sq = None
+    if sort == "rating_desc" or rating_min is not None:
         avg_rating_sq = (
             select(
                 ProductReview.product_id,
@@ -99,13 +120,24 @@ async def get_catalog(
             .group_by(ProductReview.product_id)
             .subquery()
         )
+
+    if rating_min is not None and avg_rating_sq is not None:
         query = (
             query.outerjoin(avg_rating_sq, avg_rating_sq.c.product_id == Product.id)
-            .order_by(
-                func.coalesce(avg_rating_sq.c.avg_rating, 0).desc(),
-                func.coalesce(avg_rating_sq.c.review_count, 0).desc(),
-                Product.created_at.desc(),
-            )
+            .where(func.coalesce(avg_rating_sq.c.avg_rating, 0) >= rating_min)
+        )
+
+    if sort == "price_asc":
+        query = query.order_by(Product.base_price_vnd.asc())
+    elif sort == "price_desc":
+        query = query.order_by(Product.base_price_vnd.desc())
+    elif sort == "rating_desc" and avg_rating_sq is not None:
+        if rating_min is None:
+            query = query.outerjoin(avg_rating_sq, avg_rating_sq.c.product_id == Product.id)
+        query = query.order_by(
+            func.coalesce(avg_rating_sq.c.avg_rating, 0).desc(),
+            func.coalesce(avg_rating_sq.c.review_count, 0).desc(),
+            Product.created_at.desc(),
         )
     elif sort == "relevance" and q:
         query = query.order_by(
@@ -129,12 +161,8 @@ async def get_catalog(
             continue
         room_trans = _get_translation(p.room_category.translations, locale)
         items.append(ProductCatalogItem(
-            id=p.id,
-            sku=p.sku,
-            name=trans.name,
-            slug=trans.slug,
-            shortDescription=trans.short_description,
-            basePriceVnd=p.base_price_vnd,
+            id=p.id, sku=p.sku, name=trans.name, slug=trans.slug,
+            shortDescription=trans.short_description, basePriceVnd=p.base_price_vnd,
             primaryImageUrl=p.primary_image_url,
             room=RoomOut(
                 code=p.room_category.code,
@@ -142,25 +170,126 @@ async def get_catalog(
             ),
         ))
 
+    available_filters = await _build_available_filters(db, locale)
+
+    fallback = None
+    if total == 0:
+        fallback = await _build_fallback(db, locale)
+
     return ProductCatalogResponse(
-        items=items,
-        page=page,
-        pageSize=page_size,
-        total=total,
-        query=q or None,
+        items=items, page=page, pageSize=page_size, total=total, query=q or None,
         appliedFilters=AppliedFilters(
-            room=room,
-            woodType=wood_type,
-            minPrice=min_price,
-            maxPrice=max_price,
-            sort=sort,
+            room=room, woodType=wood_type, minPrice=min_price, maxPrice=max_price,
+            sort=sort, tags=tags, availability=availability, ratingMin=rating_min,
         ),
+        availableFilters=available_filters,
+        fallback=fallback,
+    )
+
+
+async def _build_available_filters(db: AsyncSession, locale: str) -> AvailableFilters:
+    from app.modules.taxonomy.models import Tag, TagTranslation
+    tag_rows = (await db.execute(
+        select(Tag).where(Tag.is_active == True)  # noqa: E712
+        .options(selectinload(Tag.translations))
+        .order_by(Tag.sort_order)
+    )).scalars().all()
+
+    tag_items = []
+    for tag in tag_rows:
+        t = _get_translation(tag.translations, locale)
+        if t:
+            tag_items.append(TagFilterItem(code=tag.code, type=tag.type, name=t.name))
+
+    price_result = await db.execute(
+        select(func.min(Product.base_price_vnd), func.max(Product.base_price_vnd))
+        .where(Product.status == ProductStatus.ACTIVE)
+    )
+    price_row = price_result.first()
+    price_range = PriceRangeOut(min=price_row[0] or 0, max=price_row[1] or 0) if price_row else None
+
+    return AvailableFilters(tags=tag_items, priceRange=price_range)
+
+
+async def _build_fallback(db: AsyncSession, locale: str) -> FallbackSuggestions:
+    from app.modules.collection.models import Collection, CollectionTranslation
+    from app.modules.content.models import ContentPost, ContentPostTranslation
+    from datetime import datetime, timezone
+
+    cat_rows = (await db.execute(
+        select(RoomCategory, RoomCategoryTranslation)
+        .join(
+            RoomCategoryTranslation,
+            and_(
+                RoomCategoryTranslation.category_id == RoomCategory.id,
+                RoomCategoryTranslation.locale == locale,
+            ),
+            isouter=True,
+        )
+        .where(RoomCategory.is_active == True)  # noqa: E712
+        .order_by(RoomCategory.sort_order)
+        .limit(4)
+    )).all()
+    suggested_categories = [
+        {"code": c.code, "name": ct.name, "slug": ct.slug}
+        for c, ct in cat_rows if ct is not None
+    ]
+
+    col_rows = (await db.execute(
+        select(Collection, CollectionTranslation)
+        .join(
+            CollectionTranslation,
+            and_(
+                CollectionTranslation.collection_id == Collection.id,
+                CollectionTranslation.locale == locale,
+            ),
+            isouter=True,
+        )
+        .where(Collection.status == "PUBLISHED")
+        .order_by(Collection.sort_order)
+        .limit(3)
+    )).all()
+    suggested_collections = [
+        {"id": c.id, "name": ct.name, "slug": ct.slug}
+        for c, ct in col_rows if ct is not None
+    ]
+
+    now = datetime.now(timezone.utc)
+    guide_rows = (await db.execute(
+        select(ContentPost, ContentPostTranslation)
+        .join(
+            ContentPostTranslation,
+            and_(
+                ContentPostTranslation.content_post_id == ContentPost.id,
+                ContentPostTranslation.locale == locale,
+            ),
+            isouter=True,
+        )
+        .where(ContentPost.status == "PUBLISHED", ContentPost.published_at <= now)
+        .order_by(ContentPost.published_at.desc())
+        .limit(3)
+    )).all()
+    suggested_guides = [
+        {"id": g.id, "type": g.type, "title": gt.title, "slug": gt.slug}
+        for g, gt in guide_rows if gt is not None
+    ]
+
+    return FallbackSuggestions(
+        suggestedCategories=suggested_categories,
+        suggestedCollections=suggested_collections,
+        suggestedGuides=suggested_guides,
     )
 
 
 async def get_suggestions(db: AsyncSession, q: str, locale: str = "vi") -> dict:
     if len(q) < 2:
-        return {"products": [], "categories": [], "woodTypes": []}
+        return {"products": [], "categories": [], "woodTypes": [], "collections": [], "tags": []}
+
+    from app.modules.discovery.service import expand_query
+    terms = await expand_query(db, q, locale)
+
+    def _ilike_conditions(col):
+        return or_(*[col.ilike(f"%{t}%") for t in terms])
 
     product_rows = (await db.execute(
         select(Product, ProductTranslation)
@@ -168,10 +297,7 @@ async def get_suggestions(db: AsyncSession, q: str, locale: str = "vi") -> dict:
             ProductTranslation,
             and_(ProductTranslation.product_id == Product.id, ProductTranslation.locale == locale),
         )
-        .where(
-            Product.status == ProductStatus.ACTIVE,
-            ProductTranslation.name.ilike(f"%{q}%"),
-        )
+        .where(Product.status == ProductStatus.ACTIVE, _ilike_conditions(ProductTranslation.name))
         .limit(5)
     )).all()
 
@@ -184,8 +310,8 @@ async def get_suggestions(db: AsyncSession, q: str, locale: str = "vi") -> dict:
                 RoomCategoryTranslation.locale == locale,
             ),
         )
-        .where(RoomCategoryTranslation.name.ilike(f"%{q}%"), RoomCategory.is_active == True)  # noqa: E712
-        .limit(5)
+        .where(_ilike_conditions(RoomCategoryTranslation.name), RoomCategory.is_active == True)  # noqa: E712
+        .limit(3)
     )).all()
 
     from app.modules.inventory.models import WoodType, WoodTypeTranslation
@@ -195,7 +321,32 @@ async def get_suggestions(db: AsyncSession, q: str, locale: str = "vi") -> dict:
             WoodTypeTranslation,
             and_(WoodTypeTranslation.wood_type_id == WoodType.id, WoodTypeTranslation.locale == locale),
         )
-        .where(WoodTypeTranslation.name.ilike(f"%{q}%"), WoodType.is_active == True)  # noqa: E712
+        .where(_ilike_conditions(WoodTypeTranslation.name), WoodType.is_active == True)  # noqa: E712
+        .limit(5)
+    )).all()
+
+    from app.modules.collection.models import Collection, CollectionTranslation
+    col_rows = (await db.execute(
+        select(Collection, CollectionTranslation)
+        .join(
+            CollectionTranslation,
+            and_(
+                CollectionTranslation.collection_id == Collection.id,
+                CollectionTranslation.locale == locale,
+            ),
+        )
+        .where(_ilike_conditions(CollectionTranslation.name), Collection.status == "PUBLISHED")
+        .limit(3)
+    )).all()
+
+    from app.modules.taxonomy.models import Tag, TagTranslation
+    tag_rows = (await db.execute(
+        select(Tag, TagTranslation)
+        .join(
+            TagTranslation,
+            and_(TagTranslation.tag_id == Tag.id, TagTranslation.locale == locale),
+        )
+        .where(_ilike_conditions(TagTranslation.name), Tag.is_active == True)  # noqa: E712
         .limit(5)
     )).all()
 
@@ -206,6 +357,8 @@ async def get_suggestions(db: AsyncSession, q: str, locale: str = "vi") -> dict:
         ],
         "categories": [{"code": c.code, "name": t.name} for c, t in cat_rows],
         "woodTypes": [{"code": w.code, "name": t.name} for w, t in wt_rows],
+        "collections": [{"id": c.id, "name": t.name, "slug": t.slug} for c, t in col_rows],
+        "tags": [{"code": tag.code, "type": tag.type, "name": t.name} for tag, t in tag_rows],
     }
 
 

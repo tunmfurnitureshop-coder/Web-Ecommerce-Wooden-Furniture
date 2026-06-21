@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.modules.product import service
@@ -25,9 +25,16 @@ async def list_products(
     sort: str = Query("newest"),
     page: int = Query(1, ge=1),
     pageSize: int = Query(12, ge=1, le=100),
+    tags: Optional[str] = Query(None, description="Comma-separated tag codes"),
+    availability: Optional[str] = Query(None),
+    ratingMin: Optional[float] = Query(None, ge=1.0, le=5.0),
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.get_catalog(db, locale, q, room, woodType, minPrice, maxPrice, sort, page, pageSize)
+    tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
+    return await service.get_catalog(
+        db, locale, q, room, woodType, minPrice, maxPrice, sort, page, pageSize,
+        tags=tag_list, availability=availability, rating_min=ratingMin,
+    )
 
 
 @router.get("/products/suggestions")
@@ -37,8 +44,34 @@ async def suggestions(
     db: AsyncSession = Depends(get_db),
 ):
     if len(q) < 2:
-        return {"products": [], "categories": [], "woodTypes": []}
+        return {"products": [], "categories": [], "woodTypes": [], "collections": [], "tags": []}
     return await service.get_suggestions(db, q, locale)
+
+
+@router.get("/products/{slug}/related")
+async def get_related_products(
+    slug: str,
+    locale: str = Query("vi"),
+    limit: int = Query(8, ge=1, le=20),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.modules.product.models import ProductTranslation
+    from sqlalchemy import select
+    trans = (await db.execute(
+        select(ProductTranslation).where(
+            ProductTranslation.slug == slug, ProductTranslation.locale == locale
+        )
+    )).scalar_one_or_none()
+    if not trans:
+        trans = (await db.execute(
+            select(ProductTranslation).where(ProductTranslation.slug == slug)
+        )).scalar_one_or_none()
+    if not trans:
+        from app.core.exceptions import not_found
+        raise not_found("Product")
+    from app.modules.discovery.service import get_related_products
+    items = await get_related_products(db, trans.product_id, locale, limit)
+    return {"items": [i.model_dump() for i in items]}
 
 
 @router.get("/products/{slug}", response_model=ProductDetailOut)

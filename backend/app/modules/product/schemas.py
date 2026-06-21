@@ -24,6 +24,31 @@ class AppliedFilters(BaseModel):
     minPrice: Optional[int] = None
     maxPrice: Optional[int] = None
     sort: Optional[str] = None
+    tags: Optional[List[str]] = None
+    availability: Optional[str] = None
+    ratingMin: Optional[float] = None
+
+
+class TagFilterItem(BaseModel):
+    code: str
+    type: str
+    name: str
+
+
+class PriceRangeOut(BaseModel):
+    min: int
+    max: int
+
+
+class AvailableFilters(BaseModel):
+    tags: List[TagFilterItem] = []
+    priceRange: Optional[PriceRangeOut] = None
+
+
+class FallbackSuggestions(BaseModel):
+    suggestedCategories: List[dict] = []
+    suggestedCollections: List[dict] = []
+    suggestedGuides: List[dict] = []
 
 
 class ProductCatalogResponse(BaseModel):
@@ -33,6 +58,8 @@ class ProductCatalogResponse(BaseModel):
     total: int
     query: Optional[str] = None
     appliedFilters: Optional[AppliedFilters] = None
+    availableFilters: Optional[AvailableFilters] = None
+    fallback: Optional[FallbackSuggestions] = None
 
 
 class WoodTypeOptionOut(BaseModel):
