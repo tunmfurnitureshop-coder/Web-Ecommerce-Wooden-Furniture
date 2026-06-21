@@ -26,10 +26,10 @@ async function fetchJson<T>(path: string): Promise<T | null> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, collections, categories, guides] = await Promise.all([
+  const [products, collections, materialTags, guides] = await Promise.all([
     fetchJson<{ items: Array<{ slug: string; updated_at?: string }> }>("/api/v1/products?pageSize=200&locale=vi"),
     fetchJson<{ items: Array<{ slug: string; published_at?: string }> }>("/api/v1/collections?locale=vi"),
-    fetchJson<{ items: Array<{ slug: string }> }>("/api/v1/taxonomy/categories?locale=vi"),
+    fetchJson<{ items: Array<{ slug: string }> }>("/api/v1/tags?locale=vi&type=MATERIAL"),
     fetchJson<{ items: Array<{ slug: string; published_at?: string }> }>("/api/v1/guides?pageSize=100&locale=vi"),
   ]);
 
@@ -45,8 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const c of collections?.items ?? []) {
     entries.push(...localizedUrls(`/collections/${c.slug}`, 0.8, "weekly"));
   }
-  for (const cat of categories?.items ?? []) {
-    entries.push(...localizedUrls(`/categories/${cat.slug}`, 0.7, "weekly"));
+  for (const tag of materialTags?.items ?? []) {
+    entries.push(...localizedUrls(`/materials/${tag.slug}`, 0.7, "weekly"));
   }
   for (const g of guides?.items ?? []) {
     entries.push(...localizedUrls(`/guides/${g.slug}`, 0.7, "monthly"));

@@ -109,19 +109,19 @@ export async function adminConfirmManualPayment(
 
 // Tags
 export async function adminListTags(): Promise<AdminTagListResponse> {
-  return api.get<AdminTagListResponse>("/api/v1/admin/taxonomy/tags", getAuthHeaders());
+  return api.get<AdminTagListResponse>("/api/v1/admin/tags", getAuthHeaders());
 }
 export async function adminGetTag(tagId: string): Promise<AdminTag> {
-  return api.get<AdminTag>(`/api/v1/admin/taxonomy/tags/${tagId}`, getAuthHeaders());
+  return api.get<AdminTag>(`/api/v1/admin/tags/${tagId}`, getAuthHeaders());
 }
 export async function adminCreateTag(data: CreateTagRequest): Promise<AdminTag> {
-  return api.post<AdminTag>("/api/v1/admin/taxonomy/tags", data, getAuthHeaders());
+  return api.post<AdminTag>("/api/v1/admin/tags", data, getAuthHeaders());
 }
 export async function adminUpdateTag(tagId: string, data: Partial<CreateTagRequest> & { is_active?: boolean }): Promise<AdminTag> {
-  return api.patch<AdminTag>(`/api/v1/admin/taxonomy/tags/${tagId}`, data, getAuthHeaders());
+  return api.patch<AdminTag>(`/api/v1/admin/tags/${tagId}`, data, getAuthHeaders());
 }
 export async function adminDeleteTag(tagId: string): Promise<void> {
-  return api.delete<void>(`/api/v1/admin/taxonomy/tags/${tagId}`, getAuthHeaders());
+  return api.delete<void>(`/api/v1/admin/tags/${tagId}`, getAuthHeaders());
 }
 
 // Collections
