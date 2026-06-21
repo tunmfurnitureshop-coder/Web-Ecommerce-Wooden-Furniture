@@ -1,0 +1,14 @@
+{
+  "name": "@vin/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/tokens.js",
+  "types": "./dist/tokens.d.ts",
+  "scripts": {
+    "build": "node --loader ts-node/esm scripts/build-css.ts"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}

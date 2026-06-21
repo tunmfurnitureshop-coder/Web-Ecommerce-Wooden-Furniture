@@ -4,25 +4,96 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
+    /* ---- Primitive Colors ---- */
+    --color-white: #FFFFFF;
+    --color-stone50: #FAF8F5;
+    --color-stone100: #F4F1EC;
+    --color-stone200: #E8E1D8;
+    --color-stone300: #D5CBC0;
+    --color-stone400: #B5AAA0;
+    --color-stone500: #8B8177;
+    --color-stone600: #6C635B;
+    --color-stone700: #4B453F;
+    --color-stone800: #332F2B;
+    --color-stone900: #24201D;
+    --color-oak50: #FFF7E8;
+    --color-oak100: #FBEBCB;
+    --color-oak200: #F1D59C;
+    --color-oak300: #E0BB67;
+    --color-oak400: #C99F42;
+    --color-oak500: #B88E2F;
+    --color-oak600: #946E22;
+    --color-oak700: #74531A;
+    --color-success50: #EAF7EF;
+    --color-success500: #2F7D57;
+    --color-success700: #1E5B3D;
+    --color-warning50: #FFF6DD;
+    --color-warning500: #B7791F;
+    --color-danger50: #FFF0F0;
+    --color-danger500: #C23B3B;
+    --color-info50: #EEF5FF;
+    --color-info500: #3973C6;
+
+    /* ---- Semantic Colors ---- */
+    --background-color: #FAF8F5;
+    --surface: #FFFFFF;
+    --surface-muted: #F4F1EC;
+    --surface-subtle: #FAF8F5;
+    --text-primary: #24201D;
+    --text-secondary: #6C635B;
+    --text-muted: #8B8177;
+    --text-inverse: #FFFFFF;
+    --border-default: #E8E1D8;
+    --border-strong: #D5CBC0;
+    --border-focus: #B88E2F;
+    --brand: #B88E2F;
+    --brand-hover: #946E22;
+    --brand-active: #74531A;
+    --brand-soft: #FBEBCB;
+    --success: #2F7D57;
+    --success-bg: #EAF7EF;
+    --warning: #B7791F;
+    --warning-bg: #FFF6DD;
+    --danger: #C23B3B;
+    --danger-bg: #FFF0F0;
+    --info: #3973C6;
+    --info-bg: #EEF5FF;
+
+    /* ---- Layout ---- */
+    --container-max-width: 1280px;
+    --header-height-desktop: 80px;
+    --header-height-mobile: 64px;
+    --cart-drawer-width: 460px;
+
+    /* ---- Shadcn bridge (HSL format required by shadcn) ---- */
+    /* stone50 #FAF8F5 */
+    --background: 38 33% 97%;
+    /* stone900 #24201D */
+    --foreground: 20 14% 12%;
+    /* white */
     --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
+    --card-foreground: 20 14% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
-    --primary: 24 9.8% 10%;
-    --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 9.8% 10%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 24 9.8% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 20 14.3% 4.1%;
+    --popover-foreground: 20 14% 12%;
+    /* oak500 #B88E2F */
+    --primary: 40 59% 45%;
+    --primary-foreground: 0 0% 100%;
+    /* stone100 #F4F1EC */
+    --secondary: 36 25% 94%;
+    --secondary-foreground: 20 14% 12%;
+    --muted: 36 25% 94%;
+    /* stone500 #8B8177 */
+    --muted-foreground: 25 5% 51%;
+    --accent: 36 25% 94%;
+    --accent-foreground: 20 14% 12%;
+    /* danger500 #C23B3B */
+    --destructive: 0 54% 49%;
+    --destructive-foreground: 0 0% 100%;
+    /* stone200 #E8E1D8 */
+    --border: 33 20% 87%;
+    --input: 33 20% 87%;
+    /* oak500 */
+    --ring: 40 59% 45%;
     --radius: 0.5rem;
   }
 }
@@ -33,5 +104,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans, 'Manrope'), 'Noto Sans SC', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
