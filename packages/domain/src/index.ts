@@ -19,15 +19,26 @@ export * from "./validation/catalog-filter.schema";
 export * from "./validation/product-option.schema";
 export * from "./validation/search.schema";
 export * from "./validation/quantity.schema";
+export * from "./validation/taxonomy.schema";
+export * from "./validation/seo.schema";
+export * from "./validation/collection.schema";
+export * from "./validation/content.schema";
+export * from "./validation/discovery.schema";
 
 // View Models
 export type * from "./view-models/product.view-model";
 export type * from "./view-models/cart.view-model";
 export type * from "./view-models/order.view-model";
 export type * from "./view-models/customer.view-model";
+export type * from "./view-models/discovery.view-model";
 
 // Mappers
 export * from "./mappers/product.mapper";
 export * from "./mappers/cart.mapper";
 export * from "./mappers/order.mapper";
 export * from "./mappers/api-error.mapper";
+export * from "./mappers/taxonomy.mapper";
+export * from "./mappers/collection.mapper";
+export * from "./mappers/content.mapper";
+export * from "./mappers/seo.mapper";
+export * from "./mappers/discovery.mapper";
