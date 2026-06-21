@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/robots.txt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Robots Txt */
+        get: operations["robots_txt_robots_txt_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sitemap.xml": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sitemap Xml */
+        get: operations["sitemap_xml_sitemap_xml_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/products": {
         parameters: {
             query?: never;
@@ -47,6 +81,23 @@ export interface paths {
         };
         /** Suggestions */
         get: operations["suggestions_api_v1_products_suggestions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products/{slug}/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Related Products */
+        get: operations["get_related_products_api_v1_products__slug__related_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -778,6 +829,407 @@ export interface paths {
         patch: operations["admin_update_review_status_api_v1_admin_reviews__review_id__status_patch"];
         trace?: never;
     };
+    "/api/v1/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tags */
+        get: operations["list_tags_api_v1_tags_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin List Tags */
+        get: operations["admin_list_tags_api_v1_admin_tags_get"];
+        put?: never;
+        /** Admin Create Tag */
+        post: operations["admin_create_tag_api_v1_admin_tags_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tags/{tag_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Admin Delete Tag */
+        delete: operations["admin_delete_tag_api_v1_admin_tags__tag_id__delete"];
+        options?: never;
+        head?: never;
+        /** Admin Update Tag */
+        patch: operations["admin_update_tag_api_v1_admin_tags__tag_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Collections */
+        get: operations["list_collections_api_v1_collections_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collections/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Collection */
+        get: operations["get_collection_api_v1_collections__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin List Collections */
+        get: operations["admin_list_collections_api_v1_admin_collections_get"];
+        put?: never;
+        /** Admin Create Collection */
+        post: operations["admin_create_collection_api_v1_admin_collections_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/collections/{collection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Get Collection */
+        get: operations["admin_get_collection_api_v1_admin_collections__collection_id__get"];
+        put?: never;
+        post?: never;
+        /** Admin Delete Collection */
+        delete: operations["admin_delete_collection_api_v1_admin_collections__collection_id__delete"];
+        options?: never;
+        head?: never;
+        /** Admin Update Collection */
+        patch: operations["admin_update_collection_api_v1_admin_collections__collection_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/collections/{collection_id}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Add Product */
+        post: operations["admin_add_product_api_v1_admin_collections__collection_id__products_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/collections/{collection_id}/products/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Admin Reorder Products */
+        patch: operations["admin_reorder_products_api_v1_admin_collections__collection_id__products_reorder_patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/collections/{collection_id}/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Admin Remove Product */
+        delete: operations["admin_remove_product_api_v1_admin_collections__collection_id__products__product_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/guides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Guides */
+        get: operations["list_guides_api_v1_guides_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/guides/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Guide */
+        get: operations["get_guide_api_v1_guides__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin List Content */
+        get: operations["admin_list_content_api_v1_admin_content_get"];
+        put?: never;
+        /** Admin Create Content */
+        post: operations["admin_create_content_api_v1_admin_content_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/content/{content_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Get Content */
+        get: operations["admin_get_content_api_v1_admin_content__content_id__get"];
+        put?: never;
+        post?: never;
+        /** Admin Delete Content */
+        delete: operations["admin_delete_content_api_v1_admin_content__content_id__delete"];
+        options?: never;
+        head?: never;
+        /** Admin Update Content */
+        patch: operations["admin_update_content_api_v1_admin_content__content_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/content/{content_id}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Link Product */
+        post: operations["admin_link_product_api_v1_admin_content__content_id__products_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/content/{content_id}/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Admin Unlink Product */
+        delete: operations["admin_unlink_product_api_v1_admin_content__content_id__products__product_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/content/{content_id}/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Link Category */
+        post: operations["admin_link_category_api_v1_admin_content__content_id__categories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/content/{content_id}/categories/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Admin Unlink Category */
+        delete: operations["admin_unlink_category_api_v1_admin_content__content_id__categories__category_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/discovery/recently-viewed/hydrate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hydrate Recently Viewed */
+        post: operations["hydrate_recently_viewed_api_v1_discovery_recently_viewed_hydrate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/categories/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Category Landing */
+        get: operations["category_landing_api_v1_categories__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/materials/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Material Landing */
+        get: operations["material_landing_api_v1_materials__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/synonyms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Synonyms */
+        get: operations["list_synonyms_api_v1_admin_synonyms_get"];
+        put?: never;
+        /** Create Synonym */
+        post: operations["create_synonym_api_v1_admin_synonyms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/synonyms/{synonym_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Synonym */
+        delete: operations["delete_synonym_api_v1_admin_synonyms__synonym_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Synonym */
+        patch: operations["update_synonym_api_v1_admin_synonyms__synonym_id__patch"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -888,6 +1340,21 @@ export interface components {
             maxPrice?: number | null;
             /** Sort */
             sort?: string | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Availability */
+            availability?: string | null;
+            /** Ratingmin */
+            ratingMin?: number | null;
+        };
+        /** AvailableFilters */
+        AvailableFilters: {
+            /**
+             * Tags
+             * @default []
+             */
+            tags: components["schemas"]["TagFilterItem"][];
+            priceRange?: components["schemas"]["PriceRangeOut"] | null;
         };
         /** AvailableOptions */
         AvailableOptions: {
@@ -914,6 +1381,13 @@ export interface components {
              * @default false
              */
             isPrimary: boolean;
+        };
+        /** BreadcrumbItem */
+        BreadcrumbItem: {
+            /** Name */
+            name: string;
+            /** Href */
+            href: string;
         };
         /** CartHydrateRequest */
         CartHydrateRequest: {
@@ -956,15 +1430,380 @@ export interface components {
             /** Size */
             size: string;
         };
+        /** CategoryLandingOut */
+        CategoryLandingOut: {
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description?: string | null;
+            seo: components["schemas"]["SeoOut"];
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["BreadcrumbItem"][];
+            /** Featured Products */
+            featured_products: components["schemas"]["CategoryProductItem"][];
+            /** Available Tags */
+            available_tags: components["schemas"]["TagInfo"][];
+            /** Featured Collections */
+            featured_collections: components["schemas"]["FeaturedCollectionItem"][];
+        };
+        /** CategoryProductItem */
+        CategoryProductItem: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Basepricevnd */
+            basePriceVnd: number;
+            /** Primaryimageurl */
+            primaryImageUrl?: string | null;
+        };
         /** ClaimOrdersResponse */
         ClaimOrdersResponse: {
             /** Claimedordercount */
             claimedOrderCount: number;
         };
+        /** CollectionAdminItem */
+        CollectionAdminItem: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Status */
+            status: string;
+            /** Is Featured */
+            is_featured: boolean;
+            /** Sort Order */
+            sort_order: number;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Translations */
+            translations: Record<string, never>[];
+            /** Product Count */
+            product_count: number;
+        };
+        /** CollectionAdminListResponse */
+        CollectionAdminListResponse: {
+            /** Items */
+            items: components["schemas"]["CollectionAdminItem"][];
+        };
+        /** CollectionCreateRequest */
+        CollectionCreateRequest: {
+            /** Code */
+            code: string;
+            /** @default DRAFT */
+            status: components["schemas"]["CollectionStatus"];
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+            /**
+             * Is Featured
+             * @default false
+             */
+            is_featured: boolean;
+            /** Translations */
+            translations: {
+                [key: string]: components["schemas"]["CollectionTranslationIn"];
+            };
+        };
+        /** CollectionDetailOut */
+        CollectionDetailOut: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Short Description */
+            short_description?: string | null;
+            /** Description Markdown */
+            description_markdown?: string | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            seo: components["schemas"]["SeoOut"];
+            /** Products */
+            products: components["schemas"]["CollectionProductItem"][];
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["BreadcrumbItem"][];
+        };
+        /** CollectionListItem */
+        CollectionListItem: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Short Description */
+            short_description?: string | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Is Featured */
+            is_featured: boolean;
+            /** Product Count */
+            product_count: number;
+        };
+        /** CollectionListResponse */
+        CollectionListResponse: {
+            /** Items */
+            items: components["schemas"]["CollectionListItem"][];
+        };
+        /** CollectionProductAddRequest */
+        CollectionProductAddRequest: {
+            /** Product Id */
+            product_id: string;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
+        /** CollectionProductItem */
+        CollectionProductItem: {
+            /** Id */
+            id: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Primary Image Url */
+            primary_image_url?: string | null;
+            /** Base Price Vnd */
+            base_price_vnd: number;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /** CollectionProductReorderItem */
+        CollectionProductReorderItem: {
+            /** Product Id */
+            product_id: string;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /** CollectionProductReorderRequest */
+        CollectionProductReorderRequest: {
+            /** Items */
+            items: components["schemas"]["CollectionProductReorderItem"][];
+        };
+        /**
+         * CollectionStatus
+         * @enum {string}
+         */
+        CollectionStatus: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+        /** CollectionTranslationIn */
+        CollectionTranslationIn: {
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Short Description */
+            short_description?: string | null;
+            /** Description Markdown */
+            description_markdown?: string | null;
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
+            /** Og Title */
+            og_title?: string | null;
+            /** Og Description */
+            og_description?: string | null;
+            /** Og Image Url */
+            og_image_url?: string | null;
+        };
+        /** CollectionUpdateRequest */
+        CollectionUpdateRequest: {
+            status?: components["schemas"]["CollectionStatus"] | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Sort Order */
+            sort_order?: number | null;
+            /** Is Featured */
+            is_featured?: boolean | null;
+            /** Translations */
+            translations?: {
+                [key: string]: components["schemas"]["CollectionTranslationIn"];
+            } | null;
+        };
         /** ConfirmManualPaymentRequest */
         ConfirmManualPaymentRequest: {
             /** Note */
             note?: string | null;
+        };
+        /** ContentAdminItem */
+        ContentAdminItem: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /** Status */
+            status: string;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Author Name */
+            author_name?: string | null;
+            /** Published At */
+            published_at?: string | null;
+            /** Scheduled At */
+            scheduled_at?: string | null;
+            /** Translations */
+            translations: Record<string, never>[];
+        };
+        /** ContentAdminListResponse */
+        ContentAdminListResponse: {
+            /** Items */
+            items: components["schemas"]["ContentAdminItem"][];
+        };
+        /** ContentCategoryLinkRequest */
+        ContentCategoryLinkRequest: {
+            /** Category Id */
+            category_id: string;
+        };
+        /** ContentCreateRequest */
+        ContentCreateRequest: {
+            type: components["schemas"]["ContentType"];
+            /** @default DRAFT */
+            status: components["schemas"]["ContentStatus"];
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Author Name */
+            author_name?: string | null;
+            /** Scheduled At */
+            scheduled_at?: string | null;
+            /** Translations */
+            translations: {
+                [key: string]: components["schemas"]["ContentTranslationIn"];
+            };
+        };
+        /** ContentDetailOut */
+        ContentDetailOut: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /** Title */
+            title: string;
+            /** Slug */
+            slug: string;
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Body Markdown */
+            body_markdown: string;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Author Name */
+            author_name?: string | null;
+            /** Published At */
+            published_at?: string | null;
+            /** Linked Products */
+            linked_products: components["schemas"]["LinkedProductItem"][];
+            /** Linked Categories */
+            linked_categories: components["schemas"]["LinkedCategoryItem"][];
+            seo: components["schemas"]["SeoOut"];
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["BreadcrumbItem"][];
+            /** Related Guides */
+            related_guides: components["schemas"]["RelatedGuideItem"][];
+        };
+        /** ContentListItem */
+        ContentListItem: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /** Title */
+            title: string;
+            /** Slug */
+            slug: string;
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Author Name */
+            author_name?: string | null;
+            /** Published At */
+            published_at?: string | null;
+        };
+        /** ContentListResponse */
+        ContentListResponse: {
+            /** Items */
+            items: components["schemas"]["ContentListItem"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** ContentProductLinkRequest */
+        ContentProductLinkRequest: {
+            /** Product Id */
+            product_id: string;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
+        /**
+         * ContentStatus
+         * @enum {string}
+         */
+        ContentStatus: "DRAFT" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+        /** ContentTranslationIn */
+        ContentTranslationIn: {
+            /** Title */
+            title: string;
+            /** Slug */
+            slug: string;
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Body Markdown */
+            body_markdown: string;
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
+            /** Og Title */
+            og_title?: string | null;
+            /** Og Description */
+            og_description?: string | null;
+            /** Og Image Url */
+            og_image_url?: string | null;
+        };
+        /**
+         * ContentType
+         * @enum {string}
+         */
+        ContentType: "BUYING_GUIDE" | "MATERIAL_GUIDE" | "CARE_GUIDE" | "ROOM_INSPIRATION" | "NEWS";
+        /** ContentUpdateRequest */
+        ContentUpdateRequest: {
+            status?: components["schemas"]["ContentStatus"] | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Author Name */
+            author_name?: string | null;
+            /** Scheduled At */
+            scheduled_at?: string | null;
+            /** Translations */
+            translations?: {
+                [key: string]: components["schemas"]["ContentTranslationIn"];
+            } | null;
         };
         /** CreateAddressRequest */
         CreateAddressRequest: {
@@ -1046,6 +1885,11 @@ export interface components {
             };
             optionCodes: components["schemas"]["OptionCodesIn"];
             inventory: components["schemas"]["InventoryIn"];
+            /**
+             * Tagcodes
+             * @default []
+             */
+            tagCodes: string[];
         };
         /** CustomerOrderDetailOut */
         CustomerOrderDetailOut: {
@@ -1165,6 +2009,35 @@ export interface components {
             /** Failedpayments */
             failedPayments: number;
         };
+        /** FallbackSuggestions */
+        FallbackSuggestions: {
+            /**
+             * Suggestedcategories
+             * @default []
+             */
+            suggestedCategories: Record<string, never>[];
+            /**
+             * Suggestedcollections
+             * @default []
+             */
+            suggestedCollections: Record<string, never>[];
+            /**
+             * Suggestedguides
+             * @default []
+             */
+            suggestedGuides: Record<string, never>[];
+        };
+        /** FeaturedCollectionItem */
+        FeaturedCollectionItem: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+        };
         /** FinishOptionOut */
         FinishOptionOut: {
             /** Code */
@@ -1256,6 +2129,46 @@ export interface components {
             reservedQty: number;
             /** Availableqty */
             availableQty: number;
+        };
+        /** LinkedCategoryItem */
+        LinkedCategoryItem: {
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
+        /** LinkedProductItem */
+        LinkedProductItem: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Primary Image Url */
+            primary_image_url?: string | null;
+            /** Base Price Vnd */
+            base_price_vnd: number;
+        };
+        /** MaterialLandingOut */
+        MaterialLandingOut: {
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description?: string | null;
+            seo: components["schemas"]["SeoOut"];
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["BreadcrumbItem"][];
+            /** Products */
+            products: components["schemas"]["CategoryProductItem"][];
+            /** Related Guides */
+            related_guides: Record<string, never>[];
         };
         /** MessageResponse */
         MessageResponse: {
@@ -1351,6 +2264,13 @@ export interface components {
             /** Sizedeltavnd */
             sizeDeltaVnd: number;
         };
+        /** PriceRangeOut */
+        PriceRangeOut: {
+            /** Min */
+            min: number;
+            /** Max */
+            max: number;
+        };
         /** PricingQuoteRequest */
         PricingQuoteRequest: {
             /** Productid */
@@ -1402,6 +2322,8 @@ export interface components {
             /** Query */
             query?: string | null;
             appliedFilters?: components["schemas"]["AppliedFilters"] | null;
+            availableFilters?: components["schemas"]["AvailableFilters"] | null;
+            fallback?: components["schemas"]["FallbackSuggestions"] | null;
         };
         /** ProductDetailOut */
         ProductDetailOut: {
@@ -1429,6 +2351,9 @@ export interface components {
              * @default []
              */
             images: components["schemas"]["ProductImageItem"][];
+            seo?: components["schemas"]["ProductSeoOut"] | null;
+            /** Jsonld */
+            jsonLd?: Record<string, never> | null;
         };
         /** ProductImageItem */
         ProductImageItem: {
@@ -1455,6 +2380,21 @@ export interface components {
             /** Pagesize */
             pageSize: number;
         };
+        /** ProductSeoOut */
+        ProductSeoOut: {
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
+            /** Og Title */
+            og_title?: string | null;
+            /** Og Description */
+            og_description?: string | null;
+            /** Og Image Url */
+            og_image_url?: string | null;
+            /** Canonical Url */
+            canonical_url?: string | null;
+        };
         /** ProfileOut */
         ProfileOut: {
             /** Id */
@@ -1472,6 +2412,16 @@ export interface components {
              * Format: date-time
              */
             createdAt: string;
+        };
+        /** RecentlyViewedHydrateRequest */
+        RecentlyViewedHydrateRequest: {
+            /**
+             * Locale
+             * @default vi
+             */
+            locale: string;
+            /** Productids */
+            productIds: string[];
         };
         /** RefreshTokenResponse */
         RefreshTokenResponse: {
@@ -1502,6 +2452,23 @@ export interface components {
             customer: components["schemas"]["CustomerPublicOut"];
             /** Message */
             message: string;
+        };
+        /** RelatedGuideItem */
+        RelatedGuideItem: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /** Title */
+            title: string;
+            /** Slug */
+            slug: string;
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** Published At */
+            published_at?: string | null;
         };
         /** ReorderItemOut */
         ReorderItemOut: {
@@ -1593,6 +2560,19 @@ export interface components {
             /** Size */
             size: string;
         };
+        /** SeoOut */
+        SeoOut: {
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
+            /** Og Title */
+            og_title?: string | null;
+            /** Og Description */
+            og_description?: string | null;
+            /** Og Image Url */
+            og_image_url?: string | null;
+        };
         /** SizeOptionOut */
         SizeOptionOut: {
             /** Code */
@@ -1607,6 +2587,158 @@ export interface components {
             heightCm?: number | null;
             /** Pricedeltavnd */
             priceDeltaVnd: number;
+        };
+        /** SynonymCreateRequest */
+        SynonymCreateRequest: {
+            /** Locale */
+            locale: string;
+            /** Canonical Term */
+            canonical_term: string;
+            /** Synonym Term */
+            synonym_term: string;
+        };
+        /** SynonymListResponse */
+        SynonymListResponse: {
+            /** Items */
+            items: components["schemas"]["SynonymOut"][];
+        };
+        /** SynonymOut */
+        SynonymOut: {
+            /** Id */
+            id: string;
+            /** Locale */
+            locale: string;
+            /** Canonical Term */
+            canonical_term: string;
+            /** Synonym Term */
+            synonym_term: string;
+        };
+        /** SynonymUpdateRequest */
+        SynonymUpdateRequest: {
+            /** Canonical Term */
+            canonical_term?: string | null;
+            /** Synonym Term */
+            synonym_term?: string | null;
+        };
+        /** TagAdminListResponse */
+        TagAdminListResponse: {
+            /** Items */
+            items: components["schemas"]["TagAdminOut"][];
+        };
+        /** TagAdminOut */
+        TagAdminOut: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Type */
+            type: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Sort Order */
+            sort_order: number;
+            /** Translations */
+            translations: components["schemas"]["TagTranslationOut"][];
+        };
+        /** TagCreateRequest */
+        TagCreateRequest: {
+            /** Code */
+            code: string;
+            type: components["schemas"]["TagType"];
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+            /** Translations */
+            translations: {
+                [key: string]: components["schemas"]["TagTranslationIn"];
+            };
+        };
+        /** TagFilterItem */
+        TagFilterItem: {
+            /** Code */
+            code: string;
+            /** Type */
+            type: string;
+            /** Name */
+            name: string;
+        };
+        /** TagInfo */
+        TagInfo: {
+            /** Code */
+            code: string;
+            /** Type */
+            type: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
+        /** TagListResponse */
+        TagListResponse: {
+            /** Items */
+            items: components["schemas"]["TagOut"][];
+        };
+        /** TagOut */
+        TagOut: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Type */
+            type: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Sort Order */
+            sort_order: number;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description?: string | null;
+        };
+        /** TagTranslationIn */
+        TagTranslationIn: {
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description?: string | null;
+        };
+        /** TagTranslationOut */
+        TagTranslationOut: {
+            /** Locale */
+            locale: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description?: string | null;
+        };
+        /**
+         * TagType
+         * @enum {string}
+         */
+        TagType: "STYLE" | "MATERIAL" | "ROOM" | "USAGE" | "CAPACITY" | "PRICE_TIER" | "FEATURE" | "AVAILABILITY";
+        /** TagUpdateRequest */
+        TagUpdateRequest: {
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Sort Order */
+            sort_order?: number | null;
+            /** Translations */
+            translations?: {
+                [key: string]: components["schemas"]["TagTranslationIn"];
+            } | null;
         };
         /** TranslationIn */
         TranslationIn: {
@@ -1688,6 +2820,8 @@ export interface components {
             } | null;
             optionCodes?: components["schemas"]["OptionCodesIn"] | null;
             inventory?: components["schemas"]["InventoryIn"] | null;
+            /** Tagcodes */
+            tagCodes?: string[] | null;
         };
         /** UpdateProfileRequest */
         UpdateProfileRequest: {
@@ -1811,6 +2945,46 @@ export interface operations {
             };
         };
     };
+    robots_txt_robots_txt_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+        };
+    };
+    sitemap_xml_sitemap_xml_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     list_products_api_v1_products_get: {
         parameters: {
             query?: {
@@ -1823,6 +2997,10 @@ export interface operations {
                 sort?: string;
                 page?: number;
                 pageSize?: number;
+                /** @description Comma-separated tag codes */
+                tags?: string | null;
+                availability?: string | null;
+                ratingMin?: number | null;
             };
             header?: never;
             path?: never;
@@ -1858,6 +3036,40 @@ export interface operations {
             };
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_related_products_api_v1_products__slug__related_get: {
+        parameters: {
+            query?: {
+                locale?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -3425,6 +4637,1029 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminReviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_tags_api_v1_tags_get: {
+        parameters: {
+            query?: {
+                locale?: string;
+                type?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_tags_api_v1_admin_tags_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagAdminListResponse"];
+                };
+            };
+        };
+    };
+    admin_create_tag_api_v1_admin_tags_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_delete_tag_api_v1_admin_tags__tag_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tag_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_update_tag_api_v1_admin_tags__tag_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tag_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_collections_api_v1_collections_get: {
+        parameters: {
+            query?: {
+                locale?: string;
+                featured?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_collection_api_v1_collections__slug__get: {
+        parameters: {
+            query?: {
+                locale?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_collections_api_v1_admin_collections_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAdminListResponse"];
+                };
+            };
+        };
+    };
+    admin_create_collection_api_v1_admin_collections_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAdminItem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_get_collection_api_v1_admin_collections__collection_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAdminItem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_delete_collection_api_v1_admin_collections__collection_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_update_collection_api_v1_admin_collections__collection_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionAdminItem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_add_product_api_v1_admin_collections__collection_id__products_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionProductAddRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_reorder_products_api_v1_admin_collections__collection_id__products_reorder_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionProductReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_remove_product_api_v1_admin_collections__collection_id__products__product_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_guides_api_v1_guides_get: {
+        parameters: {
+            query?: {
+                locale?: string;
+                type?: string | null;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_guide_api_v1_guides__slug__get: {
+        parameters: {
+            query?: {
+                locale?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_content_api_v1_admin_content_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentAdminListResponse"];
+                };
+            };
+        };
+    };
+    admin_create_content_api_v1_admin_content_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentAdminItem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_get_content_api_v1_admin_content__content_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentAdminItem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_delete_content_api_v1_admin_content__content_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_update_content_api_v1_admin_content__content_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentAdminItem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_link_product_api_v1_admin_content__content_id__products_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentProductLinkRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_unlink_product_api_v1_admin_content__content_id__products__product_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_link_category_api_v1_admin_content__content_id__categories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentCategoryLinkRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_unlink_category_api_v1_admin_content__content_id__categories__category_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                content_id: string;
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    hydrate_recently_viewed_api_v1_discovery_recently_viewed_hydrate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecentlyViewedHydrateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    category_landing_api_v1_categories__slug__get: {
+        parameters: {
+            query?: {
+                locale?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryLandingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    material_landing_api_v1_materials__slug__get: {
+        parameters: {
+            query?: {
+                locale?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MaterialLandingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_synonyms_api_v1_admin_synonyms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SynonymListResponse"];
+                };
+            };
+        };
+    };
+    create_synonym_api_v1_admin_synonyms_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SynonymCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SynonymOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_synonym_api_v1_admin_synonyms__synonym_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                synonym_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_synonym_api_v1_admin_synonyms__synonym_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                synonym_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SynonymUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SynonymOut"];
                 };
             };
             /** @description Validation Error */
