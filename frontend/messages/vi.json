@@ -148,5 +148,106 @@
     "FAILED": "Thất bại",
     "CANCELLED": "Đã hủy",
     "EXPIRED": "Hết hạn"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "loggingIn": "Đang đăng nhập...",
+      "error": "Email hoặc mật khẩu không đúng",
+      "forgotPassword": "Quên mật khẩu?",
+      "noAccount": "Chưa có tài khoản?",
+      "register": "Đăng ký ngay"
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "fullName": "Họ tên",
+      "fullNamePlaceholder": "Nguyễn Văn A",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "phone": "Số điện thoại (không bắt buộc)",
+      "submit": "Đăng ký",
+      "registering": "Đang đăng ký...",
+      "success": "Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản.",
+      "hasAccount": "Đã có tài khoản?",
+      "login": "Đăng nhập"
+    },
+    "forgotPassword": {
+      "title": "Quên mật khẩu",
+      "email": "Email",
+      "submit": "Gửi link đặt lại",
+      "sending": "Đang gửi...",
+      "success": "Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu.",
+      "backToLogin": "Quay lại đăng nhập"
+    },
+    "resetPassword": {
+      "title": "Đặt lại mật khẩu",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "submit": "Đặt lại mật khẩu",
+      "submitting": "Đang xử lý...",
+      "success": "Mật khẩu đã được đặt lại thành công!",
+      "mismatch": "Mật khẩu không khớp",
+      "backToLogin": "Đăng nhập"
+    },
+    "verifyEmail": {
+      "verifying": "Đang xác minh email...",
+      "success": "Email đã được xác minh thành công!",
+      "error": "Link xác minh không hợp lệ hoặc đã hết hạn.",
+      "backToLogin": "Đăng nhập"
+    }
+  },
+  "account": {
+    "nav": {
+      "profile": "Thông tin cá nhân",
+      "addresses": "Địa chỉ",
+      "orders": "Đơn hàng",
+      "wishlist": "Danh sách yêu thích",
+      "logout": "Đăng xuất"
+    },
+    "profile": {
+      "title": "Thông tin cá nhân",
+      "fullName": "Họ tên",
+      "fullNamePlaceholder": "Nguyễn Văn A",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "0900000000",
+      "email": "Email",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu...",
+      "saveSuccess": "Đã lưu thông tin",
+      "saveError": "Lưu thất bại"
+    },
+    "addresses": {
+      "title": "Địa chỉ giao hàng",
+      "addNew": "Thêm địa chỉ",
+      "edit": "Chỉnh sửa",
+      "setDefault": "Đặt làm mặc định",
+      "defaultBadge": "Mặc định",
+      "delete": "Xóa",
+      "empty": "Bạn chưa có địa chỉ nào",
+      "recipientName": "Tên người nhận",
+      "phone": "Số điện thoại",
+      "fullAddress": "Địa chỉ đầy đủ",
+      "setAsDefault": "Đặt làm địa chỉ mặc định",
+      "save": "Lưu địa chỉ",
+      "saving": "Đang lưu...",
+      "cancel": "Hủy",
+      "saveError": "Lưu địa chỉ thất bại"
+    },
+    "orders": {
+      "title": "Đơn hàng của tôi",
+      "empty": "Bạn chưa có đơn hàng nào",
+      "items": "sản phẩm",
+      "viewDetail": "Xem chi tiết",
+      "detail": {
+        "title": "Chi tiết đơn hàng",
+        "timeline": "Lịch sử đơn hàng",
+        "reorder": "Đặt lại",
+        "reordering": "Đang xử lý...",
+        "reorderError": "Đặt lại thất bại"
+      }
+    }
   }
 }

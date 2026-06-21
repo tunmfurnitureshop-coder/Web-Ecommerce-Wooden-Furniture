@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/lib/i18n";
 import { useCartStore } from "@/features/cart/cart.store";
 import { createOrder } from "@/features/checkout/checkout.api";
 import type { PaymentMethod } from "@/features/checkout/checkout.types";
+import { useCustomerAuth } from "@/components/customer/CustomerAuthContext";
+import type { CustomerPublic, CustomerAddress } from "@/features/customer/customer.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +21,7 @@ export function CheckoutForm() {
   const tPayment = useTranslations("payment");
   const router = useRouter();
   const { items, clearCart } = useCartStore();
+  const { isAuthenticated, customerFetch } = useCustomerAuth();
 
   const [form, setForm] = useState({
     customerName: "",
@@ -30,6 +33,24 @@ export function CheckoutForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    Promise.all([
+      customerFetch<CustomerPublic>("/api/v1/customer/me"),
+      customerFetch<CustomerAddress[]>("/api/v1/customer/addresses"),
+    ]).then(([profile, addresses]) => {
+      const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
+      setForm((f) => ({
+        ...f,
+        customerName: profile.fullName ?? f.customerName,
+        customerPhone: profile.phone ?? f.customerPhone,
+        customerEmail: profile.email,
+        shippingAddress: defaultAddr?.fullAddress ?? f.shippingAddress,
+      }));
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   function validate() {
     const errs: Record<string, string> = {};

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/lib/i18n";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { CustomerAuthProvider } from "@/components/customer/CustomerAuthContext";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -32,9 +33,11 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <CustomerAuthProvider>
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+          </CustomerAuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>
