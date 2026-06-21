@@ -1,20 +1,22 @@
-# Wood Furniture Ecommerce Platform
+# Vin Furniture — E-commerce Platform
 
-A full-stack ecommerce platform for premium wooden furniture with product customization (wood type, finish, size), server-side pricing, payOS payment integration, Cloudflare R2 image storage, customer accounts, wishlists, reviews, and a complete admin panel.
+A full-stack e-commerce platform for premium custom wooden furniture. Customers configure products (wood type, finish, size), get server-calculated pricing, pay via PayOS or COD, and manage orders and wishlists through a full account portal. Includes a complete admin panel and a shared domain package with Zod schemas and view-model mappers.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | Backend | FastAPI, SQLAlchemy 2.0 (async), Alembic, PostgreSQL 16 |
-| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
+| Frontend | Next.js 14 (App Router, RSC-first), TypeScript, Tailwind CSS |
+| Design System | Custom component library (`frontend/design-system/`) with semantic Tailwind tokens |
+| Shared Packages | `@vin/domain` (Zod schemas, mappers, view models), `@vin/api-contracts` (generated OpenAPI types) |
 | State | Zustand (cart + wishlist) |
 | i18n | next-intl v3 — route-based (`/vi/...`, `/zh-CN/...`) |
 | Auth | JWT (python-jose) + bcrypt (passlib); refresh token in httpOnly cookie |
-| Payment | payOS |
+| Payment | PayOS |
 | Storage | Cloudflare R2 (boto3 S3-compatible) |
 | Email | Resend (console fallback for local dev) |
-| Tests | pytest + httpx AsyncClient + SQLite in-memory |
+| Tests | pytest + httpx AsyncClient (backend); Vitest (domain package) |
 | Infra | Docker Compose |
 
 ## Getting Started
@@ -88,47 +90,63 @@ docker exec wood_furniture_backend python -m app.seed
 │   │   │   ├── customer/      # profile, addresses, order history, reorder
 │   │   │   ├── product/       # catalog, detail, suggestions
 │   │   │   ├── pricing/       # server-side price calculation
-│   │   │   ├── cart/          # cart validation
+│   │   │   ├── cart/          # cart hydration & validation
 │   │   │   ├── order/         # order creation, events
 │   │   │   ├── inventory/     # stock management
 │   │   │   ├── wishlist/      # wishlist CRUD
 │   │   │   ├── review/        # product reviews + admin moderation
-│   │   │   ├── payment/       # payOS provider, transaction service
-│   │   │   ├── webhook/       # payOS webhook processing
+│   │   │   ├── payment/       # PayOS provider, transaction service
+│   │   │   ├── webhook/       # PayOS webhook processing
 │   │   │   ├── media/         # R2 image upload/delete
 │   │   │   ├── notification/  # email service, templates
 │   │   │   └── admin/         # dashboard, manual payment confirm
 │   │   └── shared/            # enums, pagination, responses
 │   ├── alembic/               # migrations
-│   ├── tests/                 # 61 pytest tests (customer auth, addresses, orders, wishlist, reviews, search)
+│   ├── tests/                 # pytest tests (customer auth, addresses, orders, wishlist, reviews, search)
 │   └── requirements.txt
+├── docs/                      # Architecture, roadmap, changelog, code standards
 ├── frontend/
 │   ├── app/[locale]/
 │   │   ├── admin/
+│   │   │   ├── dashboard/     # revenue and order metrics
 │   │   │   ├── payments/      # payment transaction list
 │   │   │   ├── orders/[id]/   # order detail with timeline
 │   │   │   ├── products/      # product management + image upload
 │   │   │   └── reviews/       # review moderation
 │   │   ├── account/
-│   │   │   ├── wishlist/      # saved products
-│   │   │   ├── orders/        # order history
-│   │   │   └── profile/       # name, phone, address book
+│   │   │   ├── profile/       # name, phone, address book
+│   │   │   ├── orders/        # order history + detail + reorder
+│   │   │   ├── addresses/     # address book management
+│   │   │   └── wishlist/      # saved products
+│   │   ├── (auth)/            # login, register, forgot/reset password, verify email
+│   │   ├── cart/              # cart with API hydration
 │   │   ├── checkout/
-│   │   │   ├── return/        # payOS return handler
-│   │   │   └── cancel/        # payOS cancel handler
-│   │   └── products/[slug]/   # product detail with reviews
+│   │   │   ├── return/        # PayOS return handler
+│   │   │   └── cancel/        # PayOS cancel handler
+│   │   ├── products/[slug]/   # product detail with reviews
+│   │   └── success/           # post-order confirmation
 │   ├── components/
+│   │   ├── auth/              # AuthLayout
+│   │   ├── catalog/           # CatalogFilters, CatalogSortSelector, ActiveFilterChips
+│   │   ├── checkout/          # CheckoutForm, CheckoutOrderSummary
+│   │   ├── customer/          # CustomerAuthContext, OrderDetailTimeline, ReorderButton
 │   │   ├── admin/             # OrderTimeline, PaymentTransactionTable, ProductImageManager
-│   │   ├── checkout/          # CheckoutForm with payOS option
-│   │   ├── product/           # ProductCard (with wishlist button), ProductDetailClient
+│   │   ├── product/           # ProductDetailClient
 │   │   ├── wishlist/          # WishlistButton, WishlistGrid, WishlistItemCard
 │   │   ├── review/            # RatingStars, ReviewSummary, ReviewList, ReviewForm
-│   │   ├── search/            # SearchBar (debounced suggestions), SortSelector, SearchEmptyState
-│   │   └── layout/            # Header (with search), Footer, AdminSidebar
+│   │   └── search/            # SearchBar (debounced suggestions)
+│   ├── design-system/         # Shared component library
+│   │   ├── primitives/        # Container, Section, Divider
+│   │   ├── components/        # Button, Badge, Skeleton, EmptyState, ErrorState, StatusBadge, Alert
+│   │   ├── commerce/          # ProductCard, ProductGrid, CartItem, CartSummary
+│   │   └── layout/            # Header, Footer, AccountSidebar, Breadcrumb, Pagination
 │   ├── features/              # API clients and types per domain
 │   ├── lib/                   # utilities, i18n config, auth helpers
 │   └── messages/              # vi.json, zh-CN.json
-├── spec/                      # Product specifications
+├── packages/
+│   ├── domain/                # @vin/domain — Zod schemas, view models, mappers (Vitest unit tests)
+│   └── api-contracts/         # @vin/api-contracts — generated TypeScript types from OpenAPI spec
+├── spec/                      # Product requirement documents
 └── docker-compose.yml
 ```
 
@@ -224,6 +242,22 @@ pytest tests/ -q
 
 Tests use SQLite in-memory — no running database required.
 
+### Run domain package tests
+
+```bash
+cd packages/domain
+npm test
+```
+
+### Regenerate API contract types
+
+```bash
+cd packages/api-contracts
+npx openapi-typescript openapi/openapi.json -o src/generated/schema.ts
+```
+
+Requires the backend to be running at `http://localhost:8000` first to fetch the latest spec.
+
 ### Run locally without Docker
 
 ```bash
@@ -235,8 +269,7 @@ alembic upgrade head
 python -m app.seed
 uvicorn app.main:app --reload
 
-# Frontend
-cd frontend
+# Frontend (from repo root — uses npm workspaces)
 npm install
-npm run dev
+npm run dev --workspace=frontend
 ```
