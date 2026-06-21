@@ -1,6 +1,6 @@
 # Vin Furniture — E-commerce Platform
 
-A full-stack e-commerce platform for premium custom wooden furniture. Customers configure products (wood type, finish, size), get server-calculated pricing, pay via PayOS or COD, and manage orders and wishlists through a full account portal. Includes a complete admin panel and a shared domain package with Zod schemas and view-model mappers.
+A full-stack e-commerce platform for premium custom wooden furniture. Customers configure products (wood type, finish, size), get server-calculated pricing, pay via PayOS or COD, and manage orders and wishlists through a full account portal. Includes a content hub (buying guides, material guides), a discovery layer (collections, categories, related products), SEO infrastructure (JSON-LD, sitemap, robots), and a complete admin panel.
 
 ## Tech Stack
 
@@ -10,13 +10,13 @@ A full-stack e-commerce platform for premium custom wooden furniture. Customers 
 | Frontend | Next.js 14 (App Router, RSC-first), TypeScript, Tailwind CSS |
 | Design System | Custom component library (`frontend/design-system/`) with semantic Tailwind tokens |
 | Shared Packages | `@vin/domain` (Zod schemas, mappers, view models), `@vin/api-contracts` (generated OpenAPI types) |
-| State | Zustand (cart + wishlist) |
+| State | Zustand (cart + wishlist + recently-viewed) |
 | i18n | next-intl v3 — route-based (`/vi/...`, `/zh-CN/...`) |
 | Auth | JWT (python-jose) + bcrypt (passlib); refresh token in httpOnly cookie |
 | Payment | PayOS |
 | Storage | Cloudflare R2 (boto3 S3-compatible) |
 | Email | Resend (console fallback for local dev) |
-| Tests | pytest + httpx AsyncClient (backend); Vitest (domain package) |
+| Tests | pytest + httpx AsyncClient (backend — 83 tests); Vitest (domain package — 44 tests) |
 | Infra | Docker Compose |
 
 ## Getting Started
@@ -38,6 +38,9 @@ docker exec wood_furniture_backend alembic upgrade head
 
 # Seed sample data (8 products, 5 room categories, admin user)
 docker exec wood_furniture_backend python -m app.seed
+
+# Seed taxonomy (tags, collections, sample guides)
+docker exec wood_furniture_backend python -m app.seed_taxonomy
 ```
 
 ### Access
@@ -61,7 +64,24 @@ docker exec wood_furniture_backend python -m app.seed
 - Guest order claim on email verification
 - Wishlist (add, remove, persistent across sessions)
 - Product reviews — submit after a delivered order, edit, delete
-- Full-text product search with live suggestions and filter/sort
+- Full-text product search with live suggestions, tag filter, availability filter, rating filter, sort
+- Recently-viewed products (localStorage persistence, max 12, API-hydrated details)
+
+### Discovery
+- `/collections` — curated product collections (draft/publish/archive workflow)
+- `/collections/[slug]` — collection detail with hero banner and product grid
+- `/categories/[slug]` — category landing with tag filtering and linked collections
+- `/materials/[slug]` — material-specific landing pages (walnut, oak, pine, etc.)
+- `/guides` — content hub listing with type filter (buying/material/style/care/how-to)
+- `/guides/[slug]` — article detail with Markdown rendering, linked products, related guides
+- Related products — 5-tier fallback (manual → same category → shared tags → price tier → latest)
+
+### SEO
+- Per-page `generateMetadata` with SEO fallback chain (custom meta title → product name)
+- JSON-LD structured data: `Product`, `BreadcrumbList`, `Article` schemas
+- `robots.txt` — disallows admin/account paths, references sitemap
+- `sitemap.xml` — all products, collections, materials, guides with hreflang alternates (vi + zh-CN)
+- Canonical URL generation on the backend
 
 ### Admin
 - Product management with image upload (Cloudflare R2)
@@ -70,10 +90,13 @@ docker exec wood_furniture_backend python -m app.seed
 - Review moderation — approve, reject, hide, restore (PENDING → APPROVED/REJECTED, APPROVED ↔ HIDDEN)
 - Inventory management
 - Dashboard with revenue and order metrics
+- **Tags** — CRUD for taxonomy tags (8 types: STYLE, MATERIAL, ROOM, USAGE, CAPACITY, PRICE_TIER, FEATURE, AVAILABILITY)
+- **Collections** — CRUD with product picker, SEO metadata per locale, cover image, publish workflow
+- **Content** — Markdown editor with live preview, locale tabs (vi/zh-CN), scheduled publishing, product/category linking
 
 ### Shopping
-- Product catalog with filters (room, wood type, price range) and sort (newest, price, rating)
-- Product detail with image gallery, option selector, pricing preview
+- Product catalog with filters (room, wood type, price range, tags, availability, rating) and sort
+- Product detail with image gallery, option selector, pricing preview, tags, related products
 - Cart (persisted in localStorage via Zustand)
 - Checkout with COD, bank transfer, or payOS (QR / card)
 - payOS webhook with checksum verification and idempotent processing
@@ -100,10 +123,15 @@ docker exec wood_furniture_backend python -m app.seed
 │   │   │   ├── webhook/       # PayOS webhook processing
 │   │   │   ├── media/         # R2 image upload/delete
 │   │   │   ├── notification/  # email service, templates
-│   │   │   └── admin/         # dashboard, manual payment confirm
+│   │   │   ├── admin/         # dashboard, manual payment confirm
+│   │   │   ├── taxonomy/      # tag system (8 types), admin CRUD, product tags
+│   │   │   ├── collection/    # curated collections, publish workflow
+│   │   │   ├── content/       # buying/material guides, Markdown + bleach sanitization
+│   │   │   ├── discovery/     # related products, recently-viewed hydration, synonym search
+│   │   │   └── seo/           # sitemap, robots.txt, JSON-LD builders, canonical URL
 │   │   └── shared/            # enums, pagination, responses
 │   ├── alembic/               # migrations
-│   ├── tests/                 # pytest tests (customer auth, addresses, orders, wishlist, reviews, search)
+│   ├── tests/                 # 83 pytest tests (auth, addresses, orders, wishlist, reviews, search, taxonomy, collections, content)
 │   └── requirements.txt
 ├── docs/                      # Architecture, roadmap, changelog, code standards
 ├── frontend/
@@ -113,7 +141,10 @@ docker exec wood_furniture_backend python -m app.seed
 │   │   │   ├── payments/      # payment transaction list
 │   │   │   ├── orders/[id]/   # order detail with timeline
 │   │   │   ├── products/      # product management + image upload
-│   │   │   └── reviews/       # review moderation
+│   │   │   ├── reviews/       # review moderation
+│   │   │   ├── tags/          # tag CRUD with type chips
+│   │   │   ├── collections/   # collection CRUD + product picker
+│   │   │   └── content/       # content CRUD with Markdown live preview
 │   │   ├── account/
 │   │   │   ├── profile/       # name, phone, address book
 │   │   │   ├── orders/        # order history + detail + reorder
@@ -124,14 +155,19 @@ docker exec wood_furniture_backend python -m app.seed
 │   │   ├── checkout/
 │   │   │   ├── return/        # PayOS return handler
 │   │   │   └── cancel/        # PayOS cancel handler
-│   │   ├── products/[slug]/   # product detail with reviews
+│   │   ├── collections/       # collections listing + [slug] detail
+│   │   ├── categories/[slug]/ # category landing with tag filter
+│   │   ├── materials/[slug]/  # material landing pages
+│   │   ├── guides/            # content hub listing + [slug] article detail
+│   │   ├── products/[slug]/   # product detail with reviews, tags, related products
 │   │   └── success/           # post-order confirmation
 │   ├── components/
 │   │   ├── auth/              # AuthLayout
 │   │   ├── catalog/           # CatalogFilters, CatalogSortSelector, ActiveFilterChips
 │   │   ├── checkout/          # CheckoutForm, CheckoutOrderSummary
 │   │   ├── customer/          # CustomerAuthContext, OrderDetailTimeline, ReorderButton
-│   │   ├── admin/             # OrderTimeline, PaymentTransactionTable, ProductImageManager
+│   │   ├── admin/             # OrderTimeline, PaymentTransactionTable, ProductImageManager,
+│   │   │                      # SeoMetadataForm (character counters), CollectionForm, ContentEditor
 │   │   ├── product/           # ProductDetailClient
 │   │   ├── wishlist/          # WishlistButton, WishlistGrid, WishlistItemCard
 │   │   ├── review/            # RatingStars, ReviewSummary, ReviewList, ReviewForm
@@ -139,13 +175,22 @@ docker exec wood_furniture_backend python -m app.seed
 │   ├── design-system/         # Shared component library
 │   │   ├── primitives/        # Container, Section, Divider
 │   │   ├── components/        # Button, Badge, Skeleton, EmptyState, ErrorState, StatusBadge, Alert
-│   │   ├── commerce/          # ProductCard, ProductGrid, CartItem, CartSummary
+│   │   ├── commerce/          # ProductCard, ProductGrid, CartItem, CartSummary,
+│   │   │                      # CollectionCard, CollectionGrid, ProductTagList,
+│   │   │                      # RelatedProductCarousel, RecentlyViewedSection
+│   │   ├── content/           # ArticleCard, ArticleGrid, ArticleHero, ArticleMeta,
+│   │   │                      # MarkdownRenderer, RelatedGuideCard, JsonLd
 │   │   └── layout/            # Header, Footer, AccountSidebar, Breadcrumb, Pagination
 │   ├── features/              # API clients and types per domain
+│   │   ├── product/           # product.api.ts, product.types.ts
+│   │   ├── cart/              # cart.store.ts
+│   │   ├── wishlist/          # wishlist.store.ts
+│   │   ├── recently-viewed/   # recently-viewed.store.ts (Zustand persist, max 12 IDs)
+│   │   └── admin/             # admin.api.ts, admin.types.ts
 │   ├── lib/                   # utilities, i18n config, auth helpers
 │   └── messages/              # vi.json, zh-CN.json
 ├── packages/
-│   ├── domain/                # @vin/domain — Zod schemas, view models, mappers (Vitest unit tests)
+│   ├── domain/                # @vin/domain — Zod schemas, view models, mappers (44 Vitest tests)
 │   └── api-contracts/         # @vin/api-contracts — generated TypeScript types from OpenAPI spec
 ├── spec/                      # Product requirement documents
 └── docker-compose.yml
@@ -164,6 +209,10 @@ docker exec wood_furniture_backend python -m app.seed
 - **Webhook idempotency** — duplicate payOS webhooks are ignored safely
 - **Email is non-blocking** — email failure never fails the checkout or payment flow
 - **Search uses translation slugs** — `room` filter matches `RoomCategoryTranslation.slug` (locale-aware)
+- **Recently-viewed is client-only** — Zustand persist in localStorage; API called only for hydration (no server state)
+- **Collection publish requires ≥1 active product** — enforced at PATCH time, not at creation
+- **Markdown sanitized with bleach** — `<script>` tags stripped server-side before storage and rendering
+- **JSON-LD injected as RSC** — `<JsonLd>` component is a Server Component; no client JS needed
 
 ## Environment Variables
 
@@ -182,6 +231,7 @@ cp frontend/.env.local.example frontend/.env.local
 | `JWT_SECRET_KEY` | Change in production |
 | `CORS_ORIGINS` | Allowed frontend origins (comma-separated) |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Initial admin account |
+| `SITE_BASE_URL` | Public site URL for canonical URLs and sitemap (e.g. `https://vinfurniture.vn`) |
 | `PAYOS_CLIENT_ID` | payOS merchant client ID |
 | `PAYOS_API_KEY` | payOS API key |
 | `PAYOS_CHECKSUM_KEY` | payOS webhook checksum key |
@@ -203,6 +253,7 @@ cp frontend/.env.local.example frontend/.env.local
 | Variable | Description |
 |----------|-------------|
 | `NEXT_PUBLIC_API_BASE_URL` | Backend base URL (default: `http://localhost:8000`) |
+| `NEXT_PUBLIC_SITE_URL` | Public site URL for sitemap generation (default: `https://vinfurniture.vn`) |
 
 ## Payment Flow
 
@@ -241,7 +292,7 @@ pip install -r requirements.txt
 pytest tests/ -q
 ```
 
-Tests use SQLite in-memory — no running database required.
+Tests use SQLite in-memory — no running database required. All 83 tests pass.
 
 ### Run domain package tests
 
@@ -268,6 +319,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 alembic upgrade head
 python -m app.seed
+python -m app.seed_taxonomy
 uvicorn app.main:app --reload
 
 # Frontend (from repo root — uses npm workspaces)
