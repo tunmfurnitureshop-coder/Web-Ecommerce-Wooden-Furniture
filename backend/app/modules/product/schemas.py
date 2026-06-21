@@ -18,11 +18,21 @@ class ProductCatalogItem(BaseModel):
     room: RoomOut
 
 
+class AppliedFilters(BaseModel):
+    room: Optional[str] = None
+    woodType: Optional[str] = None
+    minPrice: Optional[int] = None
+    maxPrice: Optional[int] = None
+    sort: Optional[str] = None
+
+
 class ProductCatalogResponse(BaseModel):
     items: List[ProductCatalogItem]
     page: int
     pageSize: int
     total: int
+    query: Optional[str] = None
+    appliedFilters: Optional[AppliedFilters] = None
 
 
 class WoodTypeOptionOut(BaseModel):

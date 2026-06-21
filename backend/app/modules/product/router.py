@@ -17,15 +17,28 @@ admin_router = APIRouter(tags=["admin-products"])
 @router.get("/products", response_model=ProductCatalogResponse)
 async def list_products(
     locale: str = Query("vi"),
+    q: Optional[str] = Query(None),
     room: Optional[str] = Query(None),
     woodType: Optional[str] = Query(None),
     minPrice: Optional[int] = Query(None),
     maxPrice: Optional[int] = Query(None),
+    sort: str = Query("newest"),
     page: int = Query(1, ge=1),
     pageSize: int = Query(12, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.get_catalog(db, locale, room, woodType, minPrice, maxPrice, page, pageSize)
+    return await service.get_catalog(db, locale, q, room, woodType, minPrice, maxPrice, sort, page, pageSize)
+
+
+@router.get("/products/suggestions")
+async def suggestions(
+    q: str = Query(""),
+    locale: str = Query("vi"),
+    db: AsyncSession = Depends(get_db),
+):
+    if len(q) < 2:
+        return {"products": [], "categories": [], "woodTypes": []}
+    return await service.get_suggestions(db, q, locale)
 
 
 @router.get("/products/{slug}", response_model=ProductDetailOut)

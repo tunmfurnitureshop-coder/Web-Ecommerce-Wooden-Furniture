@@ -8,13 +8,13 @@ from app.modules.inventory.models import (
     ProductWoodType, ProductFinishOption, ProductSizeOption, InventoryItem
 )
 from app.modules.product.schemas import (
-    ProductCatalogItem, ProductCatalogResponse, ProductDetailOut,
+    ProductCatalogItem, ProductCatalogResponse, AppliedFilters, ProductDetailOut,
     AvailableOptions, WoodTypeOptionOut, FinishOptionOut, SizeOptionOut,
     RoomOut, CreateProductRequest, UpdateProductRequest,
     AdminProductItem, AdminProductListResponse, InventoryOut
 )
 from app.core.exceptions import not_found, conflict, validation_error
-from app.shared.enums import ProductStatus
+from app.shared.enums import ProductStatus, ReviewStatus
 import uuid
 
 
@@ -31,13 +31,17 @@ def _get_translation(translations, locale: str, fallback: str = "vi"):
 async def get_catalog(
     db: AsyncSession,
     locale: str = "vi",
+    q: Optional[str] = None,
     room: Optional[str] = None,
     wood_type: Optional[str] = None,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
+    sort: str = "newest",
     page: int = 1,
     page_size: int = 12,
 ) -> ProductCatalogResponse:
+    from app.modules.review.models import ProductReview
+
     query = (
         select(Product)
         .where(Product.status == ProductStatus.ACTIVE)
@@ -48,6 +52,19 @@ async def get_catalog(
             selectinload(Product.wood_types).selectinload(ProductWoodType.wood_type),
         )
     )
+
+    if q:
+        query = query.join(
+            ProductTranslation,
+            and_(ProductTranslation.product_id == Product.id, ProductTranslation.locale == locale),
+            isouter=True,
+        ).where(
+            or_(
+                ProductTranslation.name.ilike(f"%{q}%"),
+                ProductTranslation.short_description.ilike(f"%{q}%"),
+                ProductTranslation.description.ilike(f"%{q}%"),
+            )
+        )
 
     if room:
         cat_sub = select(RoomCategory.id).join(
@@ -66,6 +83,37 @@ async def get_catalog(
         query = query.where(Product.base_price_vnd >= min_price)
     if max_price is not None:
         query = query.where(Product.base_price_vnd <= max_price)
+
+    if sort == "price_asc":
+        query = query.order_by(Product.base_price_vnd.asc())
+    elif sort == "price_desc":
+        query = query.order_by(Product.base_price_vnd.desc())
+    elif sort == "rating_desc":
+        avg_rating_sq = (
+            select(
+                ProductReview.product_id,
+                func.coalesce(func.avg(ProductReview.rating), 0).label("avg_rating"),
+                func.count(ProductReview.id).label("review_count"),
+            )
+            .where(ProductReview.status == ReviewStatus.APPROVED)
+            .group_by(ProductReview.product_id)
+            .subquery()
+        )
+        query = (
+            query.outerjoin(avg_rating_sq, avg_rating_sq.c.product_id == Product.id)
+            .order_by(
+                func.coalesce(avg_rating_sq.c.avg_rating, 0).desc(),
+                func.coalesce(avg_rating_sq.c.review_count, 0).desc(),
+                Product.created_at.desc(),
+            )
+        )
+    elif sort == "relevance" and q:
+        query = query.order_by(
+            func.similarity(ProductTranslation.name, q).desc(),
+            Product.created_at.desc(),
+        )
+    else:
+        query = query.order_by(Product.created_at.desc())
 
     count_result = await db.execute(select(func.count()).select_from(query.subquery()))
     total = count_result.scalar_one()
@@ -94,7 +142,71 @@ async def get_catalog(
             ),
         ))
 
-    return ProductCatalogResponse(items=items, page=page, pageSize=page_size, total=total)
+    return ProductCatalogResponse(
+        items=items,
+        page=page,
+        pageSize=page_size,
+        total=total,
+        query=q or None,
+        appliedFilters=AppliedFilters(
+            room=room,
+            woodType=wood_type,
+            minPrice=min_price,
+            maxPrice=max_price,
+            sort=sort,
+        ),
+    )
+
+
+async def get_suggestions(db: AsyncSession, q: str, locale: str = "vi") -> dict:
+    if len(q) < 2:
+        return {"products": [], "categories": [], "woodTypes": []}
+
+    product_rows = (await db.execute(
+        select(Product, ProductTranslation)
+        .join(
+            ProductTranslation,
+            and_(ProductTranslation.product_id == Product.id, ProductTranslation.locale == locale),
+        )
+        .where(
+            Product.status == ProductStatus.ACTIVE,
+            ProductTranslation.name.ilike(f"%{q}%"),
+        )
+        .limit(5)
+    )).all()
+
+    cat_rows = (await db.execute(
+        select(RoomCategory, RoomCategoryTranslation)
+        .join(
+            RoomCategoryTranslation,
+            and_(
+                RoomCategoryTranslation.category_id == RoomCategory.id,
+                RoomCategoryTranslation.locale == locale,
+            ),
+        )
+        .where(RoomCategoryTranslation.name.ilike(f"%{q}%"), RoomCategory.is_active == True)  # noqa: E712
+        .limit(5)
+    )).all()
+
+    from app.modules.inventory.models import WoodType, WoodTypeTranslation
+    wt_rows = (await db.execute(
+        select(WoodType, WoodTypeTranslation)
+        .join(
+            WoodTypeTranslation,
+            and_(WoodTypeTranslation.wood_type_id == WoodType.id, WoodTypeTranslation.locale == locale),
+        )
+        .where(WoodTypeTranslation.name.ilike(f"%{q}%"), WoodType.is_active == True)  # noqa: E712
+        .limit(5)
+    )).all()
+
+    return {
+        "products": [
+            {"slug": t.slug, "name": t.name, "primaryImageUrl": p.primary_image_url}
+            for p, t in product_rows
+        ],
+        "categories": [{"code": c.code, "name": t.name} for c, t in cat_rows],
+        "woodTypes": [{"code": w.code, "name": t.name} for w, t in wt_rows],
+    }
 
 
 async def get_product_detail(db: AsyncSession, slug: str, locale: str = "vi") -> ProductDetailOut:
