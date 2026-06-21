@@ -2,7 +2,14 @@
   "nav": {
     "home": "首页",
     "products": "产品",
-    "cart": "购物车"
+    "rooms": "家居空间",
+    "cart": "购物车",
+    "wishlist": "收藏夹",
+    "account": "账户",
+    "login": "登录",
+    "search": "搜索",
+    "switchLanguage": "切换语言",
+    "mainNavLabel": "主导航"
   },
   "product": {
     "addToCart": "加入购物车",
@@ -106,20 +113,6 @@
     "apply": "应用",
     "reset": "重置"
   },
-  "home": {
-    "heroTitle": "高端天然木家具",
-    "heroSubtitle": "精心打造，经久耐用",
-    "heroCtaShop": "浏览产品",
-    "featuredTitle": "精选产品",
-    "categoriesTitle": "房间分类",
-    "categories": {
-      "living_room": "客厅",
-      "bedroom": "卧室",
-      "dining_room": "餐厅",
-      "office": "办公室",
-      "outdoor": "户外"
-    }
-  },
   "common": {
     "loading": "加载中...",
     "error": "发生错误",
@@ -201,12 +194,61 @@
       "backToLogin": "登录"
     }
   },
+  "footer": {
+    "tagline": "精选天然木材，为您的生活空间打造高品质家具。",
+    "sections": {
+      "products": "产品",
+      "account": "账户",
+      "support": "支持"
+    },
+    "rooms": {
+      "living_room": "客厅",
+      "bedroom": "卧室",
+      "dining_room": "餐厅",
+      "outdoor": "户外"
+    },
+    "accountLinks": {
+      "profile": "个人信息",
+      "orders": "订单",
+      "wishlist": "收藏夹",
+      "addresses": "地址"
+    },
+    "contact": {
+      "email": "support@vinfurniture.vn",
+      "phone": "+84 901 234 567"
+    },
+    "copyright": "© {year} Vin Furniture. 版权所有。"
+  },
+  "home": {
+    "heroTitle": "高端天然木家具",
+    "heroSubtitle": "精心打造，经久耐用",
+    "heroCtaShop": "浏览产品",
+    "heroCtaCollection": "查看系列",
+    "featuredTitle": "精选产品",
+    "browseByRoom": "按空间浏览",
+    "trustTitle": "为什么选择我们",
+    "trust": {
+      "delivery": { "title": "免费配送", "desc": "订单满5百万越盾免费配送" },
+      "quality": { "title": "品质保证", "desc": "精选天然木材，严格品质检测" },
+      "warranty": { "title": "两年保修", "desc": "所有产品全面保修承诺" },
+      "support": { "title": "24/7支持", "desc": "专业顾问团队随时为您服务" }
+    },
+    "categoriesTitle": "房间分类",
+    "categories": {
+      "living_room": "客厅",
+      "bedroom": "卧室",
+      "dining_room": "餐厅",
+      "office": "办公室",
+      "outdoor": "户外"
+    }
+  },
   "account": {
     "nav": {
+      "ariaLabel": "账户导航",
       "profile": "个人信息",
       "addresses": "地址",
       "orders": "订单",
-      "wishlist": "收藏",
+      "wishlist": "收藏夹",
       "logout": "退出登录"
     },
     "profile": {
@@ -285,6 +327,12 @@
   },
   "search": {
     "placeholder": "搜索商品...",
+    "inputLabel": "输入搜索关键词",
+    "close": "关闭搜索",
+    "loading": "搜索中...",
+    "recentSearches": "最近搜索",
+    "suggestions": "建议",
+    "noSuggestions": "无建议",
     "resultsFor": "搜索结果",
     "allProducts": "所有商品",
     "noResults": "未找到商品",
@@ -298,11 +346,6 @@
       "priceDesc": "价格从高到低",
       "ratingDesc": "评分最高",
       "relevance": "最相关"
-    },
-    "suggestions": {
-      "products": "商品",
-      "categories": "分类",
-      "woodTypes": "木材类型"
     }
   },
   "reviewStatus": {

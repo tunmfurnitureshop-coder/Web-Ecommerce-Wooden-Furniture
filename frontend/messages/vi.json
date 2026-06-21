@@ -2,7 +2,14 @@
   "nav": {
     "home": "Trang chủ",
     "products": "Sản phẩm",
-    "cart": "Giỏ hàng"
+    "rooms": "Phòng nội thất",
+    "cart": "Giỏ hàng",
+    "wishlist": "Danh sách yêu thích",
+    "account": "Tài khoản",
+    "login": "Đăng nhập",
+    "search": "Tìm kiếm",
+    "switchLanguage": "Chuyển ngôn ngữ",
+    "mainNavLabel": "Điều hướng chính"
   },
   "product": {
     "addToCart": "Thêm vào giỏ",
@@ -106,20 +113,6 @@
     "apply": "Áp dụng",
     "reset": "Đặt lại"
   },
-  "home": {
-    "heroTitle": "Nội thất gỗ tự nhiên cao cấp",
-    "heroSubtitle": "Crafted with passion, built to last",
-    "heroCtaShop": "Khám phá sản phẩm",
-    "featuredTitle": "Sản phẩm nổi bật",
-    "categoriesTitle": "Danh mục phòng",
-    "categories": {
-      "living_room": "Phòng khách",
-      "bedroom": "Phòng ngủ",
-      "dining_room": "Phòng ăn",
-      "office": "Văn phòng",
-      "outdoor": "Ngoài trời"
-    }
-  },
   "common": {
     "loading": "Đang tải...",
     "error": "Đã xảy ra lỗi",
@@ -201,8 +194,57 @@
       "backToLogin": "Đăng nhập"
     }
   },
+  "footer": {
+    "tagline": "Nội thất gỗ tự nhiên cao cấp, được chế tác tỉ mỉ cho không gian sống của bạn.",
+    "sections": {
+      "products": "Sản phẩm",
+      "account": "Tài khoản",
+      "support": "Hỗ trợ"
+    },
+    "rooms": {
+      "living_room": "Phòng khách",
+      "bedroom": "Phòng ngủ",
+      "dining_room": "Phòng ăn",
+      "outdoor": "Ngoài trời"
+    },
+    "accountLinks": {
+      "profile": "Thông tin cá nhân",
+      "orders": "Đơn hàng",
+      "wishlist": "Yêu thích",
+      "addresses": "Địa chỉ"
+    },
+    "contact": {
+      "email": "support@vinfurniture.vn",
+      "phone": "+84 901 234 567"
+    },
+    "copyright": "© {year} Vin Furniture. Tất cả quyền được bảo lưu."
+  },
+  "home": {
+    "heroTitle": "Nội thất gỗ tự nhiên cao cấp",
+    "heroSubtitle": "Chế tác tỉ mỉ, bền vững theo thời gian",
+    "heroCtaShop": "Khám phá sản phẩm",
+    "heroCtaCollection": "Xem bộ sưu tập",
+    "featuredTitle": "Sản phẩm nổi bật",
+    "browseByRoom": "Theo phòng",
+    "trustTitle": "Tại sao chọn chúng tôi",
+    "trust": {
+      "delivery": { "title": "Giao hàng miễn phí", "desc": "Miễn phí vận chuyển cho đơn từ 5 triệu đồng" },
+      "quality": { "title": "Chất lượng đảm bảo", "desc": "Gỗ tự nhiên chọn lọc, kiểm định nghiêm ngặt" },
+      "warranty": { "title": "Bảo hành 2 năm", "desc": "Cam kết bảo hành toàn bộ sản phẩm" },
+      "support": { "title": "Hỗ trợ 24/7", "desc": "Đội ngũ tư vấn luôn sẵn sàng hỗ trợ bạn" }
+    },
+    "categoriesTitle": "Danh mục phòng",
+    "categories": {
+      "living_room": "Phòng khách",
+      "bedroom": "Phòng ngủ",
+      "dining_room": "Phòng ăn",
+      "office": "Văn phòng",
+      "outdoor": "Ngoài trời"
+    }
+  },
   "account": {
     "nav": {
+      "ariaLabel": "Điều hướng tài khoản",
       "profile": "Thông tin cá nhân",
       "addresses": "Địa chỉ",
       "orders": "Đơn hàng",
@@ -285,6 +327,12 @@
   },
   "search": {
     "placeholder": "Tìm kiếm sản phẩm...",
+    "inputLabel": "Nhập từ khóa tìm kiếm",
+    "close": "Đóng tìm kiếm",
+    "loading": "Đang tìm kiếm...",
+    "recentSearches": "Tìm kiếm gần đây",
+    "suggestions": "Gợi ý",
+    "noSuggestions": "Không có gợi ý",
     "resultsFor": "Kết quả cho",
     "allProducts": "Tất cả sản phẩm",
     "noResults": "Không tìm thấy sản phẩm",
@@ -298,11 +346,6 @@
       "priceDesc": "Giá cao đến thấp",
       "ratingDesc": "Đánh giá cao nhất",
       "relevance": "Phù hợp nhất"
-    },
-    "suggestions": {
-      "products": "Sản phẩm",
-      "categories": "Danh mục",
-      "woodTypes": "Loại gỗ"
     }
   },
   "reviewStatus": {
