@@ -20,3 +20,5 @@ boto3==1.35.0
 resend==2.5.1
 mistune==3.3.0
 bleach==6.4.0
+arq==0.26.1
+redis[asyncio]==5.2.1

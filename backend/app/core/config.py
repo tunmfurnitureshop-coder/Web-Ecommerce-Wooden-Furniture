@@ -48,6 +48,13 @@ class Settings(BaseSettings):
     EMAIL_FROM: str = "Wood Furniture <no-reply@example.com>"
     ADMIN_NOTIFICATION_EMAIL: str = "admin@example.com"
 
+    # Redis / Arq
+    REDIS_URL: str = "redis://localhost:6379/0"
+    ARQ_QUEUE_NAME: str = "vin_furniture_jobs"
+    ABANDONED_CART_DELAY_MINUTES: int = 120
+    ABANDONED_CART_TOKEN_TTL_HOURS: int = 168
+    ABANDONED_CART_SCAN_INTERVAL_MINUTES: int = 15
+
     @property
     def cors_origins_list(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",")]
