@@ -24,6 +24,7 @@ import app.modules.customer_auth.models  # noqa
 import app.modules.customer.models  # noqa
 import app.modules.wishlist.models  # noqa
 import app.modules.review.models  # noqa
+import app.modules.promotion.models  # noqa
 
 target_metadata = Base.metadata
 

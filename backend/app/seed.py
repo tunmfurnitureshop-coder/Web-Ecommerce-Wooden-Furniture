@@ -11,6 +11,14 @@ from app.modules.inventory.models import (
     SizeOption, SizeOptionTranslation, InventoryItem,
     ProductWoodType, ProductFinishOption, ProductSizeOption,
 )
+from sqlalchemy import select
+from app.modules.promotion.models import Promotion, PromotionTranslation
+from app.shared.enums import (
+    PromotionStatus, PromotionTrigger, PromotionScopeType, DiscountType,
+)
+
+PROMO_SUMMER10_ID = "promo-seed-summer10-v05"
+PROMO_AUTO_500K_ID = "promo-seed-auto-500k-v05"
 
 
 def uid() -> str:
@@ -309,6 +317,72 @@ async def seed():
                 id=uid(), product_id=p_id,
                 total_qty=p["inventory"], reserved_qty=0,
                 created_at=now(), updated_at=now(),
+            ))
+
+        print("Seeding promotions...")
+        starts = datetime(2026, 6, 1, tzinfo=timezone.utc)
+        ends = datetime(2026, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+
+        with db.no_autoflush:
+            result = await db.execute(select(Promotion).where(Promotion.id == PROMO_SUMMER10_ID))
+            existing_promo = result.scalar_one_or_none()
+
+        if not existing_promo:
+            db.add(Promotion(
+                id=PROMO_SUMMER10_ID,
+                code="SUMMER10",
+                code_normalized="SUMMER10",
+                trigger=PromotionTrigger.COUPON,
+                scope_type=PromotionScopeType.CART,
+                status=PromotionStatus.ACTIVE,
+                discount_type=DiscountType.PERCENTAGE,
+                discount_percentage_bps=1000,
+                max_discount_vnd=1000000,
+                min_order_value_vnd=5000000,
+                usage_limit_total=500,
+                usage_limit_per_customer=1,
+                priority=100,
+                starts_at=starts,
+                ends_at=ends,
+                created_at=now(),
+                updated_at=now(),
+            ))
+            db.add(PromotionTranslation(
+                id=uid(),
+                promotion_id=PROMO_SUMMER10_ID,
+                locale="vi",
+                name="Giảm giá mùa hè",
+                description="Giảm 10% cho đơn hàng từ 5.000.000 VND",
+                badge_label="Giảm 10%",
+                created_at=now(),
+                updated_at=now(),
+            ))
+
+            db.add(Promotion(
+                id=PROMO_AUTO_500K_ID,
+                code=None,
+                code_normalized=None,
+                trigger=PromotionTrigger.AUTOMATIC,
+                scope_type=PromotionScopeType.CART,
+                status=PromotionStatus.ACTIVE,
+                discount_type=DiscountType.FIXED_AMOUNT,
+                discount_amount_vnd=500000,
+                min_order_value_vnd=10000000,
+                priority=50,
+                starts_at=starts,
+                ends_at=ends,
+                created_at=now(),
+                updated_at=now(),
+            ))
+            db.add(PromotionTranslation(
+                id=uid(),
+                promotion_id=PROMO_AUTO_500K_ID,
+                locale="vi",
+                name="Giảm 500.000 VND đơn hàng lớn",
+                description="Tự động giảm 500.000 VND cho đơn hàng từ 10.000.000 VND",
+                badge_label="Giảm 500K",
+                created_at=now(),
+                updated_at=now(),
             ))
 
         await db.commit()

@@ -4,7 +4,7 @@ from typing import Optional, List
 from sqlalchemy import String, Integer, Text, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
-from app.shared.enums import OrderStatus, PaymentStatus, PaymentMethod
+from app.shared.enums import OrderStatus, PaymentStatus, PaymentMethod  # noqa: F401
 
 
 class Order(Base):
@@ -37,6 +37,16 @@ class Order(Base):
     guest_order_claim_token_hash: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     guest_order_claimed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    # v0.5 — discount fields
+    merchandise_subtotal_vnd: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    promotion_discount_vnd: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    shipping_discount_vnd: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_discount_vnd: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    campaign_id: Mapped[Optional[str]] = mapped_column(String, ForeignKey("campaigns.id"), nullable=True)
+    attribution_snapshot: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    cart_recovery_session_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
@@ -57,6 +67,10 @@ class OrderItem(Base):
     unit_price_vnd: Mapped[int] = mapped_column(Integer, nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     line_total_vnd: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # v0.5 — per-line discount fields
+    promotion_discount_vnd: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    final_line_total_vnd: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

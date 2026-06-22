@@ -134,3 +134,80 @@ class ProductRelationType(str, enum.Enum):
     MANUAL_RELATED = "MANUAL_RELATED"
     CROSS_SELL = "CROSS_SELL"
     UPSELL = "UPSELL"
+
+
+class PromotionStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    ACTIVE = "ACTIVE"
+    PAUSED = "PAUSED"
+    ARCHIVED = "ARCHIVED"
+
+
+class PromotionTrigger(str, enum.Enum):
+    COUPON = "COUPON"
+    AUTOMATIC = "AUTOMATIC"
+
+
+class PromotionScopeType(str, enum.Enum):
+    CART = "CART"
+    PRODUCT = "PRODUCT"
+    CATEGORY = "CATEGORY"
+    COLLECTION = "COLLECTION"
+    BUNDLE = "BUNDLE"
+
+
+class DiscountType(str, enum.Enum):
+    PERCENTAGE = "PERCENTAGE"
+    FIXED_AMOUNT = "FIXED_AMOUNT"
+
+
+class PromotionRedemptionStatus(str, enum.Enum):
+    RESERVED = "RESERVED"
+    REDEEMED = "REDEEMED"
+    RELEASED = "RELEASED"
+
+
+class CampaignStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    ACTIVE = "ACTIVE"
+    PAUSED = "PAUSED"
+    ARCHIVED = "ARCHIVED"
+
+
+class CampaignPlacement(str, enum.Enum):
+    HOME_HERO = "HOME_HERO"
+    HOME_SECTION = "HOME_SECTION"
+    COLLECTION_SECTION = "COLLECTION_SECTION"
+    PRODUCT_PAGE = "PRODUCT_PAGE"
+    CART = "CART"
+    CHECKOUT = "CHECKOUT"
+
+
+class CommerceEventName(str, enum.Enum):
+    PRODUCT_VIEWED = "PRODUCT_VIEWED"
+    SEARCH_PERFORMED = "SEARCH_PERFORMED"
+    SEARCH_RESULT_CLICKED = "SEARCH_RESULT_CLICKED"
+    PRODUCT_ADDED_TO_CART = "PRODUCT_ADDED_TO_CART"
+    PRODUCT_REMOVED_FROM_CART = "PRODUCT_REMOVED_FROM_CART"
+    CART_VIEWED = "CART_VIEWED"
+    CHECKOUT_STARTED = "CHECKOUT_STARTED"
+    PAYMENT_INITIATED = "PAYMENT_INITIATED"
+    PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
+    PURCHASE_COMPLETED = "PURCHASE_COMPLETED"
+    PROMOTION_APPLIED = "PROMOTION_APPLIED"
+    PROMOTION_REJECTED = "PROMOTION_REJECTED"
+    WISHLIST_ADDED = "WISHLIST_ADDED"
+    WISHLIST_REMOVED = "WISHLIST_REMOVED"
+
+
+class CommerceEventSource(str, enum.Enum):
+    CLIENT = "CLIENT"
+    SERVER = "SERVER"
+
+
+class CartRecoveryStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    CHECKOUT_STARTED = "CHECKOUT_STARTED"
+    ABANDONED = "ABANDONED"
+    PURCHASED = "PURCHASED"
+    EXPIRED = "EXPIRED"
