@@ -22,6 +22,7 @@ from app.modules.collection.router import router as collection_router, admin_rou
 from app.modules.content.router import router as content_router, admin_router as admin_content_router
 from app.modules.discovery.router import router as discovery_router, admin_router as admin_discovery_router
 from app.modules.promotion.router import router as promotion_router
+from app.modules.campaign.router import router as campaign_router, admin_router as admin_campaign_router
 # Ensure all models are imported so SQLAlchemy can resolve string-based relationships
 import app.modules.customer.models  # noqa: F401
 import app.modules.wishlist.models  # noqa: F401
@@ -241,3 +242,5 @@ app.include_router(admin_content_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(discovery_router, prefix=API_PREFIX)
 app.include_router(admin_discovery_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(promotion_router, prefix=API_PREFIX)
+app.include_router(campaign_router, prefix=API_PREFIX)
+app.include_router(admin_campaign_router, prefix=f"{API_PREFIX}/admin")

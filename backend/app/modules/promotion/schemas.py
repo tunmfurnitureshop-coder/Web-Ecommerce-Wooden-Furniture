@@ -30,6 +30,7 @@ class AppliedPromotionOut(BaseModel):
     code: Optional[str] = None
     name: str
     trigger: str
+    scopeType: str = "CART"
     discountType: str
     discountVnd: int
     selectionReason: str

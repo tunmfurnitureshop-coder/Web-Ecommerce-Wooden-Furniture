@@ -133,6 +133,7 @@ def _promo_out(selected: EvaluationResult) -> AppliedPromotionOut:
     name = trans.name if trans else (p.code or p.id)
     return AppliedPromotionOut(
         id=p.id, code=p.code, name=name, trigger=p.trigger,
+        scopeType=p.scope_type,
         discountType=p.discount_type, discountVnd=selected.discount_vnd,
         selectionReason="BEST_ELIGIBLE_PROMOTION",
     )

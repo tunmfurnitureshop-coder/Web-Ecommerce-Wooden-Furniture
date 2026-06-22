@@ -33,6 +33,12 @@ class Campaign(Base):
     translations: Mapped[List["CampaignTranslation"]] = relationship(
         "CampaignTranslation", back_populates="campaign", lazy="selectin"
     )
+    campaign_products: Mapped[List["CampaignProduct"]] = relationship(
+        "CampaignProduct", backref="campaign", lazy="selectin"
+    )
+    campaign_collections: Mapped[List["CampaignCollection"]] = relationship(
+        "CampaignCollection", backref="campaign", lazy="selectin"
+    )
 
 
 class CampaignTranslation(Base):
@@ -58,3 +64,32 @@ class CampaignTranslation(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     campaign: Mapped["Campaign"] = relationship("Campaign", back_populates="translations")
+
+
+class CampaignPromotion(Base):
+    __tablename__ = "campaign_promotions"
+    __table_args__ = (UniqueConstraint("campaign_id", "promotion_id", name="uq_campaign_promotions"),)
+
+    campaign_id: Mapped[str] = mapped_column(String, ForeignKey("campaigns.id", ondelete="CASCADE"), primary_key=True)
+    promotion_id: Mapped[str] = mapped_column(String, ForeignKey("promotions.id", ondelete="CASCADE"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class CampaignProduct(Base):
+    __tablename__ = "campaign_products"
+    __table_args__ = (UniqueConstraint("campaign_id", "product_id", name="uq_campaign_products"),)
+
+    campaign_id: Mapped[str] = mapped_column(String, ForeignKey("campaigns.id", ondelete="CASCADE"), primary_key=True)
+    product_id: Mapped[str] = mapped_column(String, ForeignKey("products.id", ondelete="CASCADE"), primary_key=True)
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class CampaignCollection(Base):
+    __tablename__ = "campaign_collections"
+    __table_args__ = (UniqueConstraint("campaign_id", "collection_id", name="uq_campaign_collections"),)
+
+    campaign_id: Mapped[str] = mapped_column(String, ForeignKey("campaigns.id", ondelete="CASCADE"), primary_key=True)
+    collection_id: Mapped[str] = mapped_column(String, ForeignKey("collections.id", ondelete="CASCADE"), primary_key=True)
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)

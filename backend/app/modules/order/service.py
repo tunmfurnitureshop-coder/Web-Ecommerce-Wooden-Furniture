@@ -133,6 +133,16 @@ async def create_order(
             "final_line_total": qi.finalLineTotalVnd,
         })
 
+    # Campaign attribution — resolve server-side, never trust client campaign_id
+    campaign_id = None
+    attribution_snapshot = None
+    if req.campaignCode:
+        from app.modules.campaign.service import validate_campaign_code
+        campaign = await validate_campaign_code(db, req.campaignCode)
+        if campaign:
+            campaign_id = campaign.id
+            attribution_snapshot = {"campaignCode": req.campaignCode}
+
     order_code = await _generate_order_code(db)
     order_status, payment_status = _initial_statuses(req.paymentMethod)
     order = Order(
@@ -149,6 +159,8 @@ async def create_order(
         customer_id=customer_id,
         guest_email=req.customerEmail.lower() if not customer_id and req.customerEmail else None,
         cart_recovery_session_id=req.cartRecoverySessionId,
+        campaign_id=campaign_id,
+        attribution_snapshot=attribution_snapshot,
     )
     db.add(order)
     for d in order_items_data:
@@ -171,7 +183,7 @@ async def create_order(
             promotion_code_snapshot=quote.appliedPromotion.code,
             promotion_name_snapshot=quote.appliedPromotion.name,
             trigger_snapshot=quote.appliedPromotion.trigger,
-            scope_type_snapshot="CART",
+            scope_type_snapshot=quote.appliedPromotion.scopeType,
             discount_type_snapshot=quote.appliedPromotion.discountType,
             discount_vnd=quote.appliedPromotion.discountVnd,
             allocation_snapshot=[
