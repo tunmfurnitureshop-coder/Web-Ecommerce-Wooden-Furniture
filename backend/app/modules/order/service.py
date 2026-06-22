@@ -211,6 +211,24 @@ async def create_order(
     from app.shared.enums import OrderEventActorType
     await create_order_event(db, order.id, "ORDER_CREATED", OrderEventActorType.SYSTEM)
 
+    try:
+        from app.modules.events.service import record_server_event
+        from app.shared.enums import CommerceEventName
+        await record_server_event(
+            db, CommerceEventName.PURCHASE_COMPLETED,
+            order_id=order.id, customer_id=customer_id, campaign_id=campaign_id,
+        )
+        if quote.appliedPromotion:
+            await record_server_event(
+                db, CommerceEventName.PROMOTION_APPLIED,
+                order_id=order.id, promotion_id=quote.appliedPromotion.id,
+                customer_id=customer_id,
+                payload={"promotionCode": quote.appliedPromotion.code, "discountVnd": quote.appliedPromotion.discountVnd},
+            )
+        await db.commit()
+    except Exception:
+        pass
+
     if req.paymentMethod == PaymentMethod.PAYOS:
         from app.modules.payment.service import create_payment_transaction
         from app.modules.payment.payos_provider import PayOSProvider
