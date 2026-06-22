@@ -56,9 +56,34 @@ Full-stack discovery, SEO infrastructure, and content hub for product findabilit
 
 ---
 
-## v0.5 — Backend Hardening & Admin Polish (Planned)
+## v0.5 — Promotion, Campaign & Conversion Optimization ✅ COMPLETE (2026-06-22)
 
-## v0.5 — Advanced Features (Backlog)
+Full-stack promotion engine, campaign management, cart recovery, commerce events, and admin tooling.
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Phase 01 | Promotion Data Foundation: DB models, Alembic migration, enums, seed | ✅ Done |
+| Phase 02 | Promotion Engine: evaluator, allocator, cart quote API (POST /cart/quote) | ✅ Done |
+| Phase 03 | Checkout Integration: idempotency, promotion lifecycle (RESERVED→REDEEMED→RELEASED), order service rewrite | ✅ Done |
+| Phase 04 | Campaign Module: Campaign, CampaignTranslation, CampaignPromotion models + public API | ✅ Done |
+| Phase 05 | Commerce Events: CommerceEvent model, client/server event ingestion, PRODUCT_VIEWED/PURCHASE_COMPLETED | ✅ Done |
+| Phase 06 | Cart Recovery & Worker: CartRecoverySession, arq worker (evaluate/send/expire crons), Redis, Docker | ✅ Done |
+| Phase 07 | Admin APIs & Frontend: promotion/campaign CRUD + metrics endpoints; feature files, design-system components, admin pages, campaign landing page, cart/checkout updates | ✅ Done |
+| Phase 08 | Domain Package: Zod schemas + view models + mappers for promotion/campaign/analytics/cart-recovery | ✅ Done |
+
+### Key Deliverables
+- Promotion engine: automatic + coupon triggers, PERCENTAGE/FIXED_AMOUNT/PERCENTAGE_PER_PRODUCT discount types, best-eligible wins, allocation proportional to eligible lines
+- Idempotency: `Idempotency-Key` header on POST /orders — same key+body → cached response, different body → 409
+- Cart recovery: arq worker scans for abandoned carts every 15 min, generates opaque recovery tokens, sends email reminders
+- Commerce events: client allowlist (9 event types), server-only events (PURCHASE_COMPLETED, PROMOTION_APPLIED), never blocks UI
+- Campaign: slug-based landing pages with hero image, featured products/collections, attribution tracking
+- Admin: promotions + campaigns CRUD with metrics (usage counts, revenue, conversion rates)
+- Frontend: CouponInput, DiscountBreakdown, PromotionSummary, CampaignHero, CheckoutSubmitButton, CartRecoveryBanner components
+- Cart page: coupon input + discount breakdown display; Checkout: marketing consent + cart recovery session tracking
+
+---
+
+## v0.6 — Advanced Features (Backlog)
 
 - Product reviews & ratings (customer-submitted)
 - Recommendation engine (room-based cross-sell)

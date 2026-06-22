@@ -14,6 +14,8 @@ const NAV = [
   { href: "/admin/tags", key: "tags" },
   { href: "/admin/collections", key: "collections" },
   { href: "/admin/content", key: "content" },
+  { href: "/admin/promotions", key: "promotions" },
+  { href: "/admin/campaigns", key: "campaigns" },
 ] as const;
 
 export function AdminSidebar() {

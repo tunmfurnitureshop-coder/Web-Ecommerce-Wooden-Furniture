@@ -40,3 +40,17 @@ export { CartSummary } from "./commerce/cart-summary";
 export { AddressCard } from "./commerce/address-card";
 export type { AddressViewModel } from "./commerce/address-card";
 export { OrderTimeline } from "./commerce/order-timeline";
+export { PromotionBadge } from "./commerce/PromotionBadge";
+export { PromotionSummary } from "./commerce/PromotionSummary";
+export { CouponInput } from "./commerce/CouponInput";
+export { DiscountBreakdown } from "./commerce/DiscountBreakdown";
+export { CampaignHero } from "./commerce/CampaignHero";
+export { CampaignProductSection } from "./commerce/CampaignProductSection";
+
+// Conversion
+export { CartRecoveryBanner } from "./conversion/CartRecoveryBanner";
+export { CheckoutSubmitButton } from "./conversion/CheckoutSubmitButton";
+
+// Admin
+export { PromotionStatusBadge } from "./admin/PromotionStatusBadge";
+export { CampaignMetricsCards } from "./admin/CampaignMetricsCards";

@@ -22,6 +22,7 @@ from app.modules.collection.router import router as collection_router, admin_rou
 from app.modules.content.router import router as content_router, admin_router as admin_content_router
 from app.modules.discovery.router import router as discovery_router, admin_router as admin_discovery_router
 from app.modules.promotion.router import router as promotion_router
+from app.modules.promotion.admin_router import admin_router as admin_promotion_router
 from app.modules.campaign.router import router as campaign_router, admin_router as admin_campaign_router
 from app.modules.events.router import router as events_router
 from app.modules.cart_recovery.router import router as cart_recovery_router
@@ -39,7 +40,7 @@ import app.modules.campaign.models  # noqa: F401
 import app.modules.events.models  # noqa: F401
 import app.modules.cart_recovery.models  # noqa: F401
 
-app = FastAPI(title=settings.APP_NAME, version="0.4.0")
+app = FastAPI(title=settings.APP_NAME, version="0.5.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -246,6 +247,7 @@ app.include_router(admin_content_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(discovery_router, prefix=API_PREFIX)
 app.include_router(admin_discovery_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(promotion_router, prefix=API_PREFIX)
+app.include_router(admin_promotion_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(campaign_router, prefix=API_PREFIX)
 app.include_router(admin_campaign_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(events_router, prefix=API_PREFIX)

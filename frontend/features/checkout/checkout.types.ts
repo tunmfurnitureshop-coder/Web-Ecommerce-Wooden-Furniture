@@ -21,6 +21,9 @@ export interface OrderItemRequest {
 
 export interface CreateOrderRequest extends CheckoutFormData {
   items: OrderItemRequest[];
+  couponCode?: string;
+  campaignCode?: string;
+  cartRecoverySessionId?: string;
 }
 
 export interface CreateOrderResponse {
@@ -28,6 +31,9 @@ export interface CreateOrderResponse {
   orderStatus: string;
   paymentStatus: string;
   paymentMethod: string;
+  merchandiseSubtotalVnd?: number;
+  promotionDiscountVnd?: number;
+  totalDiscountVnd?: number;
   totalVnd: number;
   currency: string;
   checkoutUrl?: string;

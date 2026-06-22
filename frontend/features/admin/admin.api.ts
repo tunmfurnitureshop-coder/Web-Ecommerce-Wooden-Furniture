@@ -180,3 +180,57 @@ export async function adminAddProductRelation(productId: string, data: CreateRel
 export async function adminRemoveProductRelation(productId: string, relationId: string): Promise<void> {
   return api.delete<void>(`/api/v1/admin/products/${productId}/relations/${relationId}`, getAuthHeaders());
 }
+
+// Promotions
+export async function adminListPromotions(page = 1, pageSize = 20) {
+  return api.get<{ items: unknown[]; page: number; pageSize: number; total: number }>(
+    `/api/v1/admin/promotions?page=${page}&pageSize=${pageSize}`,
+    getAuthHeaders()
+  );
+}
+export async function adminGetPromotion(id: string) {
+  return api.get<Record<string, unknown>>(`/api/v1/admin/promotions/${id}`, getAuthHeaders());
+}
+export async function adminCreatePromotion(data: Record<string, unknown>) {
+  return api.post<{ id: string; code: string; status: string }>("/api/v1/admin/promotions", data, getAuthHeaders());
+}
+export async function adminPatchPromotion(id: string, data: Record<string, unknown>) {
+  return api.patch<{ id: string; code: string; status: string }>(`/api/v1/admin/promotions/${id}`, data, getAuthHeaders());
+}
+export async function adminDeletePromotion(id: string) {
+  return api.delete<void>(`/api/v1/admin/promotions/${id}`, getAuthHeaders());
+}
+export async function adminGetPromotionMetrics(id: string, from?: string, to?: string) {
+  const params = new URLSearchParams();
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
+  const q = params.toString();
+  return api.get<Record<string, unknown>>(`/api/v1/admin/promotions/${id}/metrics${q ? `?${q}` : ""}`, getAuthHeaders());
+}
+
+// Campaigns
+export async function adminListCampaigns(page = 1, pageSize = 20) {
+  return api.get<{ items: unknown[]; page: number; pageSize: number; total: number }>(
+    `/api/v1/admin/campaigns?page=${page}&pageSize=${pageSize}`,
+    getAuthHeaders()
+  );
+}
+export async function adminGetCampaign(id: string) {
+  return api.get<Record<string, unknown>>(`/api/v1/admin/campaigns/${id}`, getAuthHeaders());
+}
+export async function adminCreateCampaign(data: Record<string, unknown>) {
+  return api.post<{ id: string; code: string; status: string }>("/api/v1/admin/campaigns", data, getAuthHeaders());
+}
+export async function adminPatchCampaign(id: string, data: Record<string, unknown>) {
+  return api.patch<{ id: string; code: string; status: string }>(`/api/v1/admin/campaigns/${id}`, data, getAuthHeaders());
+}
+export async function adminDeleteCampaign(id: string) {
+  return api.delete<void>(`/api/v1/admin/campaigns/${id}`, getAuthHeaders());
+}
+export async function adminGetCampaignMetrics(id: string, from?: string, to?: string) {
+  const params = new URLSearchParams();
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
+  const q = params.toString();
+  return api.get<Record<string, unknown>>(`/api/v1/admin/campaigns/${id}/metrics${q ? `?${q}` : ""}`, getAuthHeaders());
+}

@@ -24,6 +24,10 @@ export * from "./validation/seo.schema";
 export * from "./validation/collection.schema";
 export * from "./validation/content.schema";
 export * from "./validation/discovery.schema";
+export * from "./validation/promotion.schema";
+export * from "./validation/campaign.schema";
+export * from "./validation/analytics.schema";
+export * from "./validation/cart-recovery.schema";
 
 // View Models
 export type * from "./view-models/product.view-model";
@@ -31,6 +35,8 @@ export type * from "./view-models/cart.view-model";
 export type * from "./view-models/order.view-model";
 export type * from "./view-models/customer.view-model";
 export type * from "./view-models/discovery.view-model";
+export type * from "./view-models/promotion.view-model";
+export type * from "./view-models/campaign.view-model";
 
 // Mappers
 export * from "./mappers/product.mapper";
@@ -42,3 +48,5 @@ export * from "./mappers/collection.mapper";
 export * from "./mappers/content.mapper";
 export * from "./mappers/seo.mapper";
 export * from "./mappers/discovery.mapper";
+export * from "./mappers/promotion.mapper";
+export * from "./mappers/campaign.mapper";

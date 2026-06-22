@@ -7,9 +7,12 @@ import type {
 } from "./checkout.types";
 
 export async function createOrder(
-  data: CreateOrderRequest
+  data: CreateOrderRequest,
+  idempotencyKey?: string
 ): Promise<CreateOrderResponse> {
-  return api.post<CreateOrderResponse>("/api/v1/orders", data);
+  const headers: Record<string, string> = {};
+  if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
+  return api.post<CreateOrderResponse>("/api/v1/orders", data, headers);
 }
 
 export async function getOrderSummary(

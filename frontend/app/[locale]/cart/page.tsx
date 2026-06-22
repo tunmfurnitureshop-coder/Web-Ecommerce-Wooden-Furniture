@@ -1,37 +1,75 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/features/cart/cart.store";
 import { hydrateCart } from "@/features/cart/cart.api";
+import { cartQuote } from "@/features/promotion/promotion.api";
 import { Container } from "@/design-system/primitives/container";
 import { EmptyState } from "@/design-system/components/empty-state";
 import { Button } from "@/design-system/components/button";
 import { CartItem as CartItemDS } from "@/design-system/commerce/cart-item";
-import { CartSummary } from "@/design-system/commerce/cart-summary";
 import { Skeleton } from "@/design-system/components/skeleton";
-import { Divider } from "@/design-system/primitives/divider";
+import { CouponInput } from "@/design-system/commerce/CouponInput";
+import { DiscountBreakdown } from "@/design-system/commerce/DiscountBreakdown";
+import { PromotionSummary } from "@/design-system/commerce/PromotionSummary";
 import { ShoppingBag, ShieldCheck, RefreshCw, HeadphonesIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/format-currency";
 import { cartItemKey } from "@/features/cart/cart.types";
 import type { CartHydrateResponse } from "@/features/cart/cart.types";
+import type { CartQuoteResponse } from "@/features/promotion/promotion.types";
+import { trackEvent } from "@/features/analytics/analytics.client";
 
 export default function CartPage() {
   const t = useTranslations("cart");
-  const tNav = useTranslations("nav");
   const { items, removeItem, updateQuantity } = useCartStore();
   const [hydrated, setHydrated] = useState<CartHydrateResponse | null>(null);
+  const [quote, setQuote] = useState<CartQuoteResponse | null>(null);
+  const [couponCode, setCouponCode] = useState<string | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const runQuote = useCallback(
+    (coupon?: string | null) => {
+      if (items.length === 0) return;
+      setCouponLoading(true);
+      cartQuote({ locale: "vi", items, couponCode: coupon ?? undefined })
+        .then(setQuote)
+        .catch(console.error)
+        .finally(() => setCouponLoading(false));
+    },
+    [items]
+  );
+
   useEffect(() => {
-    if (items.length === 0) { setHydrated(null); return; }
+    if (items.length === 0) { setHydrated(null); setQuote(null); return; }
     setLoading(true);
-    hydrateCart({ locale: "vi", items })
-      .then(setHydrated)
+    Promise.all([
+      hydrateCart({ locale: "vi", items }),
+      cartQuote({ locale: "vi", items, couponCode: couponCode ?? undefined }),
+    ])
+      .then(([h, q]) => { setHydrated(h); setQuote(q); })
       .catch(console.error)
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      trackEvent({ eventName: "CART_VIEWED" });
+    }
+  }, [items.length]);
+
+  function handleCouponApply(code: string) {
+    setCouponCode(code);
+    runQuote(code);
+  }
+
+  function handleCouponRemove() {
+    setCouponCode(null);
+    runQuote(null);
+  }
 
   if (items.length === 0) {
     return (
@@ -51,6 +89,7 @@ export default function CartPage() {
   }
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
+  const hasDiscount = (quote?.promotionDiscountVnd ?? 0) > 0;
 
   return (
     <Container className="py-8 pb-16">
@@ -111,12 +150,52 @@ export default function CartPage() {
 
         {/* Order summary */}
         <div className="w-full lg:w-80 xl:w-96 shrink-0 flex flex-col gap-4">
-          <CartSummary
-            subtotalFormatted={formatCurrency(hydrated?.subtotalVnd ?? 0)}
-            totalFormatted={formatCurrency(hydrated?.totalVnd ?? 0)}
-            subtotalLabel={t("subtotal")}
-            totalLabel={t("total")}
+          <CouponInput
+            onApply={handleCouponApply}
+            onRemove={handleCouponRemove}
+            appliedCode={quote?.appliedPromotion?.code ?? (couponCode && !quote?.couponError ? couponCode : null)}
+            errorMessage={quote?.couponError ?? null}
+            loading={couponLoading}
+            inputLabel={t("couponCode")}
+            applyLabel={t("applyCoupon")}
+            removeLabel={t("removeCoupon")}
+            placeholder="SUMMER20"
           />
+
+          {quote?.appliedPromotion && (
+            <PromotionSummary
+              promotionLabel={quote.appliedPromotion.name}
+              promotionCode={quote.appliedPromotion.code}
+              discountFormatted={formatCurrency(quote.appliedPromotion.discountVnd)}
+              discountLabel={t("discount")}
+            />
+          )}
+
+          {hasDiscount ? (
+            <DiscountBreakdown
+              subtotalFormatted={formatCurrency(quote?.merchandiseSubtotalVnd ?? hydrated?.subtotalVnd ?? 0)}
+              discountFormatted={formatCurrency(quote?.promotionDiscountVnd ?? 0)}
+              totalFormatted={formatCurrency(quote?.totalVnd ?? hydrated?.totalVnd ?? 0)}
+              subtotalLabel={t("subtotal")}
+              discountLabel={t("discount")}
+              totalLabel={t("total")}
+            />
+          ) : (
+            <div className="rounded-lg border border-border-default bg-surface p-5 flex flex-col gap-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-text-secondary">{t("subtotal")}</span>
+                <span className="font-medium text-text-primary">
+                  {formatCurrency(quote?.merchandiseSubtotalVnd ?? hydrated?.subtotalVnd ?? 0)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-text-primary">{t("total")}</span>
+                <span className="text-lg font-bold text-text-primary">
+                  {formatCurrency(quote?.totalVnd ?? hydrated?.totalVnd ?? 0)}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Payment confidence */}
           <div className="rounded-lg border border-border-default bg-surface p-4 flex flex-col gap-3 text-xs text-text-muted">
@@ -134,7 +213,7 @@ export default function CartPage() {
             </div>
           </div>
 
-          <Link href="/checkout">
+          <Link href={{ pathname: "/checkout", query: couponCode ? { coupon: couponCode } : undefined }}>
             <Button variant="primary" size="lg" fullWidth disabled={loading || !hydrated}>
               {t("checkout")}
             </Button>

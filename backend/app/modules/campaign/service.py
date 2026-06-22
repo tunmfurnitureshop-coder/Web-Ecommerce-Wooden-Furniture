@@ -179,6 +179,23 @@ async def admin_create_campaign(db: AsyncSession, req: AdminCreateCampaignReques
     return {"id": campaign.id, "code": campaign.code, "status": campaign.status}
 
 
+async def admin_get_campaign(db: AsyncSession, campaign_id: str) -> dict:
+    campaign = (await db.execute(select(Campaign).where(Campaign.id == campaign_id))).scalar_one_or_none()
+    if not campaign:
+        raise AppException(404, "CAMPAIGN_NOT_FOUND", "Campaign not found.")
+    return {
+        "id": campaign.id, "code": campaign.code, "status": campaign.status,
+        "heroImageUrl": campaign.hero_image_url, "mobileHeroImageUrl": campaign.mobile_hero_image_url,
+        "placement": campaign.placement, "displayPriority": campaign.display_priority,
+        "startsAt": campaign.starts_at, "endsAt": campaign.ends_at, "createdAt": campaign.created_at,
+        "translations": [
+            {"locale": t.locale, "name": t.name, "slug": t.slug,
+             "shortDescription": t.short_description, "descriptionMarkdown": t.description_markdown}
+            for t in campaign.translations
+        ],
+    }
+
+
 async def admin_patch_campaign(db: AsyncSession, campaign_id: str, req: AdminPatchCampaignRequest) -> dict:
     campaign = (await db.execute(select(Campaign).where(Campaign.id == campaign_id))).scalar_one_or_none()
     if not campaign:
@@ -189,3 +206,108 @@ async def admin_patch_campaign(db: AsyncSession, campaign_id: str, req: AdminPat
             setattr(campaign, snake, value)
     await db.commit()
     return {"id": campaign.id, "code": campaign.code, "status": campaign.status}
+
+
+async def admin_delete_campaign(db: AsyncSession, campaign_id: str) -> None:
+    campaign = (await db.execute(select(Campaign).where(Campaign.id == campaign_id))).scalar_one_or_none()
+    if not campaign:
+        raise AppException(404, "CAMPAIGN_NOT_FOUND", "Campaign not found.")
+    await db.delete(campaign)
+    await db.commit()
+
+
+async def admin_add_campaign_promotion(db: AsyncSession, campaign_id: str, promotion_id: str) -> dict:
+    from app.modules.campaign.models import CampaignPromotion
+    db.add(CampaignPromotion(campaign_id=campaign_id, promotion_id=promotion_id))
+    await db.commit()
+    return {"campaignId": campaign_id, "promotionId": promotion_id}
+
+
+async def admin_remove_campaign_promotion(db: AsyncSession, campaign_id: str, promotion_id: str) -> None:
+    from app.modules.campaign.models import CampaignPromotion
+    t = (await db.execute(select(CampaignPromotion).where(
+        CampaignPromotion.campaign_id == campaign_id,
+        CampaignPromotion.promotion_id == promotion_id,
+    ))).scalar_one_or_none()
+    if t:
+        await db.delete(t)
+        await db.commit()
+
+
+async def admin_add_campaign_product(db: AsyncSession, campaign_id: str, product_id: str, sort_order: int = 0) -> dict:
+    db.add(CampaignProduct(campaign_id=campaign_id, product_id=product_id, sort_order=sort_order))
+    await db.commit()
+    return {"campaignId": campaign_id, "productId": product_id}
+
+
+async def admin_remove_campaign_product(db: AsyncSession, campaign_id: str, product_id: str) -> None:
+    t = (await db.execute(select(CampaignProduct).where(
+        CampaignProduct.campaign_id == campaign_id,
+        CampaignProduct.product_id == product_id,
+    ))).scalar_one_or_none()
+    if t:
+        await db.delete(t)
+        await db.commit()
+
+
+async def admin_add_campaign_collection(db: AsyncSession, campaign_id: str, collection_id: str, sort_order: int = 0) -> dict:
+    db.add(CampaignCollection(campaign_id=campaign_id, collection_id=collection_id, sort_order=sort_order))
+    await db.commit()
+    return {"campaignId": campaign_id, "collectionId": collection_id}
+
+
+async def admin_remove_campaign_collection(db: AsyncSession, campaign_id: str, collection_id: str) -> None:
+    t = (await db.execute(select(CampaignCollection).where(
+        CampaignCollection.campaign_id == campaign_id,
+        CampaignCollection.collection_id == collection_id,
+    ))).scalar_one_or_none()
+    if t:
+        await db.delete(t)
+        await db.commit()
+
+
+async def get_campaign_metrics(
+    db: AsyncSession,
+    campaign_id: str,
+    from_dt: Optional[datetime] = None,
+    to_dt: Optional[datetime] = None,
+) -> dict:
+    from sqlalchemy import func
+    from app.modules.events.models import CommerceEvent
+    from app.modules.order.models import Order
+    from app.shared.enums import CommerceEventName
+
+    def _event_count(event_name: str) -> "select":
+        q = select(func.count()).where(
+            CommerceEvent.campaign_id == campaign_id,
+            CommerceEvent.event_name == event_name,
+        )
+        if from_dt:
+            q = q.where(CommerceEvent.occurred_at >= from_dt)
+        if to_dt:
+            q = q.where(CommerceEvent.occurred_at <= to_dt)
+        return q
+
+    product_views = (await db.execute(_event_count(CommerceEventName.PRODUCT_VIEWED))).scalar_one()
+    add_to_cart = (await db.execute(_event_count(CommerceEventName.PRODUCT_ADDED_TO_CART))).scalar_one()
+    checkout_started = (await db.execute(_event_count(CommerceEventName.CHECKOUT_STARTED))).scalar_one()
+    purchase_completed = (await db.execute(_event_count(CommerceEventName.PURCHASE_COMPLETED))).scalar_one()
+
+    revenue_q = select(func.coalesce(func.sum(Order.total_vnd), 0)).where(Order.campaign_id == campaign_id)
+    if from_dt:
+        revenue_q = revenue_q.where(Order.created_at >= from_dt)
+    if to_dt:
+        revenue_q = revenue_q.where(Order.created_at <= to_dt)
+    revenue = (await db.execute(revenue_q)).scalar_one()
+
+    conversion_rate = round(purchase_completed / product_views, 6) if product_views else 0.0
+
+    return {
+        "campaignId": campaign_id,
+        "productViews": product_views,
+        "addToCartCount": add_to_cart,
+        "checkoutStartedCount": checkout_started,
+        "purchaseCompletedCount": purchase_completed,
+        "campaignRevenueVnd": revenue,
+        "conversionRate": conversion_rate,
+    }
