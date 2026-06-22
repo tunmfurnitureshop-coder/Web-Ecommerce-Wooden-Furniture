@@ -1,3 +1,4 @@
+import hashlib
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
@@ -50,30 +51,66 @@ def _initial_statuses(payment_method: str) -> tuple:
 
 
 async def create_order(
-    db: AsyncSession, req: CreateOrderRequest, customer_id: Optional[str] = None
+    db: AsyncSession,
+    req: CreateOrderRequest,
+    customer_id: Optional[str] = None,
+    idempotency_key: Optional[str] = None,
 ) -> CreateOrderResponse:
     if not req.items:
         raise AppException(422, "VALIDATION_ERROR", "Cart cannot be empty.")
     if req.paymentMethod not in [m.value for m in PaymentMethod]:
         raise AppException(422, "VALIDATION_ERROR", "Invalid payment method.")
 
-    order_items_data = []
-    subtotal = 0
+    from app.modules.promotion import idempotency as idem_service
+    idem_record = None
+    if idempotency_key:
+        req_hash = idem_service.hash_request(req.model_dump())
+        idem_record, is_new = await idem_service.get_or_create(
+            db, "order_create", idempotency_key, req_hash, customer_id=customer_id
+        )
+        if not is_new:
+            if idem_record.request_hash != req_hash:
+                raise AppException(409, "IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_REQUEST",
+                                   "Idempotency key reused with a different request body.")
+            if idem_record.status == "DONE" and idem_record.response_body:
+                return CreateOrderResponse(**idem_record.response_body)
+            raise AppException(409, "ORDER_ALREADY_PROCESSING", "Order creation is already in progress.")
 
+    # Re-evaluate cart + promotion (authoritative backend pricing)
+    from app.modules.promotion.schemas import CartQuoteRequest, CartQuoteItemIn
+    from app.modules.promotion import evaluator as promo_eval
+    quote = await promo_eval.quote_cart(
+        CartQuoteRequest(
+            locale="vi",
+            paymentMethod=req.paymentMethod,
+            couponCode=req.couponCode,
+            items=[CartQuoteItemIn(
+                productId=i.productId,
+                quantity=i.quantity,
+                selectedOptions=i.selectedOptions,
+            ) for i in req.items],
+        ),
+        db,
+        customer_id=customer_id,
+    )
+    quote_map = {qi.productId: qi for qi in quote.items}
+
+    order_items_data = []
     for item in req.items:
+        qi = quote_map.get(item.productId)
+        if not qi:
+            raise AppException(422, "VALIDATION_ERROR", f"Product {item.productId} could not be priced.")
         options = SelectedOptionsIn(
             woodType=item.selectedOptions.get("woodType", ""),
             finish=item.selectedOptions.get("finish", ""),
             size=item.selectedOptions.get("size", ""),
         )
-        quote = await calculate_quote(db, PricingQuoteRequest(
-            productId=item.productId, quantity=item.quantity, selectedOptions=options
-        ))
         product = (await db.execute(select(Product).where(Product.id == item.productId))).scalar_one_or_none()
-        trans_result = await db.execute(select(ProductTranslation).where(
+        if not product:
+            raise AppException(422, "VALIDATION_ERROR", f"Product {item.productId} not found.")
+        trans = (await db.execute(select(ProductTranslation).where(
             ProductTranslation.product_id == product.id, ProductTranslation.locale == "vi"
-        ))
-        trans = trans_result.scalar_one_or_none()
+        ))).scalar_one_or_none()
         inv = (await db.execute(select(InventoryItem).where(InventoryItem.product_id == product.id))).scalar_one_or_none()
         if not inv or inv.available_qty < item.quantity:
             raise AppException(422, "INSUFFICIENT_STOCK", f"Not enough stock for product {product.sku}.")
@@ -90,10 +127,11 @@ async def create_order(
         }
         order_items_data.append({
             "product": product, "trans": trans, "inv": inv,
-            "unit_price": quote.unitPriceVnd, "line_total": quote.lineTotalVnd,
+            "unit_price": qi.unitPriceVnd, "line_total": qi.lineTotalVnd,
             "quantity": item.quantity, "snapshot": snapshot,
+            "promo_discount": qi.promotionDiscountVnd,
+            "final_line_total": qi.finalLineTotalVnd,
         })
-        subtotal += quote.lineTotalVnd
 
     order_code = await _generate_order_code(db)
     order_status, payment_status = _initial_statuses(req.paymentMethod)
@@ -101,10 +139,16 @@ async def create_order(
         id=str(uuid.uuid4()), order_code=order_code,
         customer_name=req.customerName, customer_phone=req.customerPhone,
         customer_email=req.customerEmail, shipping_address=req.shippingAddress, note=req.note,
-        subtotal_vnd=subtotal, shipping_fee_vnd=0, total_vnd=subtotal,
+        subtotal_vnd=quote.merchandiseSubtotalVnd,
+        merchandise_subtotal_vnd=quote.merchandiseSubtotalVnd,
+        promotion_discount_vnd=quote.promotionDiscountVnd,
+        total_discount_vnd=quote.totalDiscountVnd,
+        shipping_fee_vnd=0,
+        total_vnd=quote.totalVnd,
         order_status=order_status, payment_status=payment_status, payment_method=req.paymentMethod,
         customer_id=customer_id,
         guest_email=req.customerEmail.lower() if not customer_id and req.customerEmail else None,
+        cart_recovery_session_id=req.cartRecoverySessionId,
     )
     db.add(order)
     for d in order_items_data:
@@ -114,8 +158,37 @@ async def create_order(
             product_sku_snapshot=d["product"].sku,
             selected_options_snapshot=d["snapshot"],
             unit_price_vnd=d["unit_price"], quantity=d["quantity"], line_total_vnd=d["line_total"],
+            promotion_discount_vnd=d["promo_discount"],
+            final_line_total_vnd=d["final_line_total"],
         ))
         d["inv"].reserved_qty += d["quantity"]
+
+    if quote.appliedPromotion:
+        from app.modules.promotion.models import OrderPromotion, PromotionRedemption
+        db.add(OrderPromotion(
+            order_id=order.id,
+            promotion_id=quote.appliedPromotion.id,
+            promotion_code_snapshot=quote.appliedPromotion.code,
+            promotion_name_snapshot=quote.appliedPromotion.name,
+            trigger_snapshot=quote.appliedPromotion.trigger,
+            scope_type_snapshot="CART",
+            discount_type_snapshot=quote.appliedPromotion.discountType,
+            discount_vnd=quote.appliedPromotion.discountVnd,
+            allocation_snapshot=[
+                {"productId": i.productId, "discountVnd": i.promotionDiscountVnd}
+                for i in quote.items
+            ],
+        ))
+        guest_email_hash = None
+        if not customer_id and req.customerEmail:
+            guest_email_hash = hashlib.sha256(req.customerEmail.lower().encode()).hexdigest()
+        db.add(PromotionRedemption(
+            promotion_id=quote.appliedPromotion.id,
+            order_id=order.id,
+            customer_id=customer_id,
+            guest_email_hash=guest_email_hash,
+            discount_vnd=quote.appliedPromotion.discountVnd,
+        ))
 
     await db.commit()
 
@@ -165,11 +238,19 @@ async def create_order(
     except Exception:
         pass
 
-    return CreateOrderResponse(
+    response = CreateOrderResponse(
         orderCode=order_code, orderStatus=order_status, paymentStatus=payment_status,
-        paymentMethod=req.paymentMethod, totalVnd=subtotal,
+        paymentMethod=req.paymentMethod,
+        merchandiseSubtotalVnd=quote.merchandiseSubtotalVnd,
+        promotionDiscountVnd=quote.promotionDiscountVnd,
+        totalDiscountVnd=quote.totalDiscountVnd,
+        totalVnd=quote.totalVnd,
         checkoutUrl=checkout_url, paymentTransactionId=payment_tx_id,
     )
+    if idem_record:
+        await idem_service.complete(db, idem_record, response.model_dump())
+        await db.commit()
+    return response
 
 
 async def get_order_by_code(db: AsyncSession, order_code: str) -> OrderSummaryResponse:
@@ -313,10 +394,12 @@ async def admin_get_order_detail(db: AsyncSession, order_id: str) -> dict:
 
 
 async def admin_update_order_status(db: AsyncSession, order_id: str, req: UpdateOrderStatusRequest) -> dict:
+    from app.modules.promotion import lifecycle as promo_lifecycle
     order = (await db.execute(select(Order).where(Order.id == order_id))).scalar_one_or_none()
     if not order:
         raise AppException(404, "ORDER_NOT_FOUND", "Order not found.")
     prev_order_status = order.order_status
+    prev_payment_status = order.payment_status
     if req.orderStatus:
         order.order_status = req.orderStatus
     if req.paymentStatus:
@@ -326,11 +409,14 @@ async def admin_update_order_status(db: AsyncSession, order_id: str, req: Update
             inv = (await db.execute(select(InventoryItem).where(InventoryItem.product_id == item.product_id))).scalar_one_or_none()
             if inv:
                 inv.reserved_qty = max(0, inv.reserved_qty - item.quantity)
+        await promo_lifecycle.release_for_order(db, order_id)
         try:
             from app.modules.notification.service import send_order_cancelled_email
             await send_order_cancelled_email(db, order)
         except Exception:
             pass
+    if req.paymentStatus == PaymentStatus.PAID and prev_payment_status != PaymentStatus.PAID:
+        await promo_lifecycle.redeem_for_order(db, order_id)
     if req.orderStatus == OrderStatus.DELIVERED and prev_order_status != OrderStatus.DELIVERED:
         for item in order.items:
             inv = (await db.execute(select(InventoryItem).where(InventoryItem.product_id == item.product_id))).scalar_one_or_none()

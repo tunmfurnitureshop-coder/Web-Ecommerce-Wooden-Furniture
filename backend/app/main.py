@@ -31,6 +31,8 @@ import app.modules.collection.models  # noqa: F401
 import app.modules.content.models  # noqa: F401
 import app.modules.discovery.models  # noqa: F401
 import app.modules.promotion.models  # noqa: F401
+import app.modules.promotion.idempotency  # noqa: F401
+import app.modules.campaign.models  # noqa: F401
 
 app = FastAPI(title=settings.APP_NAME, version="0.4.0")
 

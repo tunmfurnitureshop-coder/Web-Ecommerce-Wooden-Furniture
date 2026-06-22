@@ -16,6 +16,9 @@ class CreateOrderRequest(BaseModel):
     shippingAddress: str
     note: Optional[str] = None
     paymentMethod: str
+    couponCode: Optional[str] = None
+    campaignCode: Optional[str] = None
+    cartRecoverySessionId: Optional[str] = None
     items: List[OrderItemIn]
 
 
@@ -24,6 +27,9 @@ class CreateOrderResponse(BaseModel):
     orderStatus: str
     paymentStatus: str
     paymentMethod: str
+    merchandiseSubtotalVnd: int = 0
+    promotionDiscountVnd: int = 0
+    totalDiscountVnd: int = 0
     totalVnd: int
     currency: str = "VND"
     checkoutUrl: Optional[str] = None

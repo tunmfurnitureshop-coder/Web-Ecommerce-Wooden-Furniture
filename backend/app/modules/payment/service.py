@@ -45,6 +45,7 @@ async def get_transaction_by_payment_link_id(
 
 
 async def apply_payment_success(db: AsyncSession, tx: PaymentTransaction, order: Order):
+    from app.modules.promotion import lifecycle as promo_lifecycle
     now = datetime.now(timezone.utc)
     old_payment = order.payment_status
     old_order = order.order_status
@@ -59,9 +60,11 @@ async def apply_payment_success(db: AsyncSession, tx: PaymentTransaction, order:
         old_value={"paymentStatus": old_payment, "orderStatus": old_order},
         new_value={"paymentStatus": PaymentStatus.PAID, "orderStatus": OrderStatus.PAID},
     )
+    await promo_lifecycle.redeem_for_order(db, order.id)
 
 
 async def apply_payment_cancelled(db: AsyncSession, tx: PaymentTransaction, order: Order):
+    from app.modules.promotion import lifecycle as promo_lifecycle
     now = datetime.now(timezone.utc)
     old_payment = order.payment_status
     old_order = order.order_status
@@ -85,6 +88,7 @@ async def apply_payment_cancelled(db: AsyncSession, tx: PaymentTransaction, orde
         db, order.id, "INVENTORY_RESERVATION_RELEASED", OrderEventActorType.WEBHOOK,
         new_value={"items": released},
     )
+    await promo_lifecycle.release_for_order(db, order.id)
 
 
 async def apply_payment_failed(db: AsyncSession, tx: PaymentTransaction, order: Order):

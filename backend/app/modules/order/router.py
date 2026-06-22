@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, Security
+from fastapi import APIRouter, Depends, Query, Security, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,13 +19,14 @@ async def create_order(
     body: CreateOrderRequest,
     db: AsyncSession = Depends(get_db),
     credentials: Optional[HTTPAuthorizationCredentials] = Security(_optional_bearer),
+    idempotency_key: Optional[str] = Header(None, alias="Idempotency-Key"),
 ):
     customer_id = None
     if credentials:
         payload = decode_token(credentials.credentials)
         if payload and payload.get("role") == "customer":
             customer_id = payload.get("sub")
-    return await service.create_order(db, body, customer_id=customer_id)
+    return await service.create_order(db, body, customer_id=customer_id, idempotency_key=idempotency_key)
 
 
 @router.get("/orders/{order_code}", response_model=OrderSummaryResponse)
