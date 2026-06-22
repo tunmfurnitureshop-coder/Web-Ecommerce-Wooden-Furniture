@@ -21,6 +21,7 @@ from app.modules.taxonomy.router import router as taxonomy_router, admin_router 
 from app.modules.collection.router import router as collection_router, admin_router as admin_collection_router
 from app.modules.content.router import router as content_router, admin_router as admin_content_router
 from app.modules.discovery.router import router as discovery_router, admin_router as admin_discovery_router
+from app.modules.promotion.router import router as promotion_router
 # Ensure all models are imported so SQLAlchemy can resolve string-based relationships
 import app.modules.customer.models  # noqa: F401
 import app.modules.wishlist.models  # noqa: F401
@@ -29,6 +30,7 @@ import app.modules.taxonomy.models  # noqa: F401
 import app.modules.collection.models  # noqa: F401
 import app.modules.content.models  # noqa: F401
 import app.modules.discovery.models  # noqa: F401
+import app.modules.promotion.models  # noqa: F401
 
 app = FastAPI(title=settings.APP_NAME, version="0.4.0")
 
@@ -236,3 +238,4 @@ app.include_router(content_router, prefix=API_PREFIX)
 app.include_router(admin_content_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(discovery_router, prefix=API_PREFIX)
 app.include_router(admin_discovery_router, prefix=f"{API_PREFIX}/admin")
+app.include_router(promotion_router, prefix=API_PREFIX)
