@@ -1,6 +1,6 @@
 # Vin Furniture — E-commerce Platform
 
-A full-stack e-commerce platform for premium custom wooden furniture. Customers configure products (wood type, finish, size), get server-calculated pricing, pay via PayOS or COD, and manage orders and wishlists through a full account portal. Includes a content hub (buying guides, material guides), a discovery layer (collections, categories, related products), SEO infrastructure (JSON-LD, sitemap, robots), and a complete admin panel.
+A full-stack e-commerce platform for premium custom wooden furniture. Customers configure products (wood type, finish, size), get server-calculated pricing with promotion/coupon discounts, pay via PayOS or COD, and manage orders and wishlists through a full account portal. Includes a promotion & campaign engine, abandoned-cart recovery, commerce event tracking, a content hub (buying guides, material guides), a discovery layer (collections, categories, related products), SEO infrastructure (JSON-LD, sitemap, robots), and a complete admin panel.
 
 ## Tech Stack
 
@@ -16,8 +16,9 @@ A full-stack e-commerce platform for premium custom wooden furniture. Customers 
 | Payment | PayOS |
 | Storage | Cloudflare R2 (boto3 S3-compatible) |
 | Email | Resend (console fallback for local dev) |
+| Background Jobs | Arq + Redis 7 — abandoned-cart evaluation, recovery session expiry |
 | Tests | pytest + httpx AsyncClient (backend — 83 tests); Vitest (domain package — 44 tests) |
-| Infra | Docker Compose |
+| Infra | Docker Compose (backend, frontend, PostgreSQL, Redis, Arq worker) |
 
 ## Getting Started
 
@@ -36,7 +37,7 @@ docker compose up -d
 # Run migrations
 docker exec wood_furniture_backend alembic upgrade head
 
-# Seed sample data (8 products, 5 room categories, admin user)
+# Seed sample data (8 products, 5 room categories, admin user, sample promotions)
 docker exec wood_furniture_backend python -m app.seed
 
 # Seed taxonomy (tags, collections, sample guides)
@@ -52,6 +53,7 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 | API Docs | http://localhost:8000/docs |
 | Admin Panel | http://localhost:3000/vi/admin |
 | Design Tokens (dev only) | http://localhost:3000/vi/design-tokens |
+| Redis | redis://localhost:6379 |
 
 **Default admin credentials:** `admin@example.com` / `admin123`
 
@@ -93,13 +95,30 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 - **Tags** — CRUD for taxonomy tags (8 types: STYLE, MATERIAL, ROOM, USAGE, CAPACITY, PRICE_TIER, FEATURE, AVAILABILITY)
 - **Collections** — CRUD with product picker, SEO metadata per locale, cover image, publish workflow
 - **Content** — Markdown editor with live preview, locale tabs (vi/zh-CN), scheduled publishing, product/category linking
+- **Promotions** — CRUD for coupon and automatic promotions with scope, trigger, discount type, usage limits, and date range
+- **Campaigns** — CRUD with placement type, date range, linked promotions; campaign metrics cards (views, orders, revenue)
 
 ### Shopping
 - Product catalog with filters (room, wood type, price range, tags, availability, rating) and sort
 - Product detail with image gallery, option selector, pricing preview, tags, related products
-- Cart (persisted in localStorage via Zustand)
-- Checkout with COD, bank transfer, or payOS (QR / card)
+- Cart (persisted in localStorage via Zustand) with coupon input and live discount breakdown
+- Checkout with COD, bank transfer, or payOS (QR / card); `Idempotency-Key` header prevents duplicate orders on retry
 - payOS webhook with checksum verification and idempotent processing
+- Campaign landing pages (`/campaigns/[slug]`) with hero banner, featured products and collections
+
+### Promotions & Campaigns
+- Promotion engine (`POST /api/v1/cart/quote`) — evaluates coupon + automatic promotions, picks best discount, returns per-line allocation
+- Promotion types: percentage off, fixed VND off; scopes: cart-wide, specific products/categories/collections, payment method
+- One promotion per order maximum; promotion discount snapshot stored immutably on the order
+- Promotion lifecycle: RESERVED on order creation → REDEEMED on payment success → RELEASED on cancel/failure
+- Campaign module — groups promotions with placement context (homepage, category, flash sale, email); server-side attribution on order creation
+- Admin CRUD for promotions (coupon + automatic) and campaigns with status management
+
+### Conversion & Analytics
+- Commerce event ingestion (`POST /api/v1/events`) — client-side fire-and-forget; 8 KB payload limit; server-side events on purchase and promotion apply
+- Cart recovery sessions — anonymous and authenticated; token stored hashed, never exposed in URLs
+- Abandoned-cart recovery — Arq worker evaluates abandoned sessions and dispatches recovery emails; expired sessions pruned automatically
+- Cart recovery restore endpoint (`POST /api/v1/cart/recovery/restore`) — token-based cart hydration
 
 ## Project Structure
 
@@ -128,9 +147,14 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   │   ├── collection/    # curated collections, publish workflow
 │   │   │   ├── content/       # buying/material guides, Markdown + bleach sanitization
 │   │   │   ├── discovery/     # related products, recently-viewed hydration, synonym search
-│   │   │   └── seo/           # sitemap, robots.txt, JSON-LD builders, canonical URL
+│   │   │   ├── seo/           # sitemap, robots.txt, JSON-LD builders, canonical URL
+│   │   │   ├── promotion/     # promotion models, eligibility, evaluator, allocation, idempotency, lifecycle
+│   │   │   ├── campaign/      # campaign models, public listing, admin CRUD, order attribution
+│   │   │   ├── analytics/     # commerce_events table, POST /events ingestion, server-side dispatch
+│   │   │   └── cart_recovery/ # cart_recovery_sessions, restore endpoint
 │   │   └── shared/            # enums, pagination, responses
-│   ├── alembic/               # migrations
+│   ├── alembic/               # migrations (001–005)
+│   ├── worker.py              # Arq worker — abandoned-cart evaluation, recovery session expiry
 │   ├── tests/                 # 83 pytest tests (auth, addresses, orders, wishlist, reviews, search, taxonomy, collections, content)
 │   └── requirements.txt
 ├── docs/                      # Architecture, roadmap, changelog, code standards
@@ -144,7 +168,9 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   │   ├── reviews/       # review moderation
 │   │   │   ├── tags/          # tag CRUD with type chips
 │   │   │   ├── collections/   # collection CRUD + product picker
-│   │   │   └── content/       # content CRUD with Markdown live preview
+│   │   │   ├── content/       # content CRUD with Markdown live preview
+│   │   │   ├── promotions/    # promotion list + new/edit (coupon + automatic)
+│   │   │   └── campaigns/     # campaign list + new/edit with metrics cards
 │   │   ├── account/
 │   │   │   ├── profile/       # name, phone, address book
 │   │   │   ├── orders/        # order history + detail + reorder
@@ -160,11 +186,12 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   ├── materials/[slug]/  # material landing pages
 │   │   ├── guides/            # content hub listing + [slug] article detail
 │   │   ├── products/[slug]/   # product detail with reviews, tags, related products
+│   │   ├── campaigns/[slug]/  # campaign landing page with hero, featured products/collections
 │   │   └── success/           # post-order confirmation
 │   ├── components/
 │   │   ├── auth/              # AuthLayout
 │   │   ├── catalog/           # CatalogFilters, CatalogSortSelector, ActiveFilterChips
-│   │   ├── checkout/          # CheckoutForm, CheckoutOrderSummary
+│   │   ├── checkout/          # CheckoutForm (coupon + consent + cart recovery), CheckoutOrderSummary
 │   │   ├── customer/          # CustomerAuthContext, OrderDetailTimeline, ReorderButton
 │   │   ├── admin/             # OrderTimeline, PaymentTransactionTable, ProductImageManager,
 │   │   │                      # SeoMetadataForm (character counters), CollectionForm, ContentEditor
@@ -177,15 +204,23 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   ├── components/        # Button, Badge, Skeleton, EmptyState, ErrorState, StatusBadge, Alert
 │   │   ├── commerce/          # ProductCard, ProductGrid, CartItem, CartSummary,
 │   │   │                      # CollectionCard, CollectionGrid, ProductTagList,
-│   │   │                      # RelatedProductCarousel, RecentlyViewedSection
+│   │   │                      # RelatedProductCarousel, RecentlyViewedSection,
+│   │   │                      # CouponInput, PromotionBadge, PromotionSummary, DiscountBreakdown,
+│   │   │                      # CampaignHero, CampaignProductSection
 │   │   ├── content/           # ArticleCard, ArticleGrid, ArticleHero, ArticleMeta,
 │   │   │                      # MarkdownRenderer, RelatedGuideCard, JsonLd
+│   │   ├── conversion/        # CartRecoveryBanner, CheckoutSubmitButton
+│   │   ├── admin/             # PromotionStatusBadge, CampaignMetricsCards
 │   │   └── layout/            # Header, Footer, AccountSidebar, Breadcrumb, Pagination
 │   ├── features/              # API clients and types per domain
 │   │   ├── product/           # product.api.ts, product.types.ts
 │   │   ├── cart/              # cart.store.ts
 │   │   ├── wishlist/          # wishlist.store.ts
 │   │   ├── recently-viewed/   # recently-viewed.store.ts (Zustand persist, max 12 IDs)
+│   │   ├── promotion/         # promotion.api.ts, promotion.types.ts, promotion.mappers.ts
+│   │   ├── campaign/          # campaign.api.ts, campaign.types.ts, campaign.mappers.ts
+│   │   ├── analytics/         # analytics.client.ts (fire-and-forget trackEvent), analytics.types.ts
+│   │   ├── cart-recovery/     # cartRecovery.api.ts, cartRecovery.types.ts
 │   │   └── admin/             # admin.api.ts, admin.types.ts
 │   ├── lib/                   # utilities, i18n config, auth helpers
 │   └── messages/              # vi.json, zh-CN.json
@@ -213,6 +248,14 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 - **Collection publish requires ≥1 active product** — enforced at PATCH time, not at creation
 - **Markdown sanitized with bleach** — `<script>` tags stripped server-side before storage and rendering
 - **JSON-LD injected as RSC** — `<JsonLd>` component is a Server Component; no client JS needed
+- **Promotion evaluation is backend-only** — `POST /api/v1/cart/quote` re-evaluates on checkout; frontend never computes or trusts local discount values
+- **One promotion per order** — enforced by the evaluator; best discount (highest amount, then priority) wins automatically
+- **Promotion discount snapshot** — `OrderPromotion` row stores type, scope, and amount at order time; immune to future promotion edits
+- **Promotion redemption lifecycle** — RESERVED on order creation, REDEEMED on payment confirmation, RELEASED on cancel/failure; prevents double-spending
+- **Checkout idempotency** — `Idempotency-Key` header (UUID) required; same key + same body returns the cached response; prevents duplicate orders on network retry
+- **Campaign attribution is server-side** — `campaignCode` query param resolved by backend during order creation; attribution snapshot stored on the order
+- **Cart recovery token stored hashed** — raw token never persisted; email never exposed in recovery URLs
+- **Commerce event ingestion is fire-and-forget** — failures silently swallowed to never block the customer UI; server-side events (PURCHASE_COMPLETED, PROMOTION_APPLIED) dispatched from order creation
 
 ## Environment Variables
 
@@ -247,6 +290,8 @@ cp frontend/.env.local.example frontend/.env.local
 | `RESEND_API_KEY` | Resend API key (required if `EMAIL_PROVIDER=resend`) |
 | `EMAIL_FROM` | Sender address, e.g. `Wood Furniture <no-reply@example.com>` |
 | `ADMIN_NOTIFICATION_EMAIL` | Admin email for order/payment alerts |
+| `REDIS_URL` | Redis connection string (default: `redis://localhost:6379/0`) |
+| `ARQ_QUEUE_NAME` | Arq job queue name (default: `vin_furniture_jobs`) |
 
 ### Frontend (`frontend/.env.local`)
 
