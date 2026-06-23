@@ -113,6 +113,7 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 - Promotion lifecycle: RESERVED on order creation → REDEEMED on payment success → RELEASED on cancel/failure
 - Campaign module — groups promotions with placement context (homepage, category, flash sale, email); server-side attribution on order creation
 - Admin CRUD for promotions (coupon + automatic) and campaigns with status management
+- Bundle and room-set promotions are deferred to Ver 0.5.2 / Ver 0.6. Ver 0.5 supports coupon and automatic promotion rules only.
 
 ### Conversion & Analytics
 - Commerce event ingestion (`POST /api/v1/events`) — client-side fire-and-forget; 8 KB payload limit; server-side events on purchase and promotion apply
