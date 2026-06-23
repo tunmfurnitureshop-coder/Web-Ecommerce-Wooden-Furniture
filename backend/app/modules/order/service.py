@@ -215,7 +215,7 @@ async def create_order(
         from app.modules.events.service import record_server_event
         from app.shared.enums import CommerceEventName
         await record_server_event(
-            db, CommerceEventName.PURCHASE_COMPLETED,
+            db, CommerceEventName.ORDER_CREATED,
             order_id=order.id, customer_id=customer_id, campaign_id=campaign_id,
         )
         if quote.appliedPromotion:
@@ -250,6 +250,15 @@ async def create_order(
             payment_tx_id = tx.id
             await create_order_event(db, order.id, "PAYMENT_LINK_CREATED", OrderEventActorType.SYSTEM,
                                      new_value={"paymentLinkId": result.provider_payment_link_id})
+            try:
+                from app.modules.events.service import record_server_event
+                from app.shared.enums import CommerceEventName
+                await record_server_event(
+                    db, CommerceEventName.PAYMENT_INITIATED,
+                    order_id=order.id, customer_id=customer_id, campaign_id=campaign_id,
+                )
+            except Exception:
+                pass
             await db.commit()
         except Exception as e:
             tx.status = PaymentTransactionStatus.FAILED
@@ -445,8 +454,21 @@ async def admin_update_order_status(db: AsyncSession, order_id: str, req: Update
             await send_order_cancelled_email(db, order)
         except Exception:
             pass
+        try:
+            from app.modules.events.service import record_server_event
+            from app.shared.enums import CommerceEventName
+            await record_server_event(db, CommerceEventName.ORDER_CANCELLED, order_id=order_id)
+        except Exception:
+            pass
     if req.paymentStatus == PaymentStatus.PAID and prev_payment_status != PaymentStatus.PAID:
         await promo_lifecycle.redeem_for_order(db, order_id)
+        try:
+            from app.modules.events.service import record_server_event
+            from app.shared.enums import CommerceEventName
+            await record_server_event(db, CommerceEventName.PAYMENT_COMPLETED, order_id=order_id)
+            await record_server_event(db, CommerceEventName.PURCHASE_COMPLETED, order_id=order_id)
+        except Exception:
+            pass
     if req.orderStatus == OrderStatus.DELIVERED and prev_order_status != OrderStatus.DELIVERED:
         for item in order.items:
             inv = (await db.execute(select(InventoryItem).where(InventoryItem.product_id == item.product_id))).scalar_one_or_none()

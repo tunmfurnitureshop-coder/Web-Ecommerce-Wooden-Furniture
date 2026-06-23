@@ -61,6 +61,13 @@ async def apply_payment_success(db: AsyncSession, tx: PaymentTransaction, order:
         new_value={"paymentStatus": PaymentStatus.PAID, "orderStatus": OrderStatus.PAID},
     )
     await promo_lifecycle.redeem_for_order(db, order.id)
+    try:
+        from app.modules.events.service import record_server_event
+        from app.shared.enums import CommerceEventName
+        await record_server_event(db, CommerceEventName.PAYMENT_COMPLETED, order_id=order.id)
+        await record_server_event(db, CommerceEventName.PURCHASE_COMPLETED, order_id=order.id)
+    except Exception:
+        pass
 
 
 async def apply_payment_cancelled(db: AsyncSession, tx: PaymentTransaction, order: Order):
@@ -89,6 +96,12 @@ async def apply_payment_cancelled(db: AsyncSession, tx: PaymentTransaction, orde
         new_value={"items": released},
     )
     await promo_lifecycle.release_for_order(db, order.id)
+    try:
+        from app.modules.events.service import record_server_event
+        from app.shared.enums import CommerceEventName
+        await record_server_event(db, CommerceEventName.ORDER_CANCELLED, order_id=order.id)
+    except Exception:
+        pass
 
 
 async def apply_payment_failed(db: AsyncSession, tx: PaymentTransaction, order: Order):

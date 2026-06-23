@@ -2,9 +2,19 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.modules.events.models import CommerceEvent
 from app.modules.events.schemas import ClientEventRequest, ClientEventResponse
 from app.shared.enums import CommerceEventSource
+
+# Events that must be idempotent per order — duplicate dispatch is silently dropped
+_IDEMPOTENT_ORDER_EVENTS = {
+    "ORDER_CREATED",
+    "PAYMENT_INITIATED",
+    "PAYMENT_COMPLETED",
+    "PURCHASE_COMPLETED",
+    "ORDER_CANCELLED",
+}
 
 
 def _now() -> datetime:
@@ -48,6 +58,15 @@ async def record_server_event(
     customer_id: Optional[str] = None,
     payload: Optional[dict] = None,
 ) -> None:
+    if order_id and event_name in _IDEMPOTENT_ORDER_EVENTS:
+        existing = await db.execute(
+            select(CommerceEvent.id).where(
+                CommerceEvent.order_id == order_id,
+                CommerceEvent.event_name == event_name,
+            )
+        )
+        if existing.scalar_one_or_none():
+            return
     db.add(CommerceEvent(
         id=str(uuid.uuid4()),
         event_name=event_name,
