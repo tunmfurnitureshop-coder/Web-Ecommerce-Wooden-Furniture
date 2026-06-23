@@ -110,6 +110,8 @@ async def restore_cart(
     if not session:
         raise AppException(404, "CART_RECOVERY_INVALID_TOKEN", "Recovery token is invalid or expired.")
     now = _now()
+    if session.purchased_at is not None:
+        raise AppException(410, "CART_RECOVERY_ALREADY_PURCHASED", "This cart has already been purchased.")
     if session.recovery_token_expires_at:
         expires = session.recovery_token_expires_at
         if expires.tzinfo is None:

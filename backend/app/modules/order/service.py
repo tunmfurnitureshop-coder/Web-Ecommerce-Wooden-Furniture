@@ -225,6 +225,13 @@ async def create_order(
                 customer_id=customer_id,
                 payload={"promotionCode": quote.appliedPromotion.code, "discountVnd": quote.appliedPromotion.discountVnd},
             )
+        if req.cartRecoverySessionId:
+            from app.modules.cart_recovery.models import CartRecoverySession
+            recovery_session = (await db.execute(
+                select(CartRecoverySession).where(CartRecoverySession.id == req.cartRecoverySessionId)
+            )).scalar_one_or_none()
+            if recovery_session:
+                recovery_session.purchased_at = datetime.now(timezone.utc)
         await db.commit()
     except Exception:
         pass
