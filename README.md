@@ -17,7 +17,7 @@ A full-stack e-commerce platform for premium custom wooden furniture. Customers 
 | Storage | Cloudflare R2 (boto3 S3-compatible) |
 | Email | Resend (console fallback for local dev) |
 | Background Jobs | Arq + Redis 7 — abandoned-cart evaluation, recovery session expiry |
-| Tests | pytest + httpx AsyncClient (backend — 83 tests); Vitest (domain package — 44 tests) |
+| Tests | pytest + httpx AsyncClient (backend — 98 tests); Vitest (domain package — 44 tests) |
 | Infra | Docker Compose (backend, frontend, PostgreSQL, Redis, Arq worker) |
 
 ## Getting Started
@@ -156,7 +156,7 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   └── shared/            # enums, pagination, responses
 │   ├── alembic/               # migrations (001–005)
 │   ├── worker.py              # Arq worker — abandoned-cart evaluation, recovery session expiry
-│   ├── tests/                 # 83 pytest tests (auth, addresses, orders, wishlist, reviews, search, taxonomy, collections, content)
+│   ├── tests/                 # 98 pytest tests (auth, addresses, orders, wishlist, reviews, search, taxonomy, collections, content, events, promotions, cart recovery, consent)
 │   └── requirements.txt
 ├── docs/                      # Architecture, roadmap, changelog, code standards
 ├── frontend/
@@ -255,8 +255,11 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 - **Promotion redemption lifecycle** — RESERVED on order creation, REDEEMED on payment confirmation, RELEASED on cancel/failure; prevents double-spending
 - **Checkout idempotency** — `Idempotency-Key` header (UUID) required; same key + same body returns the cached response; prevents duplicate orders on network retry
 - **Campaign attribution is server-side** — `campaignCode` query param resolved by backend during order creation; attribution snapshot stored on the order
-- **Cart recovery token stored hashed** — raw token never persisted; email never exposed in recovery URLs
-- **Commerce event ingestion is fire-and-forget** — failures silently swallowed to never block the customer UI; server-side events (PURCHASE_COMPLETED, PROMOTION_APPLIED) dispatched from order creation
+- **Cart recovery token stored hashed** — SHA-256 hash stored in DB; raw token only in the recovery email link; `purchased_at` set on successful checkout to prevent token replay
+- **Commerce event timing** — `ORDER_CREATED` on order creation; `PAYMENT_INITIATED` after payOS link is successfully created; `PAYMENT_COMPLETED` + `PURCHASE_COMPLETED` on payment confirmation; all per-(order, event) pairs are idempotent
+- **Promotion lifecycle contract** — RESERVED on order creation; REDEEMED on payment success; RELEASED on cancel or payment failure; `retry_payment` validates the promotion is still ACTIVE and within its validity window before creating a new link
+- **Marketing consent is explicit opt-in** — `marketing_opt_in` defaults to `False`; abandoned-cart emails require `customer.marketing_opt_in = True` (logged-in) or `session.marketing_opt_in = True` (guest); no fallback
+- **Commerce event ingestion is fire-and-forget** — failures silently swallowed to never block the customer UI
 
 ## Environment Variables
 
@@ -338,7 +341,7 @@ pip install -r requirements.txt
 pytest tests/ -q
 ```
 
-Tests use SQLite in-memory — no running database required. All 83 tests pass.
+Tests use SQLite in-memory — no running database required. All 98 tests pass.
 
 ### Run domain package tests
 

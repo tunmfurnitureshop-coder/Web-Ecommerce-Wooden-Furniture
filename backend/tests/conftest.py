@@ -47,6 +47,12 @@ async def db_session():
         yield session
 
 
+@pytest.fixture
+def test_session_factory():
+    """Expose the test session factory so tests can patch worker DB sessions."""
+    return TestSession
+
+
 @pytest_asyncio.fixture
 async def seeded_db(db_session: AsyncSession):
     from app.modules.auth.models import AdminUser
