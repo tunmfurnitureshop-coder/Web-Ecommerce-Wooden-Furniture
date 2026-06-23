@@ -9,12 +9,14 @@ class ProfileOut(BaseModel):
     fullName: Optional[str]
     phone: Optional[str]
     isEmailVerified: bool
+    marketingOptIn: bool
     createdAt: datetime
 
 
 class UpdateProfileRequest(BaseModel):
     fullName: Optional[str] = None
     phone: Optional[str] = None
+    marketingOptIn: Optional[bool] = None
 
 
 class AddressOut(BaseModel):

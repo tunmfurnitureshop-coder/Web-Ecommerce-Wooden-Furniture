@@ -12,6 +12,7 @@ async def evaluate_abandoned_carts(ctx: dict) -> dict:
     from sqlalchemy import select, and_
     from app.modules.cart_recovery.models import CartRecoverySession
     from app.modules.cart_recovery.service import generate_recovery_token
+    from app.modules.customer_auth.models import Customer
 
     cutoff = datetime.now(timezone.utc) - timedelta(minutes=settings.ABANDONED_CART_DELAY_MINUTES)
     abandoned_count = 0
@@ -22,20 +23,30 @@ async def evaluate_abandoned_carts(ctx: dict) -> dict:
                 CartRecoverySession.status == "ACTIVE",
                 CartRecoverySession.last_activity_at < cutoff,
                 CartRecoverySession.email.isnot(None),
-                CartRecoverySession.marketing_opt_in.is_(True),
                 CartRecoverySession.reminder_sent_at.is_(None),
             )
         )).scalars().all()
 
+        eligible = []
         for session in sessions:
+            if session.customer_id:
+                customer = (await db.execute(
+                    select(Customer).where(Customer.id == session.customer_id)
+                )).scalar_one_or_none()
+                if not customer or not customer.marketing_opt_in:
+                    continue
+            else:
+                if not session.marketing_opt_in:
+                    continue
             session.status = "ABANDONED"
             session.abandoned_at = datetime.now(timezone.utc)
             abandoned_count += 1
+            eligible.append(session)
 
         if abandoned_count:
             await db.commit()
 
-        for session in sessions:
+        for session in eligible:
             token = await generate_recovery_token(db, session.id)
             await ctx["redis"].enqueue_job(
                 "send_abandoned_cart_email",

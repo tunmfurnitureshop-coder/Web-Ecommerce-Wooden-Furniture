@@ -34,6 +34,7 @@ def get_profile(customer: Customer) -> ProfileOut:
         fullName=customer.full_name,
         phone=customer.phone,
         isEmailVerified=customer.is_email_verified,
+        marketingOptIn=customer.marketing_opt_in,
         createdAt=customer.created_at,
     )
 
@@ -41,10 +42,14 @@ def get_profile(customer: Customer) -> ProfileOut:
 async def update_profile(
     db: AsyncSession, customer: Customer, body: UpdateProfileRequest
 ) -> ProfileOut:
+    from datetime import datetime, timezone
     if body.fullName is not None:
         customer.full_name = body.fullName
     if body.phone is not None:
         customer.phone = body.phone
+    if body.marketingOptIn is not None and body.marketingOptIn != customer.marketing_opt_in:
+        customer.marketing_opt_in = body.marketingOptIn
+        customer.marketing_opt_in_updated_at = datetime.now(timezone.utc)
     return get_profile(customer)
 
 

@@ -22,6 +22,9 @@ class Customer(Base):
 
     last_login_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    marketing_opt_in: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    marketing_opt_in_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
