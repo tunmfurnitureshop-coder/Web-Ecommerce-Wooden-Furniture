@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from typing import List
 
@@ -48,12 +49,45 @@ class Settings(BaseSettings):
     EMAIL_FROM: str = "Wood Furniture <no-reply@example.com>"
     ADMIN_NOTIFICATION_EMAIL: str = "admin@example.com"
 
-    # Redis / Arq
+    # Redis / Arq worker
     REDIS_URL: str = "redis://localhost:6379/0"
     ARQ_QUEUE_NAME: str = "vin_furniture_jobs"
     ABANDONED_CART_DELAY_MINUTES: int = 120
     ABANDONED_CART_TOKEN_TTL_HOURS: int = 168
     ABANDONED_CART_SCAN_INTERVAL_MINUTES: int = 15
+
+    # Promotion engine
+    PROMOTION_TIMEZONE: str = "Asia/Ho_Chi_Minh"
+    PROMOTION_MAX_ACTIVE_PER_ORDER: int = 1
+    PROMOTION_MAX_COUPON_CODE_LENGTH: int = 40
+
+    @field_validator("ABANDONED_CART_DELAY_MINUTES")
+    @classmethod
+    def _validate_delay(cls, v: int) -> int:
+        if v < 15:
+            raise ValueError("ABANDONED_CART_DELAY_MINUTES must be >= 15")
+        return v
+
+    @field_validator("ABANDONED_CART_SCAN_INTERVAL_MINUTES")
+    @classmethod
+    def _validate_scan_interval(cls, v: int) -> int:
+        if v < 5:
+            raise ValueError("ABANDONED_CART_SCAN_INTERVAL_MINUTES must be >= 5")
+        return v
+
+    @field_validator("ABANDONED_CART_TOKEN_TTL_HOURS")
+    @classmethod
+    def _validate_ttl(cls, v: int) -> int:
+        if v < 1:
+            raise ValueError("ABANDONED_CART_TOKEN_TTL_HOURS must be >= 1")
+        return v
+
+    @field_validator("PROMOTION_MAX_ACTIVE_PER_ORDER")
+    @classmethod
+    def _validate_max_active(cls, v: int) -> int:
+        if v != 1:
+            raise ValueError("PROMOTION_MAX_ACTIVE_PER_ORDER must equal 1 in Ver 0.5")
+        return v
 
     @property
     def cors_origins_list(self) -> List[str]:
