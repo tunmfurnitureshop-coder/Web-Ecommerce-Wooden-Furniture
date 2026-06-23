@@ -332,6 +332,15 @@ async def retry_payment(db: AsyncSession, order_code: str) -> dict:
         raise AppException(422, "PAYMENT_STATUS_INVALID_TRANSITION", "Cannot retry cancelled order.")
     if order.order_status == OrderStatus.DELIVERED:
         raise AppException(422, "PAYMENT_STATUS_INVALID_TRANSITION", "Cannot retry delivered order.")
+    from app.modules.promotion.models import OrderPromotion
+    from app.modules.promotion import lifecycle as promo_lifecycle
+    op = (await db.execute(
+        select(OrderPromotion).where(OrderPromotion.order_id == order.id)
+    )).scalar_one_or_none()
+    if op and op.promotion_id:
+        if not await promo_lifecycle.is_promotion_still_valid(db, op.promotion_id):
+            raise AppException(422, "PROMOTION_EXPIRED",
+                               "The promotion applied to this order is no longer valid. Please create a new order.")
     from app.modules.payment.service import create_payment_transaction
     from app.modules.payment.payos_provider import PayOSProvider
     from app.shared.enums import PaymentTransactionStatus, OrderEventActorType
