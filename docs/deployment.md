@@ -9,7 +9,8 @@ Production stack: **Vercel** (Next.js) · **Railway** (FastAPI + Arq worker + Re
 | Service | Free tier | Purpose |
 |---|---|---|
 | [Supabase](https://supabase.com) | 500 MB DB, 2 projects | PostgreSQL |
-| [Railway](https://railway.app) | $5 trial credit | FastAPI + Worker + Redis |
+| [Railway](https://railway.app) | $5 trial credit | FastAPI + Arq Worker |
+| [Redis Cloud](https://redis.io/cloud) | 30 MB free | Redis (Arq queue) |
 | [Vercel](https://vercel.com) | Hobby — non-commercial | Next.js frontend |
 | [Cloudflare](https://cloudflare.com) | Free | R2 storage + DNS |
 | [Resend](https://resend.com) | 3,000 emails/mo | Transactional email |
@@ -26,17 +27,25 @@ Production stack: **Vercel** (Next.js) · **Railway** (FastAPI + Arq worker + Re
 postgresql://postgres.[ref]:[password]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
 ```
 
-3. **Important**: Use the **Session mode** pooler URL (port `6543`) for async SQLAlchemy with asyncpg.
+3. **Important**: Use the **Session mode** pooler URL (port `6543`) for async SQLAlchemy with psycopg3.
 
 > Set `DATABASE_URL` in Railway backend env (Step 3).
 
 ---
 
-## Step 2 — Railway: Redis service
+## Step 2 — Redis Cloud
 
-1. New project on Railway → **Add Service → Database → Redis**
-2. After provisioning: **Variables** tab → copy `REDIS_URL` (format: `redis://default:password@host:port`)
-3. Note this URL for backend and worker services.
+1. Đăng ký tại [redis.io/cloud](https://redis.io/cloud) (free tier: 30 MB)
+2. **Create Database** → chọn region **Asia Pacific (Singapore)** → Cloud: AWS
+3. Sau khi tạo xong, vào database → **Security** tab → note **Default user password**
+4. **General** tab → copy **Public endpoint** (format: `redis-xxxxx.c1.ap-southeast-1-1.ec2.redns.redis-cloud.com:12345`)
+5. Cấu trúc `REDIS_URL`:
+
+```
+redis://default:<password>@redis-xxxxx.c1.ap-southeast-1-1.ec2.redns.redis-cloud.com:12345
+```
+
+> Nếu Redis Cloud yêu cầu TLS, dùng `rediss://` (hai chữ s) thay vì `redis://`.
 
 ---
 
@@ -59,7 +68,7 @@ APP_NAME=Vin Furniture
 ENV=production
 
 # Database (from Supabase Step 1)
-DATABASE_URL=postgresql+asyncpg://postgres.[ref]:[password]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
+DATABASE_URL=postgresql+psycopg://postgres.[ref]:[password]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
 
 # Auth
 JWT_SECRET_KEY=<generate: openssl rand -hex 32>
@@ -294,6 +303,7 @@ railway service rollback --service backend
 | Vercel | Hobby (non-commercial) | $0 |
 | Railway | Hobby + usage | ~$5–15/mo |
 | Supabase | Free tier | $0 |
+| Redis Cloud | Free (30 MB) | $0 |
 | Cloudflare R2 | Free (10 GB storage, 1M ops) | $0 |
 | Resend | Free (3,000 emails/mo) | $0 |
 | **Total** | | **~$5–15/mo** |
