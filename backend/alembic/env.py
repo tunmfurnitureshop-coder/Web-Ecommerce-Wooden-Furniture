@@ -28,7 +28,10 @@ import app.modules.promotion.models  # noqa
 
 target_metadata = Base.metadata
 
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Escape '%' as '%%' so ConfigParser interpolation does not choke on
+# URL-encoded characters in the password (e.g. '$' -> '%24'). SQLAlchemy
+# still decodes the URL correctly when building the engine.
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 
 
 def run_migrations_offline() -> None:
