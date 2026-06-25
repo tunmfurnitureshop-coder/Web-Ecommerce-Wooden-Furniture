@@ -5,6 +5,8 @@ import type {
   PricingQuoteRequest,
   PricingQuoteResponse,
   ProductCatalogFilters,
+  BestSellerListResponse,
+  DealListResponse,
 } from "./product.types";
 
 export async function getProducts(
@@ -35,4 +37,22 @@ export async function getPricingQuote(
   data: PricingQuoteRequest
 ): Promise<PricingQuoteResponse> {
   return api.post<PricingQuoteResponse>("/api/v1/pricing/quote", data);
+}
+
+export async function getBestSellers(
+  locale: string,
+  limit = 12
+): Promise<BestSellerListResponse> {
+  return api.get<BestSellerListResponse>(
+    `/api/v1/products/best-sellers?locale=${locale}&limit=${limit}`
+  );
+}
+
+export async function getDeals(
+  locale: string,
+  limit = 12
+): Promise<DealListResponse> {
+  return api.get<DealListResponse>(
+    `/api/v1/products/deals?locale=${locale}&limit=${limit}`
+  );
 }

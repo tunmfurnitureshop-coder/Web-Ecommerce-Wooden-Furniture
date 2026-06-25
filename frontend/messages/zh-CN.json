@@ -336,6 +336,9 @@
     "promotionsAria": "精选促销",
     "goToSlide": "跳转到第 {index} 张",
     "featuredTitle": "精选产品",
+    "dealsTitle": "超值优惠",
+    "bestSellersTitle": "热销商品",
+    "dealBadge": "-{pct}%",
     "browseByRoom": "按空间浏览",
     "trustTitle": "为什么选择我们",
     "trust": {

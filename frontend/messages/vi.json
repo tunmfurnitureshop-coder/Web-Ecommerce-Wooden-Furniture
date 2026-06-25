@@ -336,6 +336,9 @@
     "promotionsAria": "Khuyến mãi nổi bật",
     "goToSlide": "Đến trang {index}",
     "featuredTitle": "Sản phẩm nổi bật",
+    "dealsTitle": "Giá siêu tốt",
+    "bestSellersTitle": "Hàng bán chạy",
+    "dealBadge": "-{pct}%",
     "browseByRoom": "Theo phòng",
     "trustTitle": "Tại sao chọn chúng tôi",
     "trust": {

@@ -144,3 +144,30 @@ export interface ProductCatalogFilters {
   page?: number;
   pageSize?: number;
 }
+
+export interface BestSellerItem {
+  id: string;
+  name: string;
+  slug: string;
+  basePriceVnd: number;
+  primaryImageUrl: string | null;
+}
+
+export interface BestSellerListResponse {
+  items: BestSellerItem[];
+}
+
+export interface ProductDealItem {
+  id: string;
+  name: string;
+  slug: string;
+  primaryImageUrl: string | null;
+  originalPriceVnd: number;
+  dealPriceVnd: number;
+  discountPct: number;
+  badgeLabel: string | null;
+}
+
+export interface DealListResponse {
+  items: ProductDealItem[];
+}

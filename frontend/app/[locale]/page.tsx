@@ -9,7 +9,10 @@ import { HomeHeroSlideshow } from "@/components/home/home-hero-slideshow";
 import { HomeHeroStatic } from "@/components/home/home-hero-static";
 import { listActiveCampaigns } from "@/features/campaign/campaign.api";
 import { mapCampaignToHeroSlide, type HeroSlideViewModel } from "@/features/campaign/campaign.mappers";
-import type { ProductListResponse } from "@/features/product/product.types";
+import type { ProductListResponse, ProductDealItem, BestSellerItem } from "@/features/product/product.types";
+import { getDeals, getBestSellers } from "@/features/product/product.api";
+import { HomeDealsSection } from "@/components/home/home-deals-section";
+import { HomeBestSellersSection } from "@/components/home/home-best-sellers-section";
 import { ArrowRight, Truck, ShieldCheck, Clock, Headphones } from "lucide-react";
 import type { ProductCardViewModel } from "@/design-system/commerce/product-card";
 import { formatCurrency } from "@/lib/format-currency";
@@ -52,6 +55,22 @@ async function getHeroSlides(locale: string): Promise<HeroSlideViewModel[]> {
   }
 }
 
+async function getDealsData(locale: string): Promise<ProductDealItem[]> {
+  try {
+    return (await getDeals(locale)).items;
+  } catch {
+    return [];
+  }
+}
+
+async function getBestSellersData(locale: string): Promise<BestSellerItem[]> {
+  try {
+    return (await getBestSellers(locale)).items;
+  } catch {
+    return [];
+  }
+}
+
 const TRUST_ICONS = [Truck, ShieldCheck, Clock, Headphones] as const;
 
 export default async function HomePage({
@@ -61,9 +80,11 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("home");
-  const [products, heroSlides] = await Promise.all([
+  const [products, heroSlides, deals, bestSellers] = await Promise.all([
     getFeaturedProducts(locale),
     getHeroSlides(locale),
+    getDealsData(locale),
+    getBestSellersData(locale),
   ]);
 
   const trustItems = ["delivery", "quality", "warranty", "support"] as const;
@@ -99,6 +120,10 @@ export default async function HomePage({
           </div>
         </Container>
       </Section>
+
+      {/* Deals & Best-sellers rails (hidden when empty) */}
+      <HomeDealsSection deals={deals} />
+      <HomeBestSellersSection items={bestSellers} />
 
       {/* Featured Products */}
       <Section>
