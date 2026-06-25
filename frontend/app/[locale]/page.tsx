@@ -5,7 +5,10 @@ import { Section } from "@/design-system/primitives/section";
 import { Container } from "@/design-system/primitives/container";
 import { ProductGrid } from "@/design-system/commerce/product-grid";
 import { ProductGridSkeleton } from "@/design-system/components/skeleton";
-import { Button } from "@/design-system/components/button";
+import { HomeHeroSlideshow } from "@/components/home/home-hero-slideshow";
+import { HomeHeroStatic } from "@/components/home/home-hero-static";
+import { listActiveCampaigns } from "@/features/campaign/campaign.api";
+import { mapCampaignToHeroSlide, type HeroSlideViewModel } from "@/features/campaign/campaign.mappers";
 import type { ProductListResponse } from "@/features/product/product.types";
 import { ArrowRight, Truck, ShieldCheck, Clock, Headphones } from "lucide-react";
 import type { ProductCardViewModel } from "@/design-system/commerce/product-card";
@@ -40,6 +43,15 @@ async function getFeaturedProducts(locale: string): Promise<ProductCardViewModel
   }
 }
 
+async function getHeroSlides(locale: string): Promise<HeroSlideViewModel[]> {
+  try {
+    const res = await listActiveCampaigns(locale, "HOME_HERO");
+    return res.items.map(mapCampaignToHeroSlide);
+  } catch {
+    return [];
+  }
+}
+
 const TRUST_ICONS = [Truck, ShieldCheck, Clock, Headphones] as const;
 
 export default async function HomePage({
@@ -49,34 +61,21 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("home");
-  const products = await getFeaturedProducts(locale);
+  const [products, heroSlides] = await Promise.all([
+    getFeaturedProducts(locale),
+    getHeroSlides(locale),
+  ]);
 
   const trustItems = ["delivery", "quality", "warranty", "support"] as const;
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-stone-100 min-h-[520px] flex items-center">
-        <div className="mx-auto max-w-container px-4 md:px-8 xl:px-12 py-20 md:py-28">
-          <div className="max-w-xl flex flex-col gap-6">
-            <h1 className="font-display text-5xl font-normal text-text-primary leading-tight">
-              {t("heroTitle")}
-            </h1>
-            <p className="text-lg text-text-secondary">{t("heroSubtitle")}</p>
-            <div className="flex items-center gap-4">
-              <Link href="/products">
-                <Button variant="primary" size="lg">
-                  {t("heroCtaShop")}
-                  <ArrowRight className="h-4 w-4 ml-1" aria-hidden />
-                </Button>
-              </Link>
-              <Link href="/products?sort=rating_desc">
-                <Button variant="outline" size="lg">{t("heroCtaCollection")}</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero — campaign slideshow with static fallback */}
+      {heroSlides.length > 0 ? (
+        <HomeHeroSlideshow slides={heroSlides} />
+      ) : (
+        <HomeHeroStatic />
+      )}
 
       {/* Browse by Room */}
       <Section className="bg-background">
