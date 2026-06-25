@@ -3,7 +3,14 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Run DB migrations in the pre-deploy phase (runs once, before the new
+# release goes live). Keeping it out of startCommand ensures the container's
+# main process is the long-running uvicorn server, not the short-lived alembic.
+preDeployCommand = "alembic upgrade head"
+# Railway runs startCommand as argv (no shell), so shell syntax like
+# ${PORT:-8000} is NOT expanded. Use a literal port; PORT=8000 is set on the
+# service so Railway routes public traffic to 8000.
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

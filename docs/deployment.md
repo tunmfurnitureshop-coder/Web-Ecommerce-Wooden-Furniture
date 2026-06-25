@@ -132,19 +132,28 @@ Note the URL: `https://web-production-xxxx.up.railway.app`
 
 ## Step 4 — Railway: Arq Worker
 
-The worker uses the **same Docker image** as the backend but runs `arq`.
+The worker uses the **same Docker image** as the backend but runs `arq` instead of uvicorn.
+
+> ⚠️ **Do not override the Start Command in the dashboard.** Railway's `railway.toml`
+> (config-as-code) always overrides dashboard settings. Since the worker shares the
+> `backend/` directory with the backend service, it would otherwise read the backend's
+> `railway.toml` and run `uvicorn` + the `/health` healthcheck (which a worker can't
+> answer → deploy fails). Instead, point the worker at its own config file
+> `backend/railway.worker.toml` (already in the repo).
 
 1. In the same Railway project → **Add Service → GitHub Repo** (same repo again)
 2. Set **Root Directory**: `backend`
-3. In **Settings → Deploy → Start Command** override:
+3. **Settings → Config-as-code → Railway Config File** → set path to:
 
 ```
-arq app.worker.WorkerSettings
+railway.worker.toml
 ```
 
-4. Copy **all the same environment variables** from Step 3b into this service.  
-   The worker needs `DATABASE_URL`, `REDIS_URL`, all app secrets.
-5. Worker does **not** need a public domain — disable **Networking**.
+   This makes the worker run `arq app.worker.WorkerSettings`, with **no healthcheck**
+   and **no migrations** (migrations are owned by the backend service).
+4. Copy **all the same environment variables** from Step 3b into this service.
+   The worker needs `DATABASE_URL`, `REDIS_URL`, and all app secrets.
+5. Worker does **not** need a public domain — leave **Networking** with no domain generated.
 
 > Tip: In Railway you can reference variables across services with `${{backend.DATABASE_URL}}` to avoid duplication.
 

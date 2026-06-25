@@ -1,7 +1,13 @@
 [build]
+builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+# Same Docker image as the backend, but the process is the Arq worker instead
+# of uvicorn. NO healthcheck: the worker serves no HTTP, so /health would never
+# respond and Railway would mark every deploy as failed. NO preDeployCommand:
+# DB migrations are owned by the backend service (railway.toml) — running them
+# from both services risks a concurrent-migration race.
 startCommand = "arq app.worker.WorkerSettings"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
