@@ -142,12 +142,13 @@ The worker uses the **same Docker image** as the backend but runs `arq` instead 
 > `backend/railway.worker.toml` (already in the repo).
 
 1. In the same Railway project → **Add Service → GitHub Repo** (same repo again)
-2. Set **Root Directory**: `backend`
-3. **Settings → Config-as-code → Railway Config File** → set path to:
-
-```
-railway.worker.toml
-```
+2. **Settings → Root Directory** = `/backend`
+   (Without this, Railway builds from the repo root, detects the npm workspace,
+   and falls back to Railpack — the `No package manager inferred / No start command`
+   build error.)
+3. **Settings → Config-as-code → Railway Config File** = `/backend/railway.worker.toml`
+   ⚠️ This path is **absolute from the repo root** — it does *not* follow Root Directory,
+   so `railway.worker.toml` alone will not be found.
 
    This makes the worker run `arq app.worker.WorkerSettings`, with **no healthcheck**
    and **no migrations** (migrations are owned by the backend service).
