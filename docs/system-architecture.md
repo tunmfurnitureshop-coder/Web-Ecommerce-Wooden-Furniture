@@ -83,7 +83,7 @@ npx openapi-typescript openapi/openapi.json -o src/generated/schema.ts
 **Payments**: PayOS integration
 
 ### Key API Groups
-- `/api/v1/products` — catalog, search, PDP
+- `/api/v1/products` — catalog, search, PDP, best-sellers, deals
 - `/api/v1/cart` — hydration (price calculation)
 - `/api/v1/orders` — create, status
 - `/api/v1/customer` — auth, profile, orders, wishlist, addresses

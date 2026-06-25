@@ -2,6 +2,29 @@
 
 ---
 
+## [Unreleased] — Homepage Merchandising
+
+### Added
+
+#### Backend
+- **Best-sellers endpoint** (`GET /api/v1/products/best-sellers`): ranks products by units sold across paid orders (90-day window), with a newest-products fallback so the rail is never empty
+- **Deals endpoint** (`GET /api/v1/products/deals`): computes display strike-through prices from active AUTOMATIC promotions, reusing the checkout `allocate_discount` engine so card prices match `/cart/quote`; honesty rule excludes promotions with minimum-order, bundle, or payment-method conditions
+
+#### Frontend
+- **Hero slideshow**: `HomeHeroSlideshow` driven by `HOME_HERO` campaigns (embla + autoplay, pause on hover/focus, reduced-motion aware), with `HomeHeroStatic` fallback when no campaigns exist
+- **Homepage rails**: "Giá siêu tốt" (deals — strike-through price + discount badge) and "Hàng bán chạy" (best-sellers) sections, hidden when empty
+- **`ProductRail`**: shared embla carousel replacing the legacy manual-scroll `RelatedProductCarousel` (removed); used by related products, deals, and best-sellers
+- **`ProductCard`**: optional strike-through price + discount badge for deal display
+- **i18n**: `home.dealsTitle/bestSellersTitle/dealBadge/heroSlideCta/promotionsAria/goToSlide` + `common.scrollPrev/scrollNext` (vi + zh-CN)
+
+#### Testing
+- 13 new backend tests: `test_deals.py` (9), `test_best_sellers.py` (4); full suite 111 passing, no regressions
+
+#### Dependencies
+- `embla-carousel-react`, `embla-carousel-autoplay` (frontend)
+
+---
+
 ## [0.4.0] — 2026-06-22
 
 ### Added

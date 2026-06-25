@@ -197,6 +197,7 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   ├── admin/             # OrderTimeline, PaymentTransactionTable, ProductImageManager,
 │   │   │                      # SeoMetadataForm (character counters), CollectionForm, ContentEditor
 │   │   ├── product/           # ProductDetailClient
+│   │   ├── home/              # HomeHeroSlideshow, HomeHeroStatic, HomeDealsSection, HomeBestSellersSection
 │   │   ├── wishlist/          # WishlistButton, WishlistGrid, WishlistItemCard
 │   │   ├── review/            # RatingStars, ReviewSummary, ReviewList, ReviewForm
 │   │   └── search/            # SearchBar (debounced suggestions)
@@ -205,7 +206,7 @@ docker exec wood_furniture_backend python -m app.seed_taxonomy
 │   │   ├── components/        # Button, Badge, Skeleton, EmptyState, ErrorState, StatusBadge, Alert
 │   │   ├── commerce/          # ProductCard, ProductGrid, CartItem, CartSummary,
 │   │   │                      # CollectionCard, CollectionGrid, ProductTagList,
-│   │   │                      # RelatedProductCarousel, RecentlyViewedSection,
+│   │   │                      # ProductRail, RecentlyViewedSection,
 │   │   │                      # CouponInput, PromotionBadge, PromotionSummary, DiscountBreakdown,
 │   │   │                      # CampaignHero, CampaignProductSection
 │   │   ├── content/           # ArticleCard, ArticleGrid, ArticleHero, ArticleMeta,
