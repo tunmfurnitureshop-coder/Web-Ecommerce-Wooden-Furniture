@@ -4,7 +4,8 @@ import { api } from "@/lib/api";
 import type { ProductDetail } from "@/features/product/product.types";
 import { ProductDetailClient } from "@/components/product/ProductDetailClient";
 import { Container } from "@/design-system/primitives/container";
-import { RelatedProductCarousel } from "@/design-system/commerce/related-product-carousel";
+import { ProductRail } from "@/design-system/commerce/product-rail";
+import { mapRelatedToCard } from "@/design-system/commerce/map-related-to-card";
 import { RecentlyViewedSection } from "@/design-system/commerce/recently-viewed-section";
 import { ProductTagList } from "@/design-system/commerce/product-tag-list";
 import { JsonLd } from "@/design-system/seo/json-ld";
@@ -81,10 +82,9 @@ export default async function ProductDetailPage({
           <ProductTagList tags={product.tags} locale={locale} />
         )}
         {relatedItems.length > 0 && (
-          <RelatedProductCarousel
+          <ProductRail
             title={t("relatedProducts")}
-            products={relatedItems}
-            locale={locale}
+            products={relatedItems.map(mapRelatedToCard)}
           />
         )}
         <RecentlyViewedSection title={t("recentlyViewed")} locale={locale} />

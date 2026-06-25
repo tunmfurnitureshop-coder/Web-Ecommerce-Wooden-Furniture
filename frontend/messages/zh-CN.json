@@ -232,7 +232,9 @@
     "of": "共",
     "previous": "上一页",
     "next": "下一页",
-    "results": "件商品"
+    "results": "件商品",
+    "scrollPrev": "向前滚动",
+    "scrollNext": "向后滚动"
   },
   "orderStatus": {
     "PENDING_PAYMENT": "待付款",

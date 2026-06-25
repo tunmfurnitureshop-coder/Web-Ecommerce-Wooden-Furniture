@@ -232,7 +232,9 @@
     "of": "trong",
     "previous": "Trước",
     "next": "Tiếp",
-    "results": "sản phẩm"
+    "results": "sản phẩm",
+    "scrollPrev": "Cuộn về trước",
+    "scrollNext": "Cuộn tiếp theo"
   },
   "orderStatus": {
     "PENDING_PAYMENT": "Chờ thanh toán",
