@@ -9,6 +9,8 @@ from app.modules.product.schemas import (
     AdminProductListResponse, AdminProductItem
 )
 from app.modules.auth.dependencies import require_admin
+from app.modules.discovery.schemas import BestSellerListResponse
+from app.modules.promotion.schemas import DealListResponse
 
 router = APIRouter(tags=["products"])
 admin_router = APIRouter(tags=["admin-products"])
@@ -46,6 +48,28 @@ async def suggestions(
     if len(q) < 2:
         return {"products": [], "categories": [], "woodTypes": [], "collections": [], "tags": []}
     return await service.get_suggestions(db, q, locale)
+
+
+# NOTE: literal paths must precede the "/products/{slug}" catch-all below,
+# otherwise "best-sellers"/"deals" get captured as a slug.
+@router.get("/products/best-sellers", response_model=BestSellerListResponse)
+async def best_sellers(
+    locale: str = Query("vi"),
+    limit: int = Query(12, ge=1, le=24),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.modules.discovery.best_sellers_service import get_best_sellers
+    return await get_best_sellers(db, locale, limit)
+
+
+@router.get("/products/deals", response_model=DealListResponse)
+async def deals(
+    locale: str = Query("vi"),
+    limit: int = Query(12, ge=1, le=24),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.modules.promotion.deals_service import get_active_deals
+    return await get_active_deals(db, locale, limit)
 
 
 @router.get("/products/{slug}/related")

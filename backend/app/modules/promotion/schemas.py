@@ -52,3 +52,18 @@ class CartQuoteResponse(BaseModel):
     totalVnd: int
     appliedPromotion: Optional[AppliedPromotionOut] = None
     coupon: Optional[CouponResultOut] = None
+
+
+class ProductDealItem(BaseModel):
+    id: str
+    name: str
+    slug: str
+    primaryImageUrl: Optional[str] = None
+    originalPriceVnd: int
+    dealPriceVnd: int
+    discountPct: int
+    badgeLabel: Optional[str] = None
+
+
+class DealListResponse(BaseModel):
+    items: List[ProductDealItem]
