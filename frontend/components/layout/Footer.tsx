@@ -4,6 +4,7 @@ import { TreePine } from "lucide-react";
 import { Divider } from "@/design-system/primitives/divider";
 import { ContactChannelButton } from "@/components/contact/contact-channel-button";
 import { getContactChannels } from "@/lib/contact/channels";
+import { BUSINESS_CONFIG } from "@/lib/business-config";
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -59,12 +60,37 @@ export function Footer() {
             <p className="text-sm font-semibold text-text-primary">{t("sections.support")}</p>
             <div className="flex flex-col gap-2 text-sm text-text-muted">
               <a
-                href={`mailto:${t("contact.email")}`}
+                href={`mailto:${BUSINESS_CONFIG.email}`}
                 className="hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
               >
-                {t("contact.email")}
+                {BUSINESS_CONFIG.email}
               </a>
-              <p>{t("contact.phone")}</p>
+              <p>{BUSINESS_CONFIG.telephone}</p>
+              {BUSINESS_CONFIG.address.streetAddress && (
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-text-primary">{t("address.label")}</span>
+                  <address className="not-italic text-sm text-text-muted leading-snug">
+                    {BUSINESS_CONFIG.address.streetAddress},<br />
+                    {BUSINESS_CONFIG.address.addressLocality}
+                  </address>
+                  {BUSINESS_CONFIG.mapsDirectionsUrl && (
+                    <a
+                      href={BUSINESS_CONFIG.mapsDirectionsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+                    >
+                      {t("address.link_text")} ↗
+                    </a>
+                  )}
+                </div>
+              )}
+              <Link
+                href="/lien-he"
+                className="hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+              >
+                {t("sections.contact_us")}
+              </Link>
               {contactChannels.map((channel) => (
                 <ContactChannelButton
                   key={channel.id}

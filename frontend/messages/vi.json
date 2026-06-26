@@ -381,7 +381,8 @@
     "sections": {
       "products": "Sản phẩm",
       "account": "Tài khoản",
-      "support": "Hỗ trợ"
+      "support": "Hỗ trợ",
+      "contact_us": "Liên hệ"
     },
     "rooms": {
       "living_room": "Phòng khách",
@@ -395,11 +396,24 @@
       "wishlist": "Yêu thích",
       "addresses": "Địa chỉ"
     },
-    "contact": {
-      "email": "support@vinfurniture.vn",
-      "phone": "+84 901 234 567"
+    "address": {
+      "label": "Showroom",
+      "link_text": "Xem bản đồ"
     },
     "copyright": "© {year} Vin Furniture. Tất cả quyền được bảo lưu."
+  },
+  "contact_page": {
+    "title": "Liên Hệ & Showroom",
+    "subtitle": "Ghé thăm showroom hoặc liên hệ với chúng tôi",
+    "address_section": "Địa Chỉ",
+    "hours_section": "Giờ Mở Cửa",
+    "hours_weekday": "Thứ 2 – Thứ 6",
+    "hours_saturday": "Thứ 7",
+    "hours_closed": "Chủ Nhật: Đóng cửa",
+    "directions_cta": "Chỉ đường",
+    "map_title": "Bản đồ đến Vin Furniture",
+    "call_cta": "Gọi ngay",
+    "email_cta": "Gửi email"
   },
   "contact": {
     "openLabel": "Liên hệ với chúng tôi",
@@ -436,6 +450,14 @@
       "title": "Gỗ tự nhiên, chế tác bằng tâm huyết",
       "body": "Mỗi sản phẩm Vin Furniture được tạo nên từ nguồn gỗ tự nhiên chọn lọc và bàn tay nghệ nhân lành nghề — bền đẹp theo năm tháng, nâng tầm không gian sống của bạn.",
       "cta": "Khám phá bộ sưu tập"
+    },
+    "showroom": {
+      "kicker": "Showroom",
+      "title": "Ghé thăm showroom của chúng tôi",
+      "subtitle": "Trải nghiệm trực tiếp chất lượng gỗ tự nhiên và độ hoàn thiện của từng sản phẩm.",
+      "directions_cta": "Chỉ đường",
+      "contact_cta": "Xem thông tin liên hệ",
+      "map_title": "Bản đồ đến showroom Vin Furniture"
     },
     "trustTitle": "Tại sao chọn chúng tôi",
     "trust": {

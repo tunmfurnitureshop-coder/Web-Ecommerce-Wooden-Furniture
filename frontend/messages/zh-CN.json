@@ -381,7 +381,8 @@
     "sections": {
       "products": "产品",
       "account": "账户",
-      "support": "支持"
+      "support": "支持",
+      "contact_us": "联系我们"
     },
     "rooms": {
       "living_room": "客厅",
@@ -395,11 +396,24 @@
       "wishlist": "收藏夹",
       "addresses": "地址"
     },
-    "contact": {
-      "email": "support@vinfurniture.vn",
-      "phone": "+84 901 234 567"
+    "address": {
+      "label": "展厅地址",
+      "link_text": "查看地图"
     },
     "copyright": "© {year} Vin Furniture. 版权所有。"
+  },
+  "contact_page": {
+    "title": "联系与展厅",
+    "subtitle": "到我们的展厅参观或联系我们",
+    "address_section": "地址",
+    "hours_section": "营业时间",
+    "hours_weekday": "周一 – 周五",
+    "hours_saturday": "周六",
+    "hours_closed": "周日：休息",
+    "directions_cta": "导航",
+    "map_title": "Vin Furniture 地图",
+    "call_cta": "立即致电",
+    "email_cta": "发送邮件"
   },
   "contact": {
     "openLabel": "联系我们",
@@ -436,6 +450,14 @@
       "title": "天然实木，匠心打造",
       "body": "每一件 Vin Furniture 都精选天然木材，由熟练匠人手工打造——经久耐用，提升您的居家空间。",
       "cta": "探索系列"
+    },
+    "showroom": {
+      "kicker": "展厅",
+      "title": "欢迎莅临我们的展厅",
+      "subtitle": "亲临展厅，近距离感受天然木材质感与产品的精致工艺。",
+      "directions_cta": "导航",
+      "contact_cta": "查看联系信息",
+      "map_title": "Vin Furniture 展厅地图"
     },
     "trustTitle": "为什么选择我们",
     "trust": {

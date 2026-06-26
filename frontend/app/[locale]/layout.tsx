@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ContactFab } from "@/components/contact/contact-fab";
 import { CustomerAuthProvider } from "@/components/customer/CustomerAuthContext";
+import { JsonLd } from "@/design-system/seo/json-ld";
+import { BUSINESS_CONFIG, buildLocalBusinessSchema } from "@/lib/business-config";
 import { Playfair_Display, Manrope } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -50,6 +52,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${playfairDisplay.variable} ${manrope.variable}`}>
       <body>
+        <JsonLd data={buildLocalBusinessSchema(BUSINESS_CONFIG)} />
         <NextIntlClientProvider messages={messages}>
           <CustomerAuthProvider>
             <Header />

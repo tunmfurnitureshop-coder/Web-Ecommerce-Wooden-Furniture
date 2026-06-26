@@ -17,6 +17,7 @@ import {
 } from "@/components/home/home-collections-section";
 import { HomeBrandStory } from "@/components/home/home-brand-story";
 import { HomeTrustSection } from "@/components/home/home-trust-section";
+import { HomeShowroomSection } from "@/components/home/home-showroom-section";
 import { listActiveCampaigns } from "@/features/campaign/campaign.api";
 import { mapCampaignToHeroSlide, type HeroSlideViewModel } from "@/features/campaign/campaign.mappers";
 import type { ProductListResponse, ProductDealItem, BestSellerItem } from "@/features/product/product.types";
@@ -169,6 +170,9 @@ export default async function HomePage({
 
       {/* Trust / Benefits */}
       <HomeTrustSection />
+
+      {/* Showroom + map (renders only when a Maps embed URL is configured) */}
+      <HomeShowroomSection />
     </div>
   );
 }
