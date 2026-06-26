@@ -12,7 +12,9 @@ from app.modules.campaign.schemas import (
     AdminCreateCampaignRequest, AdminPatchCampaignRequest,
 )
 from app.core.exceptions import AppException
-from app.shared.enums import CampaignStatus, PromotionStatus, PromotionTrigger
+from app.shared.enums import (
+    CampaignStatus, CampaignTargetType, PromotionStatus, PromotionTrigger, PromotionScopeType,
+)
 
 
 def _now() -> datetime:
@@ -279,8 +281,59 @@ async def admin_delete_campaign(db: AsyncSession, campaign_id: str) -> None:
     await db.commit()
 
 
+async def _validate_campaign_promotion_match(
+    db: AsyncSession, campaign_id: str, promotion_id: str
+) -> None:
+    """Enforce the golden rule: a campaign's promotion must be AUTOMATIC and its
+    scope must match the campaign target. Keeps the campaign↔promotion link
+    meaningful (the discount auto-applies to exactly the campaign's product group)."""
+    from app.modules.promotion.models import (
+        Promotion, PromotionCollectionTarget, PromotionCategoryTarget,
+    )
+
+    campaign = (await db.execute(
+        select(Campaign).where(Campaign.id == campaign_id)
+    )).scalar_one_or_none()
+    if not campaign:
+        raise AppException(404, "CAMPAIGN_NOT_FOUND", "Campaign not found.")
+    if not campaign.target_type or not campaign.target_id:
+        raise AppException(422, "CAMPAIGN_TARGET_REQUIRED",
+                           "Set the campaign target before linking a promotion.")
+
+    promo = (await db.execute(
+        select(Promotion).where(Promotion.id == promotion_id)
+    )).scalar_one_or_none()
+    if not promo:
+        raise AppException(404, "PROMOTION_NOT_FOUND", "Promotion not found.")
+    if promo.trigger != PromotionTrigger.AUTOMATIC:
+        raise AppException(422, "CAMPAIGN_PROMO_NOT_AUTOMATIC",
+                           "Campaign promotion must be AUTOMATIC so the discount auto-applies.")
+
+    if campaign.target_type == CampaignTargetType.COLLECTION:
+        ok = promo.scope_type == PromotionScopeType.COLLECTION and (await db.execute(
+            select(PromotionCollectionTarget).where(
+                PromotionCollectionTarget.promotion_id == promo.id,
+                PromotionCollectionTarget.collection_id == campaign.target_id,
+            )
+        )).scalar_one_or_none() is not None
+    elif campaign.target_type == CampaignTargetType.CATEGORY:
+        ok = promo.scope_type == PromotionScopeType.CATEGORY and (await db.execute(
+            select(PromotionCategoryTarget).where(
+                PromotionCategoryTarget.promotion_id == promo.id,
+                PromotionCategoryTarget.room_category_id == campaign.target_id,
+            )
+        )).scalar_one_or_none() is not None
+    else:
+        ok = False
+
+    if not ok:
+        raise AppException(422, "CAMPAIGN_PROMO_SCOPE_MISMATCH",
+                           "Promotion scope must match the campaign target.")
+
+
 async def admin_add_campaign_promotion(db: AsyncSession, campaign_id: str, promotion_id: str) -> dict:
     from app.modules.campaign.models import CampaignPromotion
+    await _validate_campaign_promotion_match(db, campaign_id, promotion_id)
     db.add(CampaignPromotion(campaign_id=campaign_id, promotion_id=promotion_id))
     await db.commit()
     return {"campaignId": campaign_id, "promotionId": promotion_id}
