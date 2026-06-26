@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/lib/i18n";
 import { adminCreateCampaign } from "@/features/admin/admin.api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUploadField } from "@/components/admin/image-upload-field";
+import { CampaignTargetField } from "@/components/admin/campaign-target-field";
 import { toUtcIso } from "@/lib/datetime";
 
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED"];
@@ -15,6 +16,7 @@ const PLACEMENTS = ["", "HOME_HERO", "HOME_SECTION", "COLLECTION_SECTION", "PROD
 
 export default function NewCampaignPage() {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,8 @@ export default function NewCampaignPage() {
     code: "",
     status: "DRAFT",
     placement: "",
+    targetType: "",
+    targetId: "",
     displayPriority: "100",
     heroImageUrl: "",
     mobileHeroImageUrl: "",
@@ -51,6 +55,8 @@ export default function NewCampaignPage() {
         code: form.code,
         status: form.status,
         placement: form.placement || null,
+        targetType: form.targetType || null,
+        targetId: form.targetId || null,
         displayPriority: parseInt(form.displayPriority) || 100,
         heroImageUrl: form.heroImageUrl || null,
         mobileHeroImageUrl: form.mobileHeroImageUrl || null,
@@ -90,6 +96,14 @@ export default function NewCampaignPage() {
           <div className="space-y-1.5">
             <Label>{t("priority")}</Label>
             <Input type="number" value={form.displayPriority} onChange={(e) => set("displayPriority", e.target.value)} />
+          </div>
+          <div className="col-span-2">
+            <CampaignTargetField
+              locale={locale}
+              targetType={form.targetType}
+              targetId={form.targetId}
+              onChange={(tt, ti) => setForm((f) => ({ ...f, targetType: tt, targetId: ti }))}
+            />
           </div>
           <div className="col-span-2">
             <ImageUploadField label={t("heroImageUrl")} value={form.heroImageUrl} onChange={(url) => set("heroImageUrl", url)} prefix="campaigns" />

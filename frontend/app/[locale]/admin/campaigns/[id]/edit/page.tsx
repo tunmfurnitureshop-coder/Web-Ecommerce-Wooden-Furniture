@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/lib/i18n";
 import { adminGetCampaign, adminPatchCampaign, adminGetCampaignMetrics } from "@/features/admin/admin.api";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ImageUploadField } from "@/components/admin/image-upload-field";
+import { CampaignTargetField } from "@/components/admin/campaign-target-field";
 import { toUtcIso, utcToLocalInput } from "@/lib/datetime";
 import { CampaignMetricsCards } from "@/design-system/admin/CampaignMetricsCards";
 
@@ -20,6 +21,7 @@ interface PageProps {
 
 export default function EditCampaignPage({ params }: PageProps) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const { id } = params;
 
@@ -31,6 +33,8 @@ export default function EditCampaignPage({ params }: PageProps) {
   const [heroImageUrl, setHeroImageUrl] = useState("");
   const [mobileHeroImageUrl, setMobileHeroImageUrl] = useState("");
   const [placement, setPlacement] = useState("");
+  const [targetType, setTargetType] = useState("");
+  const [targetId, setTargetId] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
 
@@ -42,6 +46,8 @@ export default function EditCampaignPage({ params }: PageProps) {
         setHeroImageUrl((d.heroImageUrl as string) ?? "");
         setMobileHeroImageUrl((d.mobileHeroImageUrl as string) ?? "");
         setPlacement((d.placement as string) ?? "");
+        setTargetType((d.targetType as string) ?? "");
+        setTargetId((d.targetId as string) ?? "");
         setStartsAt(utcToLocalInput(d.startsAt));
         setEndsAt(utcToLocalInput(d.endsAt));
       })
@@ -59,6 +65,8 @@ export default function EditCampaignPage({ params }: PageProps) {
       const payload: Record<string, unknown> = {
         status,
         placement: placement || null,
+        targetType: targetType || null,
+        targetId: targetId || null,
         heroImageUrl: heroImageUrl || null,
         mobileHeroImageUrl: mobileHeroImageUrl || null,
         endsAt: toUtcIso(endsAt),
@@ -116,6 +124,16 @@ export default function EditCampaignPage({ params }: PageProps) {
             {PLACEMENTS.map((v) => <option key={v} value={v}>{v || "—"}</option>)}
           </select>
         </div>
+
+        <CampaignTargetField
+          locale={locale}
+          targetType={targetType}
+          targetId={targetId}
+          onChange={(tt, ti) => {
+            setTargetType(tt);
+            setTargetId(ti);
+          }}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
