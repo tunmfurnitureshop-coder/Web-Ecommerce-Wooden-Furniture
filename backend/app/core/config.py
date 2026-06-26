@@ -8,6 +8,12 @@ class Settings(BaseSettings):
     ENV: str = "development"
 
     DATABASE_URL: str
+    # Keep the app's pool well below Supabase's session-mode client cap (15).
+    # Total held connections = DB_POOL_SIZE + DB_MAX_OVERFLOW.
+    DB_POOL_SIZE: int = 3
+    DB_MAX_OVERFLOW: int = 2
+    DB_POOL_TIMEOUT: int = 30
+    DB_POOL_RECYCLE: int = 300
 
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
