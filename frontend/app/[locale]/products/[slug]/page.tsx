@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 
 interface RelatedProductRaw {
   id: string; name: string; slug: string;
-  base_price_vnd: number; primary_image_url?: string | null;
+  basePriceVnd: number; primaryImageUrl?: string | null;
 }
 
 async function getProduct(slug: string, locale: string) {
@@ -29,7 +29,7 @@ async function getRelatedProducts(slug: string, locale: string) {
     const data = await api.get<{ items: RelatedProductRaw[] }>(`/api/v1/products/${slug}/related?locale=${locale}&limit=8`);
     return (data.items ?? []).map((p) => ({
       id: p.id, name: p.name, slug: p.slug,
-      basePriceVnd: p.base_price_vnd, primaryImageUrl: p.primary_image_url,
+      basePriceVnd: p.basePriceVnd, primaryImageUrl: p.primaryImageUrl,
     }));
   } catch {
     return [];
