@@ -401,6 +401,18 @@
     },
     "copyright": "© {year} Vin Furniture. Tất cả quyền được bảo lưu."
   },
+  "contact": {
+    "openLabel": "Liên hệ với chúng tôi",
+    "closeLabel": "Đóng",
+    "heading": "Chat với cửa hàng",
+    "channels": {
+      "zalo": "Chat Zalo",
+      "messenger": "Nhắn Messenger",
+      "hotline": "Gọi hotline"
+    },
+    "productInquiry": "Hỏi về sản phẩm này",
+    "productInquiryMessage": "Tôi muốn hỏi về sản phẩm \"{name}\": {url}"
+  },
   "home": {
     "heroTitle": "Nội thất gỗ tự nhiên cao cấp",
     "heroSubtitle": "Chế tác tỉ mỉ, bền vững theo thời gian",

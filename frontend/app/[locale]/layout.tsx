@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/lib/i18n";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ContactFab } from "@/components/contact/contact-fab";
 import { CustomerAuthProvider } from "@/components/customer/CustomerAuthContext";
 import { Playfair_Display, Manrope } from "next/font/google";
 import type { Metadata } from "next";
@@ -54,6 +55,7 @@ export default async function LocaleLayout({
             <Header />
             <main className="min-h-screen">{children}</main>
             <Footer />
+            <ContactFab />
           </CustomerAuthProvider>
         </NextIntlClientProvider>
       </body>

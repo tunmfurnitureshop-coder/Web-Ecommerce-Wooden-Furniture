@@ -17,6 +17,8 @@ import { Divider } from "@/design-system/primitives/divider";
 import { Breadcrumb } from "@/design-system/layout/breadcrumb";
 import { formatCurrency } from "@/lib/format-currency";
 import { ShoppingCart } from "lucide-react";
+import { ContactChannelButton } from "@/components/contact/contact-channel-button";
+import { findContactChannel } from "@/lib/contact/channels";
 import type { ProductDetail, ProductImageItem, PricingQuoteResponse } from "@/features/product/product.types";
 
 interface Props {
@@ -26,7 +28,15 @@ interface Props {
 
 export function ProductDetailClient({ product, locale }: Props) {
   const t = useTranslations("product");
+  const tc = useTranslations("contact");
   const addItem = useCartStore((s) => s.addItem);
+
+  // Only Messenger honours a prefilled message; show the inquiry button only when
+  // it's configured so we never imply a prefill that silently gets dropped.
+  const inquiryChannel = findContactChannel("messenger");
+  // SSR-safe absolute URL: env wins, else fill origin after mount.
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(window.location.origin), []);
 
   const [activeImage, setActiveImage] = useState<string | null>(
     product.primaryImageUrl ?? product.images[0]?.imageUrl ?? null
@@ -257,6 +267,19 @@ export function ProductDetailClient({ product, locale }: Props) {
               </Button>
               {quoteLoading && <LoadingOverlay label="Đang tính giá..." />}
             </div>
+
+            {inquiryChannel && (
+              <ContactChannelButton
+                channel={inquiryChannel}
+                label={tc("productInquiry")}
+                text={tc("productInquiryMessage", {
+                  name: product.name,
+                  url: `${process.env.NEXT_PUBLIC_SITE_URL || origin}/${locale}/products/${product.slug}`,
+                })}
+                variant="fab"
+                className="w-full justify-center"
+              />
+            )}
           </Stack>
 
           {/* Pricing breakdown */}

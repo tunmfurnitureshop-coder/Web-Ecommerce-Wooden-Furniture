@@ -2,9 +2,13 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { TreePine } from "lucide-react";
 import { Divider } from "@/design-system/primitives/divider";
+import { ContactChannelButton } from "@/components/contact/contact-channel-button";
+import { getContactChannels } from "@/lib/contact/channels";
 
 export function Footer() {
   const t = useTranslations("footer");
+  const tc = useTranslations("contact");
+  const contactChannels = getContactChannels();
 
   return (
     <footer className="border-t border-border-default bg-surface">
@@ -54,8 +58,21 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <p className="text-sm font-semibold text-text-primary">{t("sections.support")}</p>
             <div className="flex flex-col gap-2 text-sm text-text-muted">
-              <p>{t("contact.email")}</p>
+              <a
+                href={`mailto:${t("contact.email")}`}
+                className="hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+              >
+                {t("contact.email")}
+              </a>
               <p>{t("contact.phone")}</p>
+              {contactChannels.map((channel) => (
+                <ContactChannelButton
+                  key={channel.id}
+                  channel={channel}
+                  label={tc(`channels.${channel.id}`)}
+                  variant="inline"
+                />
+              ))}
             </div>
           </div>
         </div>

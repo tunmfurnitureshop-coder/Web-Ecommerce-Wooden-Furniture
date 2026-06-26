@@ -401,6 +401,18 @@
     },
     "copyright": "© {year} Vin Furniture. 版权所有。"
   },
+  "contact": {
+    "openLabel": "联系我们",
+    "closeLabel": "关闭",
+    "heading": "与门店聊天",
+    "channels": {
+      "zalo": "Zalo 聊天",
+      "messenger": "Messenger 私信",
+      "hotline": "拨打热线"
+    },
+    "productInquiry": "咨询此产品",
+    "productInquiryMessage": "我想咨询产品 \"{name}\"：{url}"
+  },
   "home": {
     "heroTitle": "高端天然木家具",
     "heroSubtitle": "精心打造，经久耐用",
