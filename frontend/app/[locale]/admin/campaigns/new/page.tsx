@@ -7,8 +7,10 @@ import { adminCreateCampaign } from "@/features/admin/admin.api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageUploadField } from "@/components/admin/image-upload-field";
 
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED"];
+const PLACEMENTS = ["", "HOME_HERO", "HOME_SECTION", "COLLECTION_SECTION", "PRODUCT_PAGE", "CART", "CHECKOUT"];
 
 export default function NewCampaignPage() {
   const t = useTranslations("admin");
@@ -22,6 +24,7 @@ export default function NewCampaignPage() {
     placement: "",
     displayPriority: "100",
     heroImageUrl: "",
+    mobileHeroImageUrl: "",
     startsAt: "",
     endsAt: "",
     nameVi: "",
@@ -49,6 +52,7 @@ export default function NewCampaignPage() {
         placement: form.placement || null,
         displayPriority: parseInt(form.displayPriority) || 100,
         heroImageUrl: form.heroImageUrl || null,
+        mobileHeroImageUrl: form.mobileHeroImageUrl || null,
         startsAt: form.startsAt,
         endsAt: form.endsAt || null,
         translations,
@@ -78,15 +82,19 @@ export default function NewCampaignPage() {
           </div>
           <div className="space-y-1.5">
             <Label>{t("placement")}</Label>
-            <Input placeholder="HOMEPAGE_HERO" value={form.placement} onChange={(e) => set("placement", e.target.value)} />
+            <select value={form.placement} onChange={(e) => set("placement", e.target.value)} className="w-full rounded-md border border-border-default bg-surface px-3 py-2 text-sm">
+              {PLACEMENTS.map((v) => <option key={v} value={v}>{v || "—"}</option>)}
+            </select>
           </div>
           <div className="space-y-1.5">
             <Label>{t("priority")}</Label>
             <Input type="number" value={form.displayPriority} onChange={(e) => set("displayPriority", e.target.value)} />
           </div>
-          <div className="space-y-1.5 col-span-2">
-            <Label>{t("heroImageUrl")}</Label>
-            <Input value={form.heroImageUrl} onChange={(e) => set("heroImageUrl", e.target.value)} />
+          <div className="col-span-2">
+            <ImageUploadField label={t("heroImageUrl")} value={form.heroImageUrl} onChange={(url) => set("heroImageUrl", url)} prefix="campaigns" />
+          </div>
+          <div className="col-span-2">
+            <ImageUploadField label={t("mobileHeroImageUrl")} value={form.mobileHeroImageUrl} onChange={(url) => set("mobileHeroImageUrl", url)} prefix="campaigns" />
           </div>
           <div className="space-y-1.5">
             <Label>{t("startsAt")}</Label>

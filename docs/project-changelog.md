@@ -17,8 +17,11 @@
 - **`ProductCard`**: optional strike-through price + discount badge for deal display
 - **i18n**: `home.dealsTitle/bestSellersTitle/dealBadge/heroSlideCta/promotionsAria/goToSlide` + `common.scrollPrev/scrollNext` (vi + zh-CN)
 
+#### Admin
+- **Campaign image upload**: reusable `ImageUploadField` (preview + upload/replace/remove) for desktop + mobile hero images in campaign create/edit; `placement` is now a dropdown; edit form can change images/placement (not just status). Backed by a generic `POST /api/v1/admin/uploads/image` endpoint reusing the R2 storage layer (type/size validated, admin-only)
+
 #### Testing
-- 13 new backend tests: `test_deals.py` (9), `test_best_sellers.py` (4); full suite 111 passing, no regressions
+- 16 new backend tests: `test_deals.py` (9), `test_best_sellers.py` (4), `test_media_upload.py` (3); full suite 114 passing, no regressions
 
 #### Dependencies
 - `embla-carousel-react`, `embla-carousel-autoplay` (frontend)

@@ -6,9 +6,11 @@ import { useRouter } from "@/lib/i18n";
 import { adminGetCampaign, adminPatchCampaign, adminGetCampaignMetrics } from "@/features/admin/admin.api";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { ImageUploadField } from "@/components/admin/image-upload-field";
 import { CampaignMetricsCards } from "@/design-system/admin/CampaignMetricsCards";
 
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED", "ARCHIVED"];
+const PLACEMENTS = ["", "HOME_HERO", "HOME_SECTION", "COLLECTION_SECTION", "PRODUCT_PAGE", "CART", "CHECKOUT"];
 
 interface PageProps {
   params: { id: string };
@@ -24,10 +26,19 @@ export default function EditCampaignPage({ params }: PageProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState("DRAFT");
+  const [heroImageUrl, setHeroImageUrl] = useState("");
+  const [mobileHeroImageUrl, setMobileHeroImageUrl] = useState("");
+  const [placement, setPlacement] = useState("");
 
   useEffect(() => {
     adminGetCampaign(id)
-      .then((d) => { setData(d); setStatus(d.status as string); })
+      .then((d) => {
+        setData(d);
+        setStatus(d.status as string);
+        setHeroImageUrl((d.heroImageUrl as string) ?? "");
+        setMobileHeroImageUrl((d.mobileHeroImageUrl as string) ?? "");
+        setPlacement((d.placement as string) ?? "");
+      })
       .catch(console.error);
     adminGetCampaignMetrics(id)
       .then(setMetrics)
@@ -39,7 +50,12 @@ export default function EditCampaignPage({ params }: PageProps) {
     setError(null);
     setSaving(true);
     try {
-      await adminPatchCampaign(id, { status });
+      await adminPatchCampaign(id, {
+        status,
+        placement: placement || null,
+        heroImageUrl: heroImageUrl || null,
+        mobileHeroImageUrl: mobileHeroImageUrl || null,
+      });
       router.push("/admin/campaigns");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("saveFailed"));
@@ -83,6 +99,16 @@ export default function EditCampaignPage({ params }: PageProps) {
             {STATUSES.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
+
+        <div className="space-y-1.5">
+          <Label>{t("placement")}</Label>
+          <select value={placement} onChange={(e) => setPlacement(e.target.value)} className="rounded-md border border-border-default bg-surface px-3 py-2 text-sm">
+            {PLACEMENTS.map((v) => <option key={v} value={v}>{v || "—"}</option>)}
+          </select>
+        </div>
+
+        <ImageUploadField label={t("heroImageUrl")} value={heroImageUrl} onChange={setHeroImageUrl} prefix="campaigns" />
+        <ImageUploadField label={t("mobileHeroImageUrl")} value={mobileHeroImageUrl} onChange={setMobileHeroImageUrl} prefix="campaigns" />
 
         {error && <p className="text-danger text-sm">{error}</p>}
 

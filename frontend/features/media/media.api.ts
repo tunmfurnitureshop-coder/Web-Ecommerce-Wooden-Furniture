@@ -51,3 +51,24 @@ export async function deleteProductImage(productId: string, imageId: string): Pr
     getAuthHeaders(),
   );
 }
+
+/** Generic admin image upload — stores to object storage and returns the URL. */
+export async function uploadAdminImage(
+  file: File,
+  prefix = "uploads",
+): Promise<{ url: string; key: string }> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("prefix", prefix);
+  const BASE_URL = typeof window === "undefined"
+    ? (process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000")
+    : (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000");
+  const token = getAdminToken();
+  const res = await fetch(`${BASE_URL}/api/v1/admin/uploads/image`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: form,
+  });
+  if (!res.ok) throw new Error("Upload failed");
+  return res.json();
+}
