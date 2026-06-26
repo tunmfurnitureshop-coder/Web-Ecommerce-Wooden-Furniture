@@ -1,23 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Boxes } from "lucide-react";
 import { InventoryTable } from "@/components/admin/InventoryTable";
 import { adminListInventory } from "@/features/admin/admin.api";
-import type { InventoryItem } from "@/features/admin/admin.types";
+import { PageState } from "@/design-system/components/page-state";
+import { usePageData } from "@/design-system/hooks/use-page-data";
 
 export default function AdminInventoryPage() {
   const t = useTranslations("admin");
-  const [items, setItems] = useState<InventoryItem[]>([]);
-
-  useEffect(() => {
-    adminListInventory().then((r) => setItems(r.items)).catch(console.error);
-  }, []);
+  const tc = useTranslations("common");
+  const { status, data, reload } = usePageData(() => adminListInventory());
+  const items = data?.items ?? [];
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-6">{t("inventory")}</h1>
-      <InventoryTable items={items} onUpdate={setItems} />
+      <h1 className="mb-6 text-xl font-bold text-text-primary">{t("inventory")}</h1>
+      <PageState
+        status={status}
+        isEmpty={items.length === 0}
+        onRetry={reload}
+        errorTitle={t("loadErrorTitle")}
+        retryLabel={tc("retry")}
+        emptyIcon={<Boxes className="h-10 w-10" />}
+        emptyTitle={t("noInventory")}
+      >
+        <InventoryTable items={items} onSaved={reload} />
+      </PageState>
     </div>
   );
 }

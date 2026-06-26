@@ -118,7 +118,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                   <p className="font-medium">{log.subject}</p>
                   <p className="text-xs text-muted-foreground">{log.recipientEmail} · {log.templateKey}</p>
                 </div>
-                <span className={`text-xs ${log.status === "SENT" ? "text-green-600" : "text-red-500"}`}>{log.status}</span>
+                <span className={`text-xs ${log.status === "SENT" ? "text-success" : "text-danger"}`}>{log.status}</span>
               </div>
             ))}
           </CardContent>

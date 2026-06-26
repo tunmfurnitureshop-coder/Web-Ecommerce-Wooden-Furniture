@@ -13,7 +13,12 @@ export async function HomeBestSellersSection({ items }: { items: BestSellerItem[
   return (
     <Section>
       <Container>
-        <ProductRail title={t("bestSellersTitle")} products={items.map(mapRelatedToCard)} />
+        <ProductRail
+          title={t("bestSellersTitle")}
+          products={items.map(mapRelatedToCard)}
+          viewAllHref="/products?sort=rating_desc"
+          viewAllLabel={t("viewAll")}
+        />
       </Container>
     </Section>
   );

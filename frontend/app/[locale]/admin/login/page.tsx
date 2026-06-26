@@ -13,8 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function AdminLoginPage() {
   const t = useTranslations("admin");
   const router = useRouter();
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
       setAdminToken(res.accessToken);
       router.push("/admin/dashboard");
     } catch {
-      setError("Email hoặc mật khẩu không đúng");
+      setError(t("invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
                 required
               />
             </div>
-            {error && <p className="text-destructive text-sm">{error}</p>}
+            {error && <p className="text-danger text-sm" role="alert">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? t("loggingIn") : t("login")}
             </Button>
