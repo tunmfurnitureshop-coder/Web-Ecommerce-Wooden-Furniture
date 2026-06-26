@@ -18,6 +18,18 @@ class CampaignListResponse(BaseModel):
     items: List[CampaignListItem]
 
 
+class CampaignBannerOut(BaseModel):
+    """Structured promo summary for the filtered PLP banner. Strings (e.g. the
+    discount label) are formatted on the frontend to keep i18n out of the API."""
+    campaignName: str
+    badgeLabel: Optional[str] = None
+    discountType: Optional[str] = None  # PERCENTAGE | FIXED_AMOUNT
+    discountPercentBps: Optional[int] = None
+    discountAmountVnd: Optional[int] = None
+    endsAt: Optional[datetime] = None
+    targetType: Optional[str] = None
+
+
 class FeaturedProductItem(BaseModel):
     id: str
     name: str
@@ -59,6 +71,8 @@ class AdminCreateCampaignRequest(BaseModel):
     heroImageUrl: Optional[str] = None
     mobileHeroImageUrl: Optional[str] = None
     placement: Optional[str] = None
+    targetType: Optional[str] = None  # CampaignTargetType: COLLECTION | CATEGORY
+    targetId: Optional[str] = None
     displayPriority: int = 100
     startsAt: datetime
     endsAt: Optional[datetime] = None
@@ -70,6 +84,8 @@ class AdminPatchCampaignRequest(BaseModel):
     heroImageUrl: Optional[str] = None
     mobileHeroImageUrl: Optional[str] = None
     placement: Optional[str] = None
+    targetType: Optional[str] = None
+    targetId: Optional[str] = None
     displayPriority: Optional[int] = None
     startsAt: Optional[datetime] = None
     endsAt: Optional[datetime] = None

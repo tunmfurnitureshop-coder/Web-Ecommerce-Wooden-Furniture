@@ -1,4 +1,4 @@
-import type { CampaignDetailResponse, FeaturedProductItem } from "./campaign.types";
+import type { CampaignDetailResponse, CampaignListItem, FeaturedProductItem } from "./campaign.types";
 import { formatCurrency } from "@/lib/format-currency";
 
 export interface CampaignHeroViewModel {
@@ -32,5 +32,24 @@ export function mapFeaturedProductToViewModel(p: FeaturedProductItem): CampaignP
     slug: p.slug,
     priceFormatted: formatCurrency(p.basePriceVnd),
     imageUrl: p.heroImageUrl,
+  };
+}
+
+export interface HeroSlideViewModel {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl: string | null;
+  mobileImageUrl: string | null;
+}
+
+/** Map a HOME_HERO campaign list item into a homepage slideshow slide. */
+export function mapCampaignToHeroSlide(c: CampaignListItem): HeroSlideViewModel {
+  return {
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    imageUrl: c.heroImageUrl,
+    mobileImageUrl: c.mobileHeroImageUrl,
   };
 }

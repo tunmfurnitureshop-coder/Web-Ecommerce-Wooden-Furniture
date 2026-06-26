@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/lib/i18n";
 import { adminGetCampaign, adminPatchCampaign, adminGetCampaignMetrics } from "@/features/admin/admin.api";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ImageUploadField } from "@/components/admin/image-upload-field";
+import { CampaignTargetField } from "@/components/admin/campaign-target-field";
+import { toUtcIso, utcToLocalInput } from "@/lib/datetime";
 import { CampaignMetricsCards } from "@/design-system/admin/CampaignMetricsCards";
 
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED", "ARCHIVED"];
+const PLACEMENTS = ["", "HOME_HERO", "HOME_SECTION", "COLLECTION_SECTION", "PRODUCT_PAGE", "CART", "CHECKOUT"];
 
 interface PageProps {
   params: { id: string };
@@ -16,6 +21,7 @@ interface PageProps {
 
 export default function EditCampaignPage({ params }: PageProps) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const { id } = params;
 
@@ -24,10 +30,27 @@ export default function EditCampaignPage({ params }: PageProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState("DRAFT");
+  const [heroImageUrl, setHeroImageUrl] = useState("");
+  const [mobileHeroImageUrl, setMobileHeroImageUrl] = useState("");
+  const [placement, setPlacement] = useState("");
+  const [targetType, setTargetType] = useState("");
+  const [targetId, setTargetId] = useState("");
+  const [startsAt, setStartsAt] = useState("");
+  const [endsAt, setEndsAt] = useState("");
 
   useEffect(() => {
     adminGetCampaign(id)
-      .then((d) => { setData(d); setStatus(d.status as string); })
+      .then((d) => {
+        setData(d);
+        setStatus(d.status as string);
+        setHeroImageUrl((d.heroImageUrl as string) ?? "");
+        setMobileHeroImageUrl((d.mobileHeroImageUrl as string) ?? "");
+        setPlacement((d.placement as string) ?? "");
+        setTargetType((d.targetType as string) ?? "");
+        setTargetId((d.targetId as string) ?? "");
+        setStartsAt(utcToLocalInput(d.startsAt));
+        setEndsAt(utcToLocalInput(d.endsAt));
+      })
       .catch(console.error);
     adminGetCampaignMetrics(id)
       .then(setMetrics)
@@ -39,7 +62,18 @@ export default function EditCampaignPage({ params }: PageProps) {
     setError(null);
     setSaving(true);
     try {
-      await adminPatchCampaign(id, { status });
+      const payload: Record<string, unknown> = {
+        status,
+        placement: placement || null,
+        targetType: targetType || null,
+        targetId: targetId || null,
+        heroImageUrl: heroImageUrl || null,
+        mobileHeroImageUrl: mobileHeroImageUrl || null,
+        endsAt: toUtcIso(endsAt),
+      };
+      const startIso = toUtcIso(startsAt);
+      if (startIso) payload.startsAt = startIso;
+      await adminPatchCampaign(id, payload);
       router.push("/admin/campaigns");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("saveFailed"));
@@ -83,6 +117,37 @@ export default function EditCampaignPage({ params }: PageProps) {
             {STATUSES.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
+
+        <div className="space-y-1.5">
+          <Label>{t("placement")}</Label>
+          <select value={placement} onChange={(e) => setPlacement(e.target.value)} className="rounded-md border border-border-default bg-surface px-3 py-2 text-sm">
+            {PLACEMENTS.map((v) => <option key={v} value={v}>{v || "—"}</option>)}
+          </select>
+        </div>
+
+        <CampaignTargetField
+          locale={locale}
+          targetType={targetType}
+          targetId={targetId}
+          onChange={(tt, ti) => {
+            setTargetType(tt);
+            setTargetId(ti);
+          }}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label>{t("startsAt")}</Label>
+            <Input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>{t("endsAt")}</Label>
+            <Input type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
+          </div>
+        </div>
+
+        <ImageUploadField label={t("heroImageUrl")} value={heroImageUrl} onChange={setHeroImageUrl} prefix="campaigns" />
+        <ImageUploadField label={t("mobileHeroImageUrl")} value={mobileHeroImageUrl} onChange={setMobileHeroImageUrl} prefix="campaigns" />
 
         {error && <p className="text-danger text-sm">{error}</p>}
 

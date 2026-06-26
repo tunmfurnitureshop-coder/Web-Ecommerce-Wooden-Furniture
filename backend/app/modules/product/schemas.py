@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List, Dict, Any
+from app.modules.campaign.schemas import CampaignBannerOut
 
 
 class RoomOut(BaseModel):
@@ -60,6 +61,7 @@ class ProductCatalogResponse(BaseModel):
     appliedFilters: Optional[AppliedFilters] = None
     availableFilters: Optional[AvailableFilters] = None
     fallback: Optional[FallbackSuggestions] = None
+    campaignBanner: Optional[CampaignBannerOut] = None
 
 
 class WoodTypeOptionOut(BaseModel):

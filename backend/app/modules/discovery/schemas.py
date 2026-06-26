@@ -107,3 +107,7 @@ class SynonymOut(BaseModel):
 
 class SynonymListResponse(BaseModel):
     items: List[SynonymOut]
+
+
+class BestSellerListResponse(BaseModel):
+    items: List[CategoryProductItem]

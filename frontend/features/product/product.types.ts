@@ -22,6 +22,16 @@ export interface AppliedFilters {
   sort?: string | null;
 }
 
+export interface CampaignBanner {
+  campaignName: string;
+  badgeLabel?: string | null;
+  discountType?: "PERCENTAGE" | "FIXED_AMOUNT" | null;
+  discountPercentBps?: number | null;
+  discountAmountVnd?: number | null;
+  endsAt?: string | null;
+  targetType?: string | null;
+}
+
 export interface ProductListResponse {
   items: ProductListItem[];
   page: number;
@@ -29,6 +39,7 @@ export interface ProductListResponse {
   total: number;
   query?: string | null;
   appliedFilters?: AppliedFilters | null;
+  campaignBanner?: CampaignBanner | null;
 }
 
 export interface SuggestionsResponse {
@@ -143,4 +154,32 @@ export interface ProductCatalogFilters {
   maxPrice?: number;
   page?: number;
   pageSize?: number;
+  campaign?: string;
+}
+
+export interface BestSellerItem {
+  id: string;
+  name: string;
+  slug: string;
+  basePriceVnd: number;
+  primaryImageUrl: string | null;
+}
+
+export interface BestSellerListResponse {
+  items: BestSellerItem[];
+}
+
+export interface ProductDealItem {
+  id: string;
+  name: string;
+  slug: string;
+  primaryImageUrl: string | null;
+  originalPriceVnd: number;
+  dealPriceVnd: number;
+  discountPct: number;
+  badgeLabel: string | null;
+}
+
+export interface DealListResponse {
+  items: ProductDealItem[];
 }

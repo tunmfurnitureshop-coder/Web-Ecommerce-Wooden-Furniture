@@ -110,7 +110,7 @@ const config: Config = {
       },
 
       fontFamily: {
-        display: ["var(--font-display)", '"DM Serif Display"', '"Noto Serif SC"', "Georgia", "serif"],
+        display: ["var(--font-display)", '"Playfair Display"', '"Noto Serif SC"', "Georgia", "serif"],
         sans: ["var(--font-sans)", "Manrope", '"Noto Sans SC"', "system-ui", "sans-serif"],
       },
 

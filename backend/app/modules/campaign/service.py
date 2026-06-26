@@ -3,14 +3,18 @@ from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.modules.campaign.models import Campaign, CampaignTranslation, CampaignProduct, CampaignCollection
+from app.modules.campaign.models import (
+    Campaign, CampaignTranslation, CampaignProduct, CampaignCollection, CampaignPromotion,
+)
 from app.modules.campaign.schemas import (
     CampaignListItem, CampaignListResponse, CampaignDetailResponse,
-    FeaturedProductItem, FeaturedCollectionItem,
+    FeaturedProductItem, FeaturedCollectionItem, CampaignBannerOut,
     AdminCreateCampaignRequest, AdminPatchCampaignRequest,
 )
 from app.core.exceptions import AppException
-from app.shared.enums import CampaignStatus
+from app.shared.enums import (
+    CampaignStatus, CampaignTargetType, PromotionStatus, PromotionTrigger, PromotionScopeType,
+)
 
 
 def _now() -> datetime:
@@ -127,6 +131,63 @@ async def get_campaign_by_slug(db: AsyncSession, slug: str, locale: str = "vi") 
     )
 
 
+async def resolve_active_campaign_by_slug(
+    db: AsyncSession, slug: str, locale: str = "vi"
+) -> Optional[Campaign]:
+    """Campaign behind a (localized) slug, only if currently active. Returns None
+    for unknown/inactive slugs so the catalog can degrade gracefully (no 404)."""
+    trans = (await db.execute(
+        select(CampaignTranslation).where(CampaignTranslation.slug == slug)
+    )).scalars().first()
+    if not trans:
+        return None
+    campaign = (await db.execute(
+        select(Campaign).where(Campaign.id == trans.campaign_id)
+    )).scalar_one_or_none()
+    if not campaign or not _is_active(campaign):
+        return None
+    return campaign
+
+
+async def build_campaign_banner(
+    db: AsyncSession, campaign: Campaign, locale: str = "vi"
+) -> Optional[CampaignBannerOut]:
+    """Promo summary for the filtered PLP: the campaign's first ACTIVE + AUTOMATIC
+    promotion (lowest priority value wins). None when no such promotion is linked."""
+    from app.modules.promotion.models import Promotion, PromotionTranslation
+
+    promo = (await db.execute(
+        select(Promotion)
+        .join(CampaignPromotion, CampaignPromotion.promotion_id == Promotion.id)
+        .where(
+            CampaignPromotion.campaign_id == campaign.id,
+            Promotion.status == PromotionStatus.ACTIVE,
+            Promotion.trigger == PromotionTrigger.AUTOMATIC,
+        )
+        .order_by(Promotion.priority.asc())
+    )).scalars().first()
+    if not promo:
+        return None
+
+    pt = (await db.execute(
+        select(PromotionTranslation).where(
+            PromotionTranslation.promotion_id == promo.id,
+            PromotionTranslation.locale == locale,
+        )
+    )).scalar_one_or_none()
+    name_trans = _trans(campaign, locale)
+
+    return CampaignBannerOut(
+        campaignName=name_trans.name if name_trans else campaign.code,
+        badgeLabel=pt.badge_label if pt else None,
+        discountType=promo.discount_type,
+        discountPercentBps=promo.discount_percentage_bps,
+        discountAmountVnd=promo.discount_amount_vnd,
+        endsAt=promo.ends_at or campaign.ends_at,
+        targetType=campaign.target_type,
+    )
+
+
 async def validate_campaign_code(db: AsyncSession, code: str) -> Optional[Campaign]:
     campaign = (await db.execute(
         select(Campaign).where(Campaign.code == code)
@@ -157,7 +218,8 @@ async def admin_create_campaign(db: AsyncSession, req: AdminCreateCampaignReques
     campaign = Campaign(
         id=str(uuid.uuid4()), code=req.code, status=req.status,
         hero_image_url=req.heroImageUrl, mobile_hero_image_url=req.mobileHeroImageUrl,
-        placement=req.placement, display_priority=req.displayPriority,
+        placement=req.placement, target_type=req.targetType, target_id=req.targetId,
+        display_priority=req.displayPriority,
         starts_at=req.startsAt, ends_at=req.endsAt,
     )
     db.add(campaign)
@@ -187,6 +249,7 @@ async def admin_get_campaign(db: AsyncSession, campaign_id: str) -> dict:
         "id": campaign.id, "code": campaign.code, "status": campaign.status,
         "heroImageUrl": campaign.hero_image_url, "mobileHeroImageUrl": campaign.mobile_hero_image_url,
         "placement": campaign.placement, "displayPriority": campaign.display_priority,
+        "targetType": campaign.target_type, "targetId": campaign.target_id,
         "startsAt": campaign.starts_at, "endsAt": campaign.ends_at, "createdAt": campaign.created_at,
         "translations": [
             {"locale": t.locale, "name": t.name, "slug": t.slug,
@@ -200,7 +263,9 @@ async def admin_patch_campaign(db: AsyncSession, campaign_id: str, req: AdminPat
     campaign = (await db.execute(select(Campaign).where(Campaign.id == campaign_id))).scalar_one_or_none()
     if not campaign:
         raise AppException(404, "CAMPAIGN_NOT_FOUND", "Campaign not found.")
-    for field, value in req.model_dump(exclude_none=True).items():
+    # exclude_unset (not exclude_none) so an explicit null can clear a nullable
+    # field such as ends_at; only fields present in the request body are applied.
+    for field, value in req.model_dump(exclude_unset=True).items():
         snake = "".join(["_" + c.lower() if c.isupper() else c for c in field]).lstrip("_")
         if hasattr(campaign, snake):
             setattr(campaign, snake, value)
@@ -216,8 +281,59 @@ async def admin_delete_campaign(db: AsyncSession, campaign_id: str) -> None:
     await db.commit()
 
 
+async def _validate_campaign_promotion_match(
+    db: AsyncSession, campaign_id: str, promotion_id: str
+) -> None:
+    """Enforce the golden rule: a campaign's promotion must be AUTOMATIC and its
+    scope must match the campaign target. Keeps the campaign↔promotion link
+    meaningful (the discount auto-applies to exactly the campaign's product group)."""
+    from app.modules.promotion.models import (
+        Promotion, PromotionCollectionTarget, PromotionCategoryTarget,
+    )
+
+    campaign = (await db.execute(
+        select(Campaign).where(Campaign.id == campaign_id)
+    )).scalar_one_or_none()
+    if not campaign:
+        raise AppException(404, "CAMPAIGN_NOT_FOUND", "Campaign not found.")
+    if not campaign.target_type or not campaign.target_id:
+        raise AppException(422, "CAMPAIGN_TARGET_REQUIRED",
+                           "Set the campaign target before linking a promotion.")
+
+    promo = (await db.execute(
+        select(Promotion).where(Promotion.id == promotion_id)
+    )).scalar_one_or_none()
+    if not promo:
+        raise AppException(404, "PROMOTION_NOT_FOUND", "Promotion not found.")
+    if promo.trigger != PromotionTrigger.AUTOMATIC:
+        raise AppException(422, "CAMPAIGN_PROMO_NOT_AUTOMATIC",
+                           "Campaign promotion must be AUTOMATIC so the discount auto-applies.")
+
+    if campaign.target_type == CampaignTargetType.COLLECTION:
+        ok = promo.scope_type == PromotionScopeType.COLLECTION and (await db.execute(
+            select(PromotionCollectionTarget).where(
+                PromotionCollectionTarget.promotion_id == promo.id,
+                PromotionCollectionTarget.collection_id == campaign.target_id,
+            )
+        )).scalar_one_or_none() is not None
+    elif campaign.target_type == CampaignTargetType.CATEGORY:
+        ok = promo.scope_type == PromotionScopeType.CATEGORY and (await db.execute(
+            select(PromotionCategoryTarget).where(
+                PromotionCategoryTarget.promotion_id == promo.id,
+                PromotionCategoryTarget.room_category_id == campaign.target_id,
+            )
+        )).scalar_one_or_none() is not None
+    else:
+        ok = False
+
+    if not ok:
+        raise AppException(422, "CAMPAIGN_PROMO_SCOPE_MISMATCH",
+                           "Promotion scope must match the campaign target.")
+
+
 async def admin_add_campaign_promotion(db: AsyncSession, campaign_id: str, promotion_id: str) -> dict:
     from app.modules.campaign.models import CampaignPromotion
+    await _validate_campaign_promotion_match(db, campaign_id, promotion_id)
     db.add(CampaignPromotion(campaign_id=campaign_id, promotion_id=promotion_id))
     await db.commit()
     return {"campaignId": campaign_id, "promotionId": promotion_id}

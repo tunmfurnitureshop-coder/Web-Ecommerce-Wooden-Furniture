@@ -5,17 +5,30 @@ import { Section } from "@/design-system/primitives/section";
 import { Container } from "@/design-system/primitives/container";
 import { ProductGrid } from "@/design-system/commerce/product-grid";
 import { ProductGridSkeleton } from "@/design-system/components/skeleton";
-import { Button } from "@/design-system/components/button";
-import type { ProductListResponse } from "@/features/product/product.types";
-import { ArrowRight, Truck, ShieldCheck, Clock, Headphones } from "lucide-react";
+import { HomeHeroSlideshow } from "@/components/home/home-hero-slideshow";
+import { HomeHeroStatic } from "@/components/home/home-hero-static";
+import { HomeUspStrip } from "@/components/home/home-usp-strip";
+import { HomeRoomCards } from "@/components/home/home-room-cards";
+import { HomeDealsSection } from "@/components/home/home-deals-section";
+import { HomeBestSellersSection } from "@/components/home/home-best-sellers-section";
+import {
+  HomeCollectionsSection,
+  type HomeCollectionItem,
+} from "@/components/home/home-collections-section";
+import { HomeBrandStory } from "@/components/home/home-brand-story";
+import { HomeTrustSection } from "@/components/home/home-trust-section";
+import { HomeShowroomSection } from "@/components/home/home-showroom-section";
+import { listActiveCampaigns } from "@/features/campaign/campaign.api";
+import { mapCampaignToHeroSlide, type HeroSlideViewModel } from "@/features/campaign/campaign.mappers";
+import type { ProductListResponse, ProductDealItem, BestSellerItem } from "@/features/product/product.types";
+import { getDeals, getBestSellers } from "@/features/product/product.api";
+import { ArrowRight } from "lucide-react";
 import type { ProductCardViewModel } from "@/design-system/commerce/product-card";
 import { formatCurrency } from "@/lib/format-currency";
 
-const ROOM_CATEGORIES = [
-  { slug: "living_room", image: "/images/rooms/living.jpg" },
-  { slug: "bedroom", image: "/images/rooms/bedroom.jpg" },
-  { slug: "dining_room", image: "/images/rooms/dining.jpg" },
-] as const;
+// Always render fresh so newly activated campaigns / deals appear immediately
+// (otherwise Next caches the fetches and the homepage freezes on first render).
+export const dynamic = "force-dynamic";
 
 async function getFeaturedProducts(locale: string): Promise<ProductCardViewModel[]> {
   try {
@@ -40,7 +53,55 @@ async function getFeaturedProducts(locale: string): Promise<ProductCardViewModel
   }
 }
 
-const TRUST_ICONS = [Truck, ShieldCheck, Clock, Headphones] as const;
+async function getHeroSlides(locale: string): Promise<HeroSlideViewModel[]> {
+  try {
+    const res = await listActiveCampaigns(locale, "HOME_HERO");
+    return res.items.map(mapCampaignToHeroSlide);
+  } catch {
+    return [];
+  }
+}
+
+async function getDealsData(locale: string): Promise<ProductDealItem[]> {
+  try {
+    return (await getDeals(locale)).items;
+  } catch {
+    return [];
+  }
+}
+
+async function getBestSellersData(locale: string): Promise<BestSellerItem[]> {
+  try {
+    return (await getBestSellers(locale)).items;
+  } catch {
+    return [];
+  }
+}
+
+interface CollectionApiItem {
+  id: string;
+  name: string;
+  slug: string;
+  short_description?: string | null;
+  cover_image_url?: string | null;
+}
+
+async function getCollectionsData(locale: string): Promise<HomeCollectionItem[]> {
+  try {
+    const res = await api.get<{ items: CollectionApiItem[] }>(
+      `/api/v1/collections?locale=${locale}`
+    );
+    return res.items.map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      shortDescription: c.short_description,
+      coverImageUrl: c.cover_image_url,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 export default async function HomePage({
   params,
@@ -49,69 +110,50 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("home");
-  const products = await getFeaturedProducts(locale);
-
-  const trustItems = ["delivery", "quality", "warranty", "support"] as const;
+  const [products, heroSlides, deals, bestSellers, collections] = await Promise.all([
+    getFeaturedProducts(locale),
+    getHeroSlides(locale),
+    getDealsData(locale),
+    getBestSellersData(locale),
+    getCollectionsData(locale),
+  ]);
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-stone-100 min-h-[520px] flex items-center">
-        <div className="mx-auto max-w-container px-4 md:px-8 xl:px-12 py-20 md:py-28">
-          <div className="max-w-xl flex flex-col gap-6">
-            <h1 className="font-display text-5xl font-normal text-text-primary leading-tight">
-              {t("heroTitle")}
-            </h1>
-            <p className="text-lg text-text-secondary">{t("heroSubtitle")}</p>
-            <div className="flex items-center gap-4">
-              <Link href="/products">
-                <Button variant="primary" size="lg">
-                  {t("heroCtaShop")}
-                  <ArrowRight className="h-4 w-4 ml-1" aria-hidden />
-                </Button>
-              </Link>
-              <Link href="/products?sort=rating_desc">
-                <Button variant="outline" size="lg">{t("heroCtaCollection")}</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Single page-level h1 keeps heading order valid across both hero variants */}
+      <h1 className="sr-only">{t("heroTitle")}</h1>
+
+      {/* Hero — campaign slideshow with static fallback */}
+      {heroSlides.length > 0 ? (
+        <HomeHeroSlideshow slides={heroSlides} />
+      ) : (
+        <HomeHeroStatic />
+      )}
+
+      {/* Service promises — reassurance above the fold */}
+      <HomeUspStrip />
 
       {/* Browse by Room */}
-      <Section className="bg-background">
-        <Container>
-          <div className="flex flex-col gap-8">
-            <h2 className="text-3xl font-bold text-text-primary">{t("browseByRoom")}</h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {ROOM_CATEGORIES.map(({ slug }) => (
-                <Link
-                  key={slug}
-                  href={`/products?room=${slug}`}
-                  className="group relative flex h-48 md:h-64 items-end overflow-hidden rounded-lg bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent" aria-hidden />
-                  <p className="relative z-10 p-5 text-base font-semibold text-white group-hover:underline">
-                    {t(`categories.${slug}`)}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
+      <HomeRoomCards />
 
-      {/* Featured Products */}
+      {/* Deals & curated collections & best-sellers (each hides itself when empty) */}
+      <HomeDealsSection deals={deals} />
+      <HomeCollectionsSection collections={collections} locale={locale} />
+      <HomeBestSellersSection items={bestSellers} />
+
+      {/* New arrivals */}
       <Section>
         <Container>
           <div className="flex flex-col gap-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-text-primary">{t("featuredTitle")}</h2>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-display text-3xl md:text-4xl font-normal text-text-primary">
+                {t("featuredTitle")}
+              </h2>
               <Link
                 href="/products"
-                className="flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+                className="flex shrink-0 items-center gap-1 rounded-sm text-sm font-medium text-brand transition-colors hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               >
-                {t("heroCtaShop")} <ArrowRight className="h-4 w-4" aria-hidden />
+                {t("viewAll")} <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
             {products.length > 0 ? (
@@ -123,26 +165,14 @@ export default async function HomePage({
         </Container>
       </Section>
 
+      {/* Brand story */}
+      <HomeBrandStory />
+
       {/* Trust / Benefits */}
-      <Section className="bg-stone-50">
-        <Container>
-          <h2 className="text-2xl font-bold text-text-primary text-center mb-10">{t("trustTitle")}</h2>
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {trustItems.map((key, i) => {
-              const Icon = TRUST_ICONS[i];
-              return (
-                <div key={key} className="flex flex-col items-center gap-3 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-soft">
-                    <Icon className="h-6 w-6 text-brand" aria-hidden />
-                  </div>
-                  <p className="font-semibold text-text-primary text-sm">{t(`trust.${key}.title`)}</p>
-                  <p className="text-xs text-text-muted">{t(`trust.${key}.desc`)}</p>
-                </div>
-              );
-            })}
-          </div>
-        </Container>
-      </Section>
+      <HomeTrustSection />
+
+      {/* Showroom + map (renders only when a Maps embed URL is configured) */}
+      <HomeShowroomSection />
     </div>
   );
 }

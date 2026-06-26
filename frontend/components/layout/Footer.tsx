@@ -2,9 +2,14 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { TreePine } from "lucide-react";
 import { Divider } from "@/design-system/primitives/divider";
+import { ContactChannelButton } from "@/components/contact/contact-channel-button";
+import { getContactChannels } from "@/lib/contact/channels";
+import { BUSINESS_CONFIG } from "@/lib/business-config";
 
 export function Footer() {
   const t = useTranslations("footer");
+  const tc = useTranslations("contact");
+  const contactChannels = getContactChannels();
 
   return (
     <footer className="border-t border-border-default bg-surface">
@@ -54,8 +59,46 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <p className="text-sm font-semibold text-text-primary">{t("sections.support")}</p>
             <div className="flex flex-col gap-2 text-sm text-text-muted">
-              <p>{t("contact.email")}</p>
-              <p>{t("contact.phone")}</p>
+              <a
+                href={`mailto:${BUSINESS_CONFIG.email}`}
+                className="hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+              >
+                {BUSINESS_CONFIG.email}
+              </a>
+              <p>{BUSINESS_CONFIG.telephone}</p>
+              {BUSINESS_CONFIG.address.streetAddress && (
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-text-primary">{t("address.label")}</span>
+                  <address className="not-italic text-sm text-text-muted leading-snug">
+                    {BUSINESS_CONFIG.address.streetAddress},<br />
+                    {BUSINESS_CONFIG.address.addressLocality}
+                  </address>
+                  {BUSINESS_CONFIG.mapsDirectionsUrl && (
+                    <a
+                      href={BUSINESS_CONFIG.mapsDirectionsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+                    >
+                      {t("address.link_text")} ↗
+                    </a>
+                  )}
+                </div>
+              )}
+              <Link
+                href="/lien-he"
+                className="hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+              >
+                {t("sections.contact_us")}
+              </Link>
+              {contactChannels.map((channel) => (
+                <ContactChannelButton
+                  key={channel.id}
+                  channel={channel}
+                  label={tc(`channels.${channel.id}`)}
+                  variant="inline"
+                />
+              ))}
             </div>
           </div>
         </div>

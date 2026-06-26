@@ -12,11 +12,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING: "text-yellow-600",
-  PAID: "text-green-600",
-  FAILED: "text-red-600",
-  CANCELLED: "text-gray-500",
-  EXPIRED: "text-gray-400",
+  PENDING: "text-warning",
+  PAID: "text-success",
+  FAILED: "text-danger",
+  CANCELLED: "text-text-muted",
+  EXPIRED: "text-text-muted",
 };
 
 interface Props {
@@ -25,14 +25,14 @@ interface Props {
 
 export function PaymentTransactionTable({ transactions }: Props) {
   if (!transactions?.length) {
-    return <p className="text-sm text-muted-foreground">Chưa có giao dịch nào.</p>;
+    return <p className="text-sm text-text-muted">Chưa có giao dịch nào.</p>;
   }
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b text-muted-foreground text-left">
+          <tr className="border-b text-text-muted text-left">
             <th className="pb-2 pr-4">Provider</th>
             <th className="pb-2 pr-4">Trạng thái</th>
             <th className="pb-2 pr-4">Số tiền</th>
@@ -49,7 +49,7 @@ export function PaymentTransactionTable({ transactions }: Props) {
               </td>
               <td className="py-2 pr-4">{formatVnd(tx.amountVnd)}</td>
               <td className="py-2 pr-4 font-mono text-xs">{tx.providerOrderCode ?? "—"}</td>
-              <td className="py-2 text-muted-foreground">
+              <td className="py-2 text-text-muted">
                 {new Date(tx.createdAt).toLocaleString("vi-VN")}
               </td>
             </tr>

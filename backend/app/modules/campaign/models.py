@@ -24,6 +24,10 @@ class Campaign(Base):
     hero_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     mobile_hero_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     placement: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # Product group the campaign points at: target_type in CampaignTargetType
+    # (COLLECTION|CATEGORY), target_id = collection id or room_category id.
+    target_type: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    target_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     display_priority: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
     starts_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

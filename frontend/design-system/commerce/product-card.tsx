@@ -16,6 +16,8 @@ export interface ProductCardViewModel {
   reviewCount?: number;
   isAvailable: boolean;
   isWishlisted: boolean;
+  originalPriceFormatted?: string;
+  discountBadge?: string;
 }
 
 interface ProductCardProps {
@@ -46,6 +48,11 @@ export function ProductCard({ product, onWishlistToggle, className, unavailableL
             </div>
           )}
         </Link>
+        {product.discountBadge && (
+          <span className="absolute top-2 left-2 z-10 rounded-full bg-danger-bg px-2 py-1 text-xs font-semibold text-danger">
+            {product.discountBadge}
+          </span>
+        )}
         {onWishlistToggle && (
           <div className="absolute top-2 right-2">
             <WishlistButton
@@ -70,7 +77,14 @@ export function ProductCard({ product, onWishlistToggle, className, unavailableL
         {product.rating !== undefined && (
           <RatingStars rating={product.rating} count={product.reviewCount} />
         )}
-        <p className="text-sm font-semibold text-text-primary">{product.priceFormatted}</p>
+        {product.originalPriceFormatted ? (
+          <div className="flex items-baseline gap-2">
+            <p className="text-sm font-semibold text-danger">{product.priceFormatted}</p>
+            <p className="text-xs text-text-muted line-through">{product.originalPriceFormatted}</p>
+          </div>
+        ) : (
+          <p className="text-sm font-semibold text-text-primary">{product.priceFormatted}</p>
+        )}
       </div>
     </article>
   );

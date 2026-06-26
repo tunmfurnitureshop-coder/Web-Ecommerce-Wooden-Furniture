@@ -2,6 +2,57 @@
 
 ---
 
+## [Unreleased] — Campaign Flow: Scoped Promotion
+
+Makes campaigns coherent — a campaign targets a product group and its promotion
+auto-applies to exactly that group. Golden rule: **Campaign target ≡ Promotion
+scope** (Campaign = display, Promotion = pricing; the evaluator never reads `campaign_id`).
+
+### Added
+
+#### Backend
+- **Campaign target** (`campaigns.target_type` + `target_id`, migration 008): a campaign points at a `COLLECTION` or `CATEGORY`
+- **Catalog scoping** (`GET /api/v1/products?campaign={slug}`): resolves the target to a collection/room filter and returns a structured `campaignBanner` (from the campaign's first ACTIVE+AUTOMATIC promotion); unknown/inactive slugs degrade to the full catalog
+- **Promotion-link validation**: linking a promotion to a campaign now requires `AUTOMATIC` trigger + scope matching the target, else `422` (`CAMPAIGN_TARGET_REQUIRED`, `CAMPAIGN_PROMO_NOT_AUTOMATIC`, `CAMPAIGN_PROMO_SCOPE_MISMATCH`)
+- **Seed** `app/seed_campaign.py`: sample `BEDROOM10` campaign (CATEGORY → bedroom) + AUTOMATIC 10% scoped promotion, linked through the validated path
+
+#### Frontend
+- **Carousel CTA** now links to `/products?campaign={slug}` (filtered PLP) instead of the campaign detail page
+- **`CampaignBannerCard`**: promo banner above the catalog grid; discount label formatted client-side from structured data
+- **Admin `CampaignTargetField`**: target type + dependent collection/room picker in campaign create + edit forms
+- **i18n**: `catalog.campaignDiscountPercent/campaignDiscountAmount/campaignEndsOn` + `admin.targetType/targetTypeNone/targetCollection/targetCategory/targetEntity` (vi + zh-CN)
+
+#### Testing
+- `test_campaign_scoped_promotion.py` (5): catalog filter, unknown-slug graceful, link validation branches; full suite 122 passing, no regressions
+
+---
+
+## [Unreleased] — Homepage Merchandising
+
+### Added
+
+#### Backend
+- **Best-sellers endpoint** (`GET /api/v1/products/best-sellers`): ranks products by units sold across paid orders (90-day window), with a newest-products fallback so the rail is never empty
+- **Deals endpoint** (`GET /api/v1/products/deals`): computes display strike-through prices from active AUTOMATIC promotions, reusing the checkout `allocate_discount` engine so card prices match `/cart/quote`; honesty rule excludes promotions with minimum-order, bundle, or payment-method conditions
+
+#### Frontend
+- **Hero slideshow**: `HomeHeroSlideshow` driven by `HOME_HERO` campaigns (embla + autoplay, pause on hover/focus, reduced-motion aware), with `HomeHeroStatic` fallback when no campaigns exist
+- **Homepage rails**: "Giá siêu tốt" (deals — strike-through price + discount badge) and "Hàng bán chạy" (best-sellers) sections, hidden when empty
+- **`ProductRail`**: shared embla carousel replacing the legacy manual-scroll `RelatedProductCarousel` (removed); used by related products, deals, and best-sellers
+- **`ProductCard`**: optional strike-through price + discount badge for deal display
+- **i18n**: `home.dealsTitle/bestSellersTitle/dealBadge/heroSlideCta/promotionsAria/goToSlide` + `common.scrollPrev/scrollNext` (vi + zh-CN)
+
+#### Admin
+- **Campaign image upload**: reusable `ImageUploadField` (preview + upload/replace/remove) for desktop + mobile hero images in campaign create/edit; `placement` is now a dropdown; edit form can change images/placement (not just status). Backed by a generic `POST /api/v1/admin/uploads/image` endpoint reusing the R2 storage layer (type/size validated, admin-only)
+
+#### Testing
+- 16 new backend tests: `test_deals.py` (9), `test_best_sellers.py` (4), `test_media_upload.py` (3); full suite 114 passing, no regressions
+
+#### Dependencies
+- `embla-carousel-react`, `embla-carousel-autoplay` (frontend)
+
+---
+
 ## [0.4.0] — 2026-06-22
 
 ### Added

@@ -24,7 +24,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
 
   useEffect(() => { load(); }, [params.id]);
 
-  if (!content) return <p className="text-sm text-muted-foreground">Đang tải...</p>;
+  if (!content) return <p className="text-sm text-text-muted">Đang tải...</p>;
 
   const linkedProductIds = new Set(content.linked_products.map((p) => p.product_id));
   const filtered = products.filter((p) => {
@@ -65,11 +65,11 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
             <tbody>
               {filtered.slice(0, 30).map((p) => (
                 <tr key={p.id} className="border-b last:border-0">
-                  <td className="py-2 px-3 font-mono text-xs text-muted-foreground">{p.sku}</td>
+                  <td className="py-2 px-3 font-mono text-xs text-text-muted">{p.sku}</td>
                   <td className="py-2 px-3">{(p as AdminProductListItem & { nameVi: string }).nameVi}</td>
                   <td className="py-2 px-3 text-right">
                     {linkedProductIds.has(p.id) ? (
-                      <Button size="sm" variant="destructive" onClick={async () => { await adminRemoveContentProduct(content.id, p.id); load(); }}>
+                      <Button size="sm" variant="destructive" onClick={async () => { if (!confirm(t("confirmRemoveProduct"))) return; await adminRemoveContentProduct(content.id, p.id); load(); }}>
                         {t("removeProduct")}
                       </Button>
                     ) : (

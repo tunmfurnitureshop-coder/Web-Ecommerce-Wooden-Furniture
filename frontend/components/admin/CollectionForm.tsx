@@ -8,6 +8,15 @@ import type { AdminCollection, CreateCollectionRequest } from "@/features/admin/
 
 const LOCALES = ["vi", "zh-CN"];
 const STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"];
+const STATUS_LABEL: Record<string, string> = {
+  DRAFT: "statusDraft",
+  PUBLISHED: "statusPublished",
+  ARCHIVED: "statusArchived",
+};
+
+// Backend requires lowercase snake_case matching ^[a-z][a-z0-9_]*$
+const sanitizeCode = (v: string) =>
+  v.toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^[^a-z]+/, "");
 
 interface CollectionTr {
   name: string; slug: string; shortDescription: string; descriptionMarkdown: string;
@@ -76,22 +85,22 @@ export function CollectionForm({ initial, onSave, saving }: Props) {
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <label className="text-sm font-medium">Code</label>
-          <input required className="w-full rounded border px-3 py-1.5 text-sm font-mono uppercase" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} readOnly={!!initial} />
+          <label className="text-sm font-medium">{t("code")}</label>
+          <input required className="w-full rounded border px-3 py-1.5 text-sm font-mono lowercase" value={code} onChange={(e) => setCode(sanitizeCode(e.target.value))} readOnly={!!initial} placeholder={t("codePlaceholder")} />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Trạng thái</label>
+          <label className="text-sm font-medium">{t("status")}</label>
           <select className="w-full rounded border px-3 py-1.5 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+            {STATUSES.map((s) => <option key={s} value={s}>{t(STATUS_LABEL[s])}</option>)}
           </select>
         </div>
         <div className="space-y-1 col-span-2">
-          <label className="text-sm font-medium">Cover Image URL</label>
+          <label className="text-sm font-medium">{t("coverImageUrl")}</label>
           <input type="url" className="w-full rounded border px-3 py-1.5 text-sm" value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="https://" />
         </div>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
-          Nổi bật
+          {t("featured")}
         </label>
       </div>
       {LOCALES.map((locale) => (
@@ -99,20 +108,20 @@ export function CollectionForm({ initial, onSave, saving }: Props) {
           <p className="text-sm font-semibold">{t("translationsSection")} — {locale}{locale === "vi" && " *"}</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Tên</label>
+              <label className="text-xs text-text-muted">{t("name")}</label>
               <input required={locale === "vi"} className="w-full rounded border px-3 py-1.5 text-sm" value={translations[locale].name} onChange={(e) => setTr(locale, "name", e.target.value)} />
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Slug</label>
+              <label className="text-xs text-text-muted">{t("slug")}</label>
               <input required={locale === "vi"} className="w-full rounded border px-3 py-1.5 text-sm font-mono" value={translations[locale].slug} onChange={(e) => setTr(locale, "slug", e.target.value)} />
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Mô tả ngắn</label>
+            <label className="text-xs text-text-muted">{t("shortDescription")}</label>
             <input className="w-full rounded border px-3 py-1.5 text-sm" value={translations[locale].shortDescription} onChange={(e) => setTr(locale, "shortDescription", e.target.value)} />
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Mô tả (Markdown)</label>
+            <label className="text-xs text-text-muted">{t("descriptionMarkdown")}</label>
             <textarea rows={5} className="w-full rounded border px-3 py-1.5 text-sm font-mono" value={translations[locale].descriptionMarkdown} onChange={(e) => setTr(locale, "descriptionMarkdown", e.target.value)} />
           </div>
           <SeoMetadataForm value={translations[locale].seo} onChange={(seo) => setTranslations((prev) => ({ ...prev, [locale]: { ...prev[locale], seo } }))} />

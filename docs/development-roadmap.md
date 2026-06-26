@@ -83,6 +83,28 @@ Full-stack promotion engine, campaign management, cart recovery, commerce events
 
 ---
 
+## v0.5.1 — Homepage Merchandising & Slideshow ✅ COMPLETE (2026-06-25)
+
+Sales-homepage UI/UX: campaign-driven hero slideshow plus deals and best-sellers rails, on a shared carousel.
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Phase 01 | Shared `ProductRail` carousel (embla); replace legacy `RelatedProductCarousel` | ✅ Done |
+| Phase 02 | Hero slideshow from `HOME_HERO` campaigns with static fallback | ✅ Done |
+| Phase 03 | Best-sellers endpoint (paid-units ranking, newest fallback) | ✅ Done |
+| Phase 04 | Deals read-side endpoint (strike-through prices, reuses discount engine) | ✅ Done |
+| Phase 05 | Frontend types + API clients for deals/best-sellers | ✅ Done |
+| Phase 06 | Homepage integration: deals + best-sellers rails, ProductCard deal display | ✅ Done |
+| Phase 07 | Docs & QA: 13 new backend tests (111 total), TypeScript clean | ✅ Done |
+
+### Key Deliverables
+- Hero slideshow (autoplay, dots, swipe, pause-on-hover, reduced-motion) with static fallback when no campaigns
+- "Giá siêu tốt" rail: strike-through prices from active AUTOMATIC promotions, honest (no min-order/bundle/payment-method conditions), reuses `allocate_discount` to match checkout
+- "Hàng bán chạy" rail: paid-units aggregation (90d) with newest fallback so it is never empty
+- Shared `ProductRail` carousel reused for related/deals/best-sellers; legacy `RelatedProductCarousel` removed
+
+---
+
 ## v0.6 — Advanced Features (Backlog)
 
 - Product reviews & ratings (customer-submitted)

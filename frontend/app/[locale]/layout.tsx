@@ -4,21 +4,26 @@ import { notFound } from "next/navigation";
 import { routing } from "@/lib/i18n";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ContactFab } from "@/components/contact/contact-fab";
 import { CustomerAuthProvider } from "@/components/customer/CustomerAuthContext";
-import { DM_Serif_Display, Manrope } from "next/font/google";
+import { JsonLd } from "@/design-system/seo/json-ld";
+import { BUSINESS_CONFIG, buildLocalBusinessSchema } from "@/lib/business-config";
+import { Playfair_Display, Manrope } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 
-const dmSerifDisplay = DM_Serif_Display({
-  weight: ["400"],
-  subsets: ["latin"],
+// Playfair Display ships a proper `vietnamese` subset, so stacked diacritics
+// (ỗ, ữ, ẵ…) render correctly — DM Serif Display fell back to a system serif.
+const playfairDisplay = Playfair_Display({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-display",
   display: "swap",
 });
 
 const manrope = Manrope({
   weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -45,13 +50,15 @@ export default async function LocaleLayout({
   }
   const messages = await getMessages();
   return (
-    <html lang={locale} className={`${dmSerifDisplay.variable} ${manrope.variable}`}>
+    <html lang={locale} className={`${playfairDisplay.variable} ${manrope.variable}`}>
       <body>
+        <JsonLd data={buildLocalBusinessSchema(BUSINESS_CONFIG)} />
         <NextIntlClientProvider messages={messages}>
           <CustomerAuthProvider>
             <Header />
             <main className="min-h-screen">{children}</main>
             <Footer />
+            <ContactFab />
           </CustomerAuthProvider>
         </NextIntlClientProvider>
       </body>

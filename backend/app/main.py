@@ -24,6 +24,7 @@ from app.modules.discovery.router import router as discovery_router, admin_route
 from app.modules.promotion.router import router as promotion_router
 from app.modules.promotion.admin_router import admin_router as admin_promotion_router
 from app.modules.campaign.router import router as campaign_router, admin_router as admin_campaign_router
+from app.modules.room.router import router as room_router, admin_router as admin_room_router
 from app.modules.events.router import router as events_router
 from app.modules.cart_recovery.router import router as cart_recovery_router
 # Ensure all models are imported so SQLAlchemy can resolve string-based relationships
@@ -250,5 +251,7 @@ app.include_router(promotion_router, prefix=API_PREFIX)
 app.include_router(admin_promotion_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(campaign_router, prefix=API_PREFIX)
 app.include_router(admin_campaign_router, prefix=f"{API_PREFIX}/admin")
+app.include_router(room_router, prefix=API_PREFIX)
+app.include_router(admin_room_router, prefix=f"{API_PREFIX}/admin")
 app.include_router(events_router, prefix=API_PREFIX)
 app.include_router(cart_recovery_router, prefix=API_PREFIX)

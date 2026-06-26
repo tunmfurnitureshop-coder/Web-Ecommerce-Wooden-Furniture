@@ -9,6 +9,16 @@ from app.modules.media.schemas import UpdateProductImageRequest
 router = APIRouter(tags=["admin-media"])
 
 
+@router.post("/uploads/image")
+async def upload_image_generic(
+    file: UploadFile = File(...),
+    prefix: str = Form("uploads"),
+    _: dict = Depends(require_admin),
+):
+    data = await file.read()
+    return await service.upload_image_file(data, file.content_type, prefix)
+
+
 @router.post("/products/{product_id}/images")
 async def upload_image(
     product_id: str,

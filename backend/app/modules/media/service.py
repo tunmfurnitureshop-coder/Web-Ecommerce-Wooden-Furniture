@@ -18,6 +18,27 @@ def _get_storage():
     return R2Storage()
 
 
+async def upload_image_file(
+    file_data: bytes, content_type: str, prefix: str = "uploads"
+) -> dict:
+    """Generic admin image upload to object storage. Returns the public URL +
+    storage key; does not persist any DB row (caller stores the URL where needed,
+    e.g. a campaign hero image)."""
+    if content_type not in ALLOWED_CONTENT_TYPES:
+        raise AppException(422, "MEDIA_INVALID_FILE_TYPE", f"Allowed: {', '.join(ALLOWED_CONTENT_TYPES)}")
+    if len(file_data) > MAX_FILE_SIZE:
+        raise AppException(422, "MEDIA_FILE_TOO_LARGE", "File too large. Max 5MB.")
+    safe_prefix = "".join(c for c in prefix if c.isalnum() or c in "-_") or "uploads"
+    ext = EXT_MAP.get(content_type, "jpg")
+    key = f"{safe_prefix}/{uuid.uuid4().hex}.{ext}"
+    storage = _get_storage()
+    try:
+        url = await storage.upload(key, file_data, content_type)
+    except Exception as e:
+        raise AppException(500, "MEDIA_UPLOAD_FAILED", f"Upload failed: {str(e)}")
+    return {"url": url, "key": key}
+
+
 def _map_image(img: ProductImage) -> ProductImageOut:
     return ProductImageOut(
         id=img.id, productId=img.product_id, imageUrl=img.image_url,

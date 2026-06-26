@@ -13,7 +13,7 @@ interface MaterialLanding {
   code: string; name: string; slug: string; description?: string | null;
   seo: { meta_title?: string | null; meta_description?: string | null; og_title?: string | null; og_description?: string | null };
   breadcrumbs: Array<{ name: string; href: string }>;
-  products: Array<{ id: string; name: string; slug: string; base_price_vnd: number; primary_image_url?: string | null }>;
+  products: Array<{ id: string; name: string; slug: string; basePriceVnd: number; primaryImageUrl?: string | null }>;
   related_guides: Array<{ id: string; type: string; title: string; slug: string; cover_image_url?: string | null; excerpt?: string | null }>;
 }
 
@@ -48,8 +48,8 @@ export default async function MaterialLandingPage({
   const breadcrumbs = mat.breadcrumbs.map((b) => ({ label: b.name, href: b.href }));
   const products = mat.products.map((p) => ({
     id: p.id, slug: p.slug, title: p.name,
-    primaryImageUrl: p.primary_image_url ?? "/images/placeholder-product.jpg",
-    imageAlt: p.name, priceFormatted: formatCurrency(p.base_price_vnd),
+    primaryImageUrl: p.primaryImageUrl ?? "/images/placeholder-product.jpg",
+    imageAlt: p.name, priceFormatted: formatCurrency(p.basePriceVnd),
     isAvailable: true, isWishlisted: false,
   }));
 

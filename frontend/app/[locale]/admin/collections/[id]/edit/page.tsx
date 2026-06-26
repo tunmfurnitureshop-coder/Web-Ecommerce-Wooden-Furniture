@@ -24,7 +24,7 @@ export default function EditCollectionPage({ params }: { params: { id: string } 
 
   useEffect(() => { load(); }, [params.id]);
 
-  if (!col) return <p className="text-sm text-muted-foreground">Đang tải...</p>;
+  if (!col) return <p className="text-sm text-text-muted">{t("loading")}</p>;
 
   const linkedIds = new Set(col.products.map((p) => p.product_id));
   const filtered = products.filter((p) => {
@@ -38,6 +38,7 @@ export default function EditCollectionPage({ params }: { params: { id: string } 
   };
 
   const removeProduct = async (productId: string) => {
+    if (!confirm(t("confirmRemoveProduct"))) return;
     await adminRemoveCollectionProduct(col.id, productId);
     load();
   };
@@ -65,7 +66,7 @@ export default function EditCollectionPage({ params }: { params: { id: string } 
         <div className="mb-4">
           <input
             className="w-full max-w-xs rounded border px-3 py-1.5 text-sm"
-            placeholder="Tìm sản phẩm..."
+            placeholder={t("searchProductPlaceholder")}
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
           />
@@ -75,7 +76,7 @@ export default function EditCollectionPage({ params }: { params: { id: string } 
             <tbody>
               {filtered.slice(0, 30).map((p) => (
                 <tr key={p.id} className="border-b last:border-0">
-                  <td className="py-2 px-3 font-mono text-xs text-muted-foreground">{p.sku}</td>
+                  <td className="py-2 px-3 font-mono text-xs text-text-muted">{p.sku}</td>
                   <td className="py-2 px-3">{(p as AdminProductListItem & { nameVi: string }).nameVi}</td>
                   <td className="py-2 px-3 text-right">
                     {linkedIds.has(p.id) ? (
