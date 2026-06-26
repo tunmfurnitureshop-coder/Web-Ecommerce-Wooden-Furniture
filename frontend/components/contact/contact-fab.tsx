@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { MessagesSquare, X } from "lucide-react";
 import { usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { isFunnelRoute } from "@/lib/layout/chrome-routes";
+import { isFunnelRoute, isProductDetailRoute } from "@/lib/layout/chrome-routes";
 import { getContactChannels, type ContactChannelId } from "@/lib/contact/channels";
 import { ContactChannelButton } from "./contact-channel-button";
 
@@ -48,7 +48,8 @@ export function ContactFab() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  if (channels.length === 0) return null;
+  // PDP has its own inquiry CTA + sticky add-to-cart owning the bottom-right.
+  if (channels.length === 0 || isProductDetailRoute(pathname)) return null;
 
   return (
     <div

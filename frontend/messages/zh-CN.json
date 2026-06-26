@@ -30,6 +30,7 @@
   "product": {
     "addToCart": "加入购物车",
     "outOfStock": "缺货",
+    "noImage": "暂无图片",
     "woodType": "木材类型",
     "finish": "表面处理",
     "size": "尺寸",
