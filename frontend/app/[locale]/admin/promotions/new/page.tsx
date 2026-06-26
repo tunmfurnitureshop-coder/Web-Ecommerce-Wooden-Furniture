@@ -7,6 +7,7 @@ import { adminCreatePromotion } from "@/features/admin/admin.api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toUtcIso } from "@/lib/datetime";
 
 const TRIGGERS = ["AUTOMATIC", "COUPON"];
 const DISCOUNT_TYPES = ["PERCENTAGE", "FIXED_AMOUNT"];
@@ -60,8 +61,8 @@ export default function NewPromotionPage() {
         maxDiscountVnd: form.maxDiscountVnd ? parseInt(form.maxDiscountVnd) : null,
         minOrderValueVnd: form.minOrderValueVnd ? parseInt(form.minOrderValueVnd) : null,
         priority: parseInt(form.priority) || 100,
-        startsAt: form.startsAt,
-        endsAt: form.endsAt || null,
+        startsAt: toUtcIso(form.startsAt),
+        endsAt: toUtcIso(form.endsAt),
         translations,
       });
       router.push("/admin/promotions");
