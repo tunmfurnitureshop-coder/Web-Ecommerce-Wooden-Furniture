@@ -17,6 +17,10 @@ import { ArrowRight, Truck, ShieldCheck, Clock, Headphones } from "lucide-react"
 import type { ProductCardViewModel } from "@/design-system/commerce/product-card";
 import { formatCurrency } from "@/lib/format-currency";
 
+// Always render fresh so newly activated campaigns / deals appear immediately
+// (otherwise Next caches the fetches and the homepage freezes on first render).
+export const dynamic = "force-dynamic";
+
 const ROOM_CATEGORIES = [
   { slug: "living_room", image: "/images/rooms/living.jpg" },
   { slug: "bedroom", image: "/images/rooms/bedroom.jpg" },

@@ -12,6 +12,12 @@ import { ImageUploadField } from "@/components/admin/image-upload-field";
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED"];
 const PLACEMENTS = ["", "HOME_HERO", "HOME_SECTION", "COLLECTION_SECTION", "PRODUCT_PAGE", "CART", "CHECKOUT"];
 
+/** A datetime-local value is naive local wall-clock; convert to a UTC ISO string
+ * so the backend's UTC date-window checks behave correctly. */
+function toUtcIso(local: string): string | null {
+  return local ? new Date(local).toISOString() : null;
+}
+
 export default function NewCampaignPage() {
   const t = useTranslations("admin");
   const router = useRouter();
@@ -53,8 +59,8 @@ export default function NewCampaignPage() {
         displayPriority: parseInt(form.displayPriority) || 100,
         heroImageUrl: form.heroImageUrl || null,
         mobileHeroImageUrl: form.mobileHeroImageUrl || null,
-        startsAt: form.startsAt,
-        endsAt: form.endsAt || null,
+        startsAt: toUtcIso(form.startsAt),
+        endsAt: toUtcIso(form.endsAt),
         translations,
       });
       router.push("/admin/campaigns");
@@ -109,11 +115,11 @@ export default function NewCampaignPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label>{t("nameVi")}</Label>
-            <Input value={form.nameVi} onChange={(e) => set("nameVi", e.target.value)} />
+            <Input value={form.nameVi} onChange={(e) => set("nameVi", e.target.value)} required />
           </div>
           <div className="space-y-1.5">
             <Label>Slug (vi)</Label>
-            <Input placeholder="mua-sam-he-2026" value={form.slugVi} onChange={(e) => set("slugVi", e.target.value)} />
+            <Input placeholder="mua-sam-he-2026" value={form.slugVi} onChange={(e) => set("slugVi", e.target.value)} required />
           </div>
           <div className="space-y-1.5">
             <Label>{t("nameZh")}</Label>
