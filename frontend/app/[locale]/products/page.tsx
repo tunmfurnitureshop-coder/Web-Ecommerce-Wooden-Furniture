@@ -8,6 +8,7 @@ import { Breadcrumb } from "@/design-system/layout/breadcrumb";
 import { Pagination } from "@/design-system/layout/pagination";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogSortSelector } from "@/components/catalog/CatalogSortSelector";
+import { CatalogMobileToolbar } from "@/components/catalog/catalog-mobile-toolbar";
 import { ActiveFilterChips } from "@/components/catalog/ActiveFilterChips";
 import { CampaignBannerCard } from "@/components/catalog/campaign-banner";
 import { Link } from "@/i18n/navigation";
@@ -109,8 +110,13 @@ export default async function ProductsPage({
                     {result.total} {t("sort.label")}
                   </p>
                 </div>
-                <CatalogSortSelector currentSort={sp.sort ?? "newest"} />
+                <div className="hidden lg:block">
+                  <CatalogSortSelector currentSort={sp.sort ?? "newest"} />
+                </div>
               </div>
+
+              {/* Mobile filter + sort toolbar (sticky, <lg) */}
+              <CatalogMobileToolbar currentFilters={sp} total={result.total} />
 
               {/* Active filters */}
               <ActiveFilterChips filters={sp} />

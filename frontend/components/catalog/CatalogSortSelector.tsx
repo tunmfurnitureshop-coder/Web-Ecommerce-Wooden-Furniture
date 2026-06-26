@@ -13,9 +13,11 @@ const SORT_OPTIONS = [
 
 interface CatalogSortSelectorProps {
   currentSort: string;
+  /** Distinct id so desktop + mobile instances don't collide in the DOM. */
+  id?: string;
 }
 
-export function CatalogSortSelector({ currentSort }: CatalogSortSelectorProps) {
+export function CatalogSortSelector({ currentSort, id = "catalog-sort" }: CatalogSortSelectorProps) {
   const t = useTranslations("search.sort");
   const router = useRouter();
   const pathname = usePathname();
@@ -30,11 +32,11 @@ export function CatalogSortSelector({ currentSort }: CatalogSortSelectorProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="catalog-sort" className="text-sm text-text-muted whitespace-nowrap">
+      <label htmlFor={id} className="text-sm text-text-muted whitespace-nowrap">
         {t("label")}:
       </label>
       <select
-        id="catalog-sort"
+        id={id}
         value={currentSort}
         onChange={handleChange}
         className="rounded-md border border-border-default bg-surface px-2 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"

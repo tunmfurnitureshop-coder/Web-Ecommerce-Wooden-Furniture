@@ -302,7 +302,12 @@
     "minPrice": "最低价格",
     "maxPrice": "最高价格",
     "apply": "应用",
-    "reset": "重置"
+    "reset": "重置",
+    "title": "筛选",
+    "button": "筛选",
+    "close": "关闭",
+    "viewResults": "查看 {count} 个结果",
+    "activeCount": "{count} 个筛选条件"
   },
   "common": {
     "loading": "加载中...",

@@ -302,7 +302,12 @@
     "minPrice": "Giá tối thiểu",
     "maxPrice": "Giá tối đa",
     "apply": "Áp dụng",
-    "reset": "Đặt lại"
+    "reset": "Đặt lại",
+    "title": "Bộ lọc",
+    "button": "Lọc",
+    "close": "Đóng",
+    "viewResults": "Xem {count} kết quả",
+    "activeCount": "{count} bộ lọc đang áp dụng"
   },
   "common": {
     "loading": "Đang tải...",
