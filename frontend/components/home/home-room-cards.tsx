@@ -35,13 +35,13 @@ export async function HomeRoomCards() {
             </h2>
             <p className="max-w-xl text-text-secondary">{t("browseByRoomSubtitle")}</p>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 md:gap-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {rooms.map((room, i) => (
               <Link
                 key={room.code}
                 href={`/products?room=${room.code}`}
                 className={cn(
-                  "group relative flex h-52 flex-col justify-end overflow-hidden rounded-xl border border-border-default p-6 transition-all duration-200 hover:border-border-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus md:h-64",
+                  "group relative flex h-52 w-[78%] shrink-0 snap-start flex-col justify-end overflow-hidden rounded-xl border border-border-default p-6 transition-all duration-200 hover:border-border-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:w-[46%] md:h-64 lg:w-[31%]",
                   !room.imageUrl && FALLBACK_SURFACES[i % FALLBACK_SURFACES.length]
                 )}
               >
