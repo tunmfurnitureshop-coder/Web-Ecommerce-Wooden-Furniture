@@ -8,15 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUploadField } from "@/components/admin/image-upload-field";
+import { toUtcIso } from "@/lib/datetime";
 
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED"];
 const PLACEMENTS = ["", "HOME_HERO", "HOME_SECTION", "COLLECTION_SECTION", "PRODUCT_PAGE", "CART", "CHECKOUT"];
-
-/** A datetime-local value is naive local wall-clock; convert to a UTC ISO string
- * so the backend's UTC date-window checks behave correctly. */
-function toUtcIso(local: string): string | null {
-  return local ? new Date(local).toISOString() : null;
-}
 
 export default function NewCampaignPage() {
   const t = useTranslations("admin");

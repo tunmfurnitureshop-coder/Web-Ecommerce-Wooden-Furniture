@@ -200,7 +200,9 @@ async def admin_patch_campaign(db: AsyncSession, campaign_id: str, req: AdminPat
     campaign = (await db.execute(select(Campaign).where(Campaign.id == campaign_id))).scalar_one_or_none()
     if not campaign:
         raise AppException(404, "CAMPAIGN_NOT_FOUND", "Campaign not found.")
-    for field, value in req.model_dump(exclude_none=True).items():
+    # exclude_unset (not exclude_none) so an explicit null can clear a nullable
+    # field such as ends_at; only fields present in the request body are applied.
+    for field, value in req.model_dump(exclude_unset=True).items():
         snake = "".join(["_" + c.lower() if c.isupper() else c for c in field]).lstrip("_")
         if hasattr(campaign, snake):
             setattr(campaign, snake, value)
