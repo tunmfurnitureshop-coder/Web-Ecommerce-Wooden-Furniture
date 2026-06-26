@@ -20,6 +20,7 @@ export async function getProducts(
   if (filters.maxPrice) params.set("maxPrice", String(filters.maxPrice));
   if (filters.page) params.set("page", String(filters.page));
   if (filters.pageSize) params.set("pageSize", String(filters.pageSize));
+  if (filters.campaign) params.set("campaign", filters.campaign);
 
   return api.get<ProductListResponse>(`/api/v1/products?${params.toString()}`);
 }

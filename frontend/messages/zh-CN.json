@@ -1,4 +1,9 @@
 {
+  "catalog": {
+    "campaignDiscountPercent": "立减 {percent}%",
+    "campaignDiscountAmount": "立减 {amount}",
+    "campaignEndsOn": "截至 {date}"
+  },
   "nav": {
     "home": "首页",
     "products": "产品",

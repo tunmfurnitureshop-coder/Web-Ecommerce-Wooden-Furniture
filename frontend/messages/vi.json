@@ -1,4 +1,9 @@
 {
+  "catalog": {
+    "campaignDiscountPercent": "Giảm {percent}%",
+    "campaignDiscountAmount": "Giảm {amount}",
+    "campaignEndsOn": "Đến hết {date}"
+  },
   "nav": {
     "home": "Trang chủ",
     "products": "Sản phẩm",

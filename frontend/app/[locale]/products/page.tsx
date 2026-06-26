@@ -9,6 +9,7 @@ import { Pagination } from "@/design-system/layout/pagination";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogSortSelector } from "@/components/catalog/CatalogSortSelector";
 import { ActiveFilterChips } from "@/components/catalog/ActiveFilterChips";
+import { CampaignBannerCard } from "@/components/catalog/campaign-banner";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/design-system/components/button";
 import { Search } from "lucide-react";
@@ -25,6 +26,7 @@ interface SearchParams {
   minPrice?: string;
   maxPrice?: string;
   page?: string;
+  campaign?: string;
 }
 
 async function getProducts(locale: string, sp: SearchParams) {
@@ -36,6 +38,7 @@ async function getProducts(locale: string, sp: SearchParams) {
   if (sp.minPrice) query.set("minPrice", sp.minPrice);
   if (sp.maxPrice) query.set("maxPrice", sp.maxPrice);
   if (sp.page) query.set("page", sp.page);
+  if (sp.campaign) query.set("campaign", sp.campaign);
   try {
     return await api.get<ProductListResponse>(`/api/v1/products?${query}`);
   } catch {
@@ -91,6 +94,11 @@ export default async function ProductsPage({
 
             {/* Main */}
             <div className="flex-1 min-w-0 flex flex-col gap-5">
+              {/* Campaign promo banner (only when scoped to a campaign) */}
+              {result.campaignBanner && (
+                <CampaignBannerCard banner={result.campaignBanner} locale={locale} />
+              )}
+
               {/* Heading + Sort */}
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

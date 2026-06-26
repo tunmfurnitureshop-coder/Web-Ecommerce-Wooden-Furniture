@@ -90,7 +90,7 @@ export function HomeHeroSlideshow({ slides }: HomeHeroSlideshowProps) {
                     <h2 className="font-display text-4xl md:text-5xl font-normal text-text-inverse leading-tight">
                       {slide.name}
                     </h2>
-                    <Link href={`/campaigns/${slide.slug}`} className="w-fit">
+                    <Link href={`/products?campaign=${slide.slug}`} className="w-fit">
                       <Button variant="primary" size="lg">
                         {t("heroSlideCta")}
                         <ArrowRight className="h-4 w-4 ml-1" aria-hidden />
