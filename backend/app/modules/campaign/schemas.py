@@ -18,6 +18,18 @@ class CampaignListResponse(BaseModel):
     items: List[CampaignListItem]
 
 
+class CampaignBannerOut(BaseModel):
+    """Structured promo summary for the filtered PLP banner. Strings (e.g. the
+    discount label) are formatted on the frontend to keep i18n out of the API."""
+    campaignName: str
+    badgeLabel: Optional[str] = None
+    discountType: Optional[str] = None  # PERCENTAGE | FIXED_AMOUNT
+    discountPercentBps: Optional[int] = None
+    discountAmountVnd: Optional[int] = None
+    endsAt: Optional[datetime] = None
+    targetType: Optional[str] = None
+
+
 class FeaturedProductItem(BaseModel):
     id: str
     name: str

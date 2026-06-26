@@ -44,6 +44,8 @@ async def get_catalog(
     tags: Optional[List[str]] = None,
     availability: Optional[str] = None,
     rating_min: Optional[float] = None,
+    collection_id: Optional[str] = None,
+    room_category_id: Optional[str] = None,
 ) -> ProductCatalogResponse:
     from app.modules.review.models import ProductReview
     from app.modules.taxonomy.models import ProductTag, Tag, TagTranslation
@@ -82,6 +84,17 @@ async def get_catalog(
             and_(RoomCategoryTranslation.category_id == RoomCategory.id, RoomCategoryTranslation.slug == room)
         )
         query = query.where(Product.room_category_id.in_(cat_sub))
+
+    # Campaign-scoped filters (target resolved to ids by the caller)
+    if room_category_id:
+        query = query.where(Product.room_category_id == room_category_id)
+
+    if collection_id:
+        from app.modules.collection.models import CollectionProduct
+        col_sub = select(CollectionProduct.product_id).where(
+            CollectionProduct.collection_id == collection_id
+        )
+        query = query.where(Product.id.in_(col_sub))
 
     if wood_type:
         wt_sub = select(ProductWoodType.product_id).join(

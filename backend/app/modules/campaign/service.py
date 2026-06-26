@@ -3,14 +3,16 @@ from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.modules.campaign.models import Campaign, CampaignTranslation, CampaignProduct, CampaignCollection
+from app.modules.campaign.models import (
+    Campaign, CampaignTranslation, CampaignProduct, CampaignCollection, CampaignPromotion,
+)
 from app.modules.campaign.schemas import (
     CampaignListItem, CampaignListResponse, CampaignDetailResponse,
-    FeaturedProductItem, FeaturedCollectionItem,
+    FeaturedProductItem, FeaturedCollectionItem, CampaignBannerOut,
     AdminCreateCampaignRequest, AdminPatchCampaignRequest,
 )
 from app.core.exceptions import AppException
-from app.shared.enums import CampaignStatus
+from app.shared.enums import CampaignStatus, PromotionStatus, PromotionTrigger
 
 
 def _now() -> datetime:
@@ -124,6 +126,63 @@ async def get_campaign_by_slug(db: AsyncSession, slug: str, locale: str = "vi") 
         metaTitle=trans.meta_title, metaDescription=trans.meta_description,
         ogTitle=trans.og_title, ogDescription=trans.og_description,
         ogImageUrl=trans.og_image_url,
+    )
+
+
+async def resolve_active_campaign_by_slug(
+    db: AsyncSession, slug: str, locale: str = "vi"
+) -> Optional[Campaign]:
+    """Campaign behind a (localized) slug, only if currently active. Returns None
+    for unknown/inactive slugs so the catalog can degrade gracefully (no 404)."""
+    trans = (await db.execute(
+        select(CampaignTranslation).where(CampaignTranslation.slug == slug)
+    )).scalars().first()
+    if not trans:
+        return None
+    campaign = (await db.execute(
+        select(Campaign).where(Campaign.id == trans.campaign_id)
+    )).scalar_one_or_none()
+    if not campaign or not _is_active(campaign):
+        return None
+    return campaign
+
+
+async def build_campaign_banner(
+    db: AsyncSession, campaign: Campaign, locale: str = "vi"
+) -> Optional[CampaignBannerOut]:
+    """Promo summary for the filtered PLP: the campaign's first ACTIVE + AUTOMATIC
+    promotion (lowest priority value wins). None when no such promotion is linked."""
+    from app.modules.promotion.models import Promotion, PromotionTranslation
+
+    promo = (await db.execute(
+        select(Promotion)
+        .join(CampaignPromotion, CampaignPromotion.promotion_id == Promotion.id)
+        .where(
+            CampaignPromotion.campaign_id == campaign.id,
+            Promotion.status == PromotionStatus.ACTIVE,
+            Promotion.trigger == PromotionTrigger.AUTOMATIC,
+        )
+        .order_by(Promotion.priority.asc())
+    )).scalars().first()
+    if not promo:
+        return None
+
+    pt = (await db.execute(
+        select(PromotionTranslation).where(
+            PromotionTranslation.promotion_id == promo.id,
+            PromotionTranslation.locale == locale,
+        )
+    )).scalar_one_or_none()
+    name_trans = _trans(campaign, locale)
+
+    return CampaignBannerOut(
+        campaignName=name_trans.name if name_trans else campaign.code,
+        badgeLabel=pt.badge_label if pt else None,
+        discountType=promo.discount_type,
+        discountPercentBps=promo.discount_percentage_bps,
+        discountAmountVnd=promo.discount_amount_vnd,
+        endsAt=promo.ends_at or campaign.ends_at,
+        targetType=campaign.target_type,
     )
 
 

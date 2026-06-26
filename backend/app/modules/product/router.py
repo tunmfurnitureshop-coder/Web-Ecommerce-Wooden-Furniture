@@ -11,6 +11,8 @@ from app.modules.product.schemas import (
 from app.modules.auth.dependencies import require_admin
 from app.modules.discovery.schemas import BestSellerListResponse
 from app.modules.promotion.schemas import DealListResponse
+from app.modules.campaign import service as campaign_service
+from app.shared.enums import CampaignTargetType
 
 router = APIRouter(tags=["products"])
 admin_router = APIRouter(tags=["admin-products"])
@@ -30,13 +32,31 @@ async def list_products(
     tags: Optional[str] = Query(None, description="Comma-separated tag codes"),
     availability: Optional[str] = Query(None),
     ratingMin: Optional[float] = Query(None, ge=1.0, le=5.0),
+    campaign: Optional[str] = Query(None, description="Campaign slug — scopes the catalog to the campaign target"),
     db: AsyncSession = Depends(get_db),
 ):
     tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
-    return await service.get_catalog(
+
+    # Campaign scoping: resolve the target to concrete ids; ignore unknown/inactive
+    # slugs (graceful — show the full catalog rather than 404 on a PLP).
+    collection_id = room_category_id = None
+    banner = None
+    if campaign:
+        camp = await campaign_service.resolve_active_campaign_by_slug(db, campaign, locale)
+        if camp and camp.target_type and camp.target_id:
+            if camp.target_type == CampaignTargetType.COLLECTION:
+                collection_id = camp.target_id
+            elif camp.target_type == CampaignTargetType.CATEGORY:
+                room_category_id = camp.target_id
+            banner = await campaign_service.build_campaign_banner(db, camp, locale)
+
+    result = await service.get_catalog(
         db, locale, q, room, woodType, minPrice, maxPrice, sort, page, pageSize,
         tags=tag_list, availability=availability, rating_min=ratingMin,
+        collection_id=collection_id, room_category_id=room_category_id,
     )
+    result.campaignBanner = banner
+    return result
 
 
 @router.get("/products/suggestions")
