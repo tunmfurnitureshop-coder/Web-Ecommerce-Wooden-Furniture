@@ -1,21 +1,29 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { Section } from "@/design-system/primitives/section";
 import { Container } from "@/design-system/primitives/container";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getRooms } from "@/features/room/room.api";
 
-// No room photos ship in /public, so each card is a warm tonal panel driven
-// entirely by semantic tokens — robust, on-brand, and zero broken images.
-const ROOMS = [
-  { slug: "living_room", surface: "bg-brand-soft" },
-  { slug: "bedroom", surface: "bg-surface-muted" },
-  { slug: "dining_room", surface: "bg-surface-subtle" },
-] as const;
+// Tonal fallbacks cycle when a room has no admin-configured image — keeps the
+// rail on-brand and free of broken images.
+const FALLBACK_SURFACES = ["bg-brand-soft", "bg-surface-muted", "bg-surface-subtle"];
 
-/** "Mua theo không gian" — tonal room cards linking into the filtered catalog. */
+/** "Mua theo không gian" — room cards (admin-configurable images) linking into
+ * the filtered catalog. Data-driven from /rooms; hides itself when empty. */
 export async function HomeRoomCards() {
   const t = await getTranslations("home");
+  const locale = await getLocale();
+
+  let rooms;
+  try {
+    rooms = (await getRooms(locale)).items;
+  } catch {
+    return null;
+  }
+  if (rooms.length === 0) return null;
 
   return (
     <Section className="bg-background">
@@ -28,21 +36,44 @@ export async function HomeRoomCards() {
             <p className="max-w-xl text-text-secondary">{t("browseByRoomSubtitle")}</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
-            {ROOMS.map(({ slug, surface }) => (
+            {rooms.map((room, i) => (
               <Link
-                key={slug}
-                href={`/products?room=${slug}`}
+                key={room.code}
+                href={`/products?room=${room.code}`}
                 className={cn(
                   "group relative flex h-52 flex-col justify-end overflow-hidden rounded-xl border border-border-default p-6 transition-all duration-200 hover:border-border-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus md:h-64",
-                  surface
+                  !room.imageUrl && FALLBACK_SURFACES[i % FALLBACK_SURFACES.length]
                 )}
               >
-                <span className="flex items-center gap-2">
-                  <span className="font-display text-2xl font-normal text-text-primary">
-                    {t(`categories.${slug}`)}
+                {room.imageUrl && (
+                  <>
+                    <Image
+                      src={room.imageUrl}
+                      alt={room.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none"
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent"
+                      aria-hidden
+                    />
+                  </>
+                )}
+                <span className="relative flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "font-display text-2xl font-normal",
+                      room.imageUrl ? "text-text-inverse" : "text-text-primary"
+                    )}
+                  >
+                    {room.name}
                   </span>
                   <ArrowUpRight
-                    className="h-5 w-5 text-brand transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none"
+                    className={cn(
+                      "h-5 w-5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none",
+                      room.imageUrl ? "text-text-inverse" : "text-brand"
+                    )}
                     aria-hidden
                   />
                 </span>
