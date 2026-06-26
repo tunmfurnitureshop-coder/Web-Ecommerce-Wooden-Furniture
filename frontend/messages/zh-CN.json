@@ -15,7 +15,17 @@
     "login": "登录",
     "search": "搜索",
     "switchLanguage": "切换语言",
-    "mainNavLabel": "主导航"
+    "mainNavLabel": "主导航",
+    "bottomNavLabel": "底部导航"
+  },
+  "mobileMenu": {
+    "title": "分类",
+    "close": "关闭",
+    "allProducts": "全部产品",
+    "byRoom": "按空间",
+    "collections": "系列",
+    "guides": "指南",
+    "contact": "联系我们"
   },
   "product": {
     "addToCart": "加入购物车",

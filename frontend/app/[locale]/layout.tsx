@@ -5,6 +5,7 @@ import { routing } from "@/lib/i18n";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ContactFab } from "@/components/contact/contact-fab";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { CustomerAuthProvider } from "@/components/customer/CustomerAuthContext";
 import { JsonLd } from "@/design-system/seo/json-ld";
 import { BUSINESS_CONFIG, buildLocalBusinessSchema } from "@/lib/business-config";
@@ -66,6 +67,7 @@ export default async function LocaleLayout({
             <Header />
             <main className="min-h-screen">{children}</main>
             <Footer />
+            <BottomNav />
             <ContactFab />
           </CustomerAuthProvider>
         </NextIntlClientProvider>

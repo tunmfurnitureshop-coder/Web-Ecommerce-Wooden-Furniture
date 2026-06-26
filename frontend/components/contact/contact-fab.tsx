@@ -3,11 +3,17 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MessagesSquare, X } from "lucide-react";
+import { usePathname } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { isFunnelRoute } from "@/lib/layout/chrome-routes";
 import { getContactChannels, type ContactChannelId } from "@/lib/contact/channels";
 import { ContactChannelButton } from "./contact-channel-button";
 
 export function ContactFab() {
   const t = useTranslations("contact");
+  const pathname = usePathname();
+  // On funnel routes the bottom nav is gone, so the FAB drops back to the base offset.
+  const onFunnel = isFunnelRoute(pathname);
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -45,7 +51,14 @@ export function ContactFab() {
   if (channels.length === 0) return null;
 
   return (
-    <div className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] z-40 flex flex-col items-end gap-3">
+    <div
+      className={cn(
+        "fixed right-4 z-40 flex flex-col items-end gap-3",
+        onFunnel
+          ? "bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]"
+          : "bottom-[calc(env(safe-area-inset-bottom,0px)+1rem+var(--bottom-nav-height))] md:bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]",
+      )}
+    >
       {open && (
         <div
           ref={panelRef}
