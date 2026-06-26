@@ -31,6 +31,13 @@
 - Use semantic Tailwind tokens, never raw colors (`text-stone-800` → `text-text-primary`)
 - No inline styles except for computed values (e.g., dynamic widths)
 
+### Mobile layering (z-index)
+- Page content: default flow (`z-0`)
+- Sticky chrome — header, bottom nav, contact FAB: `z-40`
+- Overlays — `Sheet`, `SearchOverlay`: `z-50` (the locale dropdown is a header-scoped popover at `z-10`/`z-20`, not a global overlay)
+- Mobile-only chrome toggles via `md:` (bottom nav `md:hidden`, desktop nav `hidden md:flex`) — one responsive tree, no JS device detection
+- Pin to viewport bottom with `pb-safe-b` (`env(safe-area-inset-bottom)`); reserve space on `<main>` with `pb-bottom-nav md:pb-0`
+
 ### State Management
 - Zustand stores for client-side persistent state (cart)
 - React state (`useState`) for local component state

@@ -9,7 +9,7 @@ import { CustomerAuthProvider } from "@/components/customer/CustomerAuthContext"
 import { JsonLd } from "@/design-system/seo/json-ld";
 import { BUSINESS_CONFIG, buildLocalBusinessSchema } from "@/lib/business-config";
 import { Playfair_Display, Manrope } from "next/font/google";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 // Playfair Display ships a proper `vietnamese` subset, so stacked diacritics
@@ -31,6 +31,14 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Nội Thất Gỗ Tự Nhiên",
   description: "Nội thất gỗ tự nhiên cao cấp",
+};
+
+// `viewportFit: "cover"` exposes env(safe-area-inset-*) for the mobile bottom nav
+// and sticky CTAs; themeColor matches the page background. Next already auto-injects
+// the width=device-width meta — this only adds theme color + safe-area handling.
+export const viewport: Viewport = {
+  themeColor: "#FAF8F5",
+  viewportFit: "cover",
 };
 
 export function generateStaticParams() {
