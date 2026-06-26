@@ -157,7 +157,8 @@ async def admin_create_campaign(db: AsyncSession, req: AdminCreateCampaignReques
     campaign = Campaign(
         id=str(uuid.uuid4()), code=req.code, status=req.status,
         hero_image_url=req.heroImageUrl, mobile_hero_image_url=req.mobileHeroImageUrl,
-        placement=req.placement, display_priority=req.displayPriority,
+        placement=req.placement, target_type=req.targetType, target_id=req.targetId,
+        display_priority=req.displayPriority,
         starts_at=req.startsAt, ends_at=req.endsAt,
     )
     db.add(campaign)
@@ -187,6 +188,7 @@ async def admin_get_campaign(db: AsyncSession, campaign_id: str) -> dict:
         "id": campaign.id, "code": campaign.code, "status": campaign.status,
         "heroImageUrl": campaign.hero_image_url, "mobileHeroImageUrl": campaign.mobile_hero_image_url,
         "placement": campaign.placement, "displayPriority": campaign.display_priority,
+        "targetType": campaign.target_type, "targetId": campaign.target_id,
         "startsAt": campaign.starts_at, "endsAt": campaign.ends_at, "createdAt": campaign.created_at,
         "translations": [
             {"locale": t.locale, "name": t.name, "slug": t.slug,

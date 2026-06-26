@@ -59,6 +59,8 @@ class AdminCreateCampaignRequest(BaseModel):
     heroImageUrl: Optional[str] = None
     mobileHeroImageUrl: Optional[str] = None
     placement: Optional[str] = None
+    targetType: Optional[str] = None  # CampaignTargetType: COLLECTION | CATEGORY
+    targetId: Optional[str] = None
     displayPriority: int = 100
     startsAt: datetime
     endsAt: Optional[datetime] = None
@@ -70,6 +72,8 @@ class AdminPatchCampaignRequest(BaseModel):
     heroImageUrl: Optional[str] = None
     mobileHeroImageUrl: Optional[str] = None
     placement: Optional[str] = None
+    targetType: Optional[str] = None
+    targetId: Optional[str] = None
     displayPriority: Optional[int] = None
     startsAt: Optional[datetime] = None
     endsAt: Optional[datetime] = None

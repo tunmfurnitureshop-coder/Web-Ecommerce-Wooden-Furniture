@@ -183,6 +183,13 @@ class CampaignPlacement(str, enum.Enum):
     CHECKOUT = "CHECKOUT"
 
 
+class CampaignTargetType(str, enum.Enum):
+    """What product group a campaign points at — drives the filtered PLP and the
+    scope-match rule against its linked promotion."""
+    COLLECTION = "COLLECTION"
+    CATEGORY = "CATEGORY"
+
+
 class CommerceEventName(str, enum.Enum):
     PRODUCT_VIEWED = "PRODUCT_VIEWED"
     SEARCH_PERFORMED = "SEARCH_PERFORMED"
