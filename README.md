@@ -37,11 +37,14 @@ docker compose up -d
 # Run migrations
 docker exec wood_furniture_backend alembic upgrade head
 
-# Seed sample data (8 products, 5 room categories, admin user, sample promotions)
+# Seed sample data (8 products, 5 room categories, admin user, sample promotions, 2 collections)
 docker exec wood_furniture_backend python -m app.seed
 
-# Seed taxonomy (tags, collections, sample guides)
+# Seed taxonomy (tags + search synonyms)
 docker exec wood_furniture_backend python -m app.seed_taxonomy
+
+# (Optional) Re-seed only the sample collections into an existing database
+docker exec wood_furniture_backend python -m app.seed_collections
 ```
 
 ### Access
