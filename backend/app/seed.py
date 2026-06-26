@@ -13,6 +13,7 @@ from app.modules.inventory.models import (
 )
 from sqlalchemy import select
 from app.modules.promotion.models import Promotion, PromotionTranslation
+from app.seed_collections import seed_collections
 from app.shared.enums import (
     PromotionStatus, PromotionTrigger, PromotionScopeType, DiscountType,
 )
@@ -319,6 +320,11 @@ async def seed():
                 created_at=now(), updated_at=now(),
             ))
 
+        # collections link products by SKU, so flush products first
+        await db.flush()
+        print("Seeding collections...")
+        await seed_collections(db)
+
         print("Seeding promotions...")
         starts = datetime(2026, 6, 1, tzinfo=timezone.utc)
         ends = datetime(2026, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
@@ -390,4 +396,10 @@ async def seed():
 
 
 if __name__ == "__main__":
+    import sys
+    if sys.platform == "win32":
+        # psycopg async can't run on Windows' default ProactorEventLoop
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        # avoid cp1252 UnicodeEncodeError when printing Vietnamese output
+        sys.stdout.reconfigure(encoding="utf-8")
     asyncio.run(seed())

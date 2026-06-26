@@ -24,7 +24,7 @@ export default function EditCollectionPage({ params }: { params: { id: string } 
 
   useEffect(() => { load(); }, [params.id]);
 
-  if (!col) return <p className="text-sm text-text-muted">Đang tải...</p>;
+  if (!col) return <p className="text-sm text-text-muted">{t("loading")}</p>;
 
   const linkedIds = new Set(col.products.map((p) => p.product_id));
   const filtered = products.filter((p) => {
@@ -66,7 +66,7 @@ export default function EditCollectionPage({ params }: { params: { id: string } 
         <div className="mb-4">
           <input
             className="w-full max-w-xs rounded border px-3 py-1.5 text-sm"
-            placeholder="Tìm sản phẩm..."
+            placeholder={t("searchProductPlaceholder")}
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
           />
