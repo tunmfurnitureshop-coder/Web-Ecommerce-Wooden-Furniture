@@ -2,6 +2,31 @@
 
 ---
 
+## [Unreleased] — Campaign Flow: Scoped Promotion
+
+Makes campaigns coherent — a campaign targets a product group and its promotion
+auto-applies to exactly that group. Golden rule: **Campaign target ≡ Promotion
+scope** (Campaign = display, Promotion = pricing; the evaluator never reads `campaign_id`).
+
+### Added
+
+#### Backend
+- **Campaign target** (`campaigns.target_type` + `target_id`, migration 008): a campaign points at a `COLLECTION` or `CATEGORY`
+- **Catalog scoping** (`GET /api/v1/products?campaign={slug}`): resolves the target to a collection/room filter and returns a structured `campaignBanner` (from the campaign's first ACTIVE+AUTOMATIC promotion); unknown/inactive slugs degrade to the full catalog
+- **Promotion-link validation**: linking a promotion to a campaign now requires `AUTOMATIC` trigger + scope matching the target, else `422` (`CAMPAIGN_TARGET_REQUIRED`, `CAMPAIGN_PROMO_NOT_AUTOMATIC`, `CAMPAIGN_PROMO_SCOPE_MISMATCH`)
+- **Seed** `app/seed_campaign.py`: sample `BEDROOM10` campaign (CATEGORY → bedroom) + AUTOMATIC 10% scoped promotion, linked through the validated path
+
+#### Frontend
+- **Carousel CTA** now links to `/products?campaign={slug}` (filtered PLP) instead of the campaign detail page
+- **`CampaignBannerCard`**: promo banner above the catalog grid; discount label formatted client-side from structured data
+- **Admin `CampaignTargetField`**: target type + dependent collection/room picker in campaign create + edit forms
+- **i18n**: `catalog.campaignDiscountPercent/campaignDiscountAmount/campaignEndsOn` + `admin.targetType/targetTypeNone/targetCollection/targetCategory/targetEntity` (vi + zh-CN)
+
+#### Testing
+- `test_campaign_scoped_promotion.py` (5): catalog filter, unknown-slug graceful, link validation branches; full suite 122 passing, no regressions
+
+---
+
 ## [Unreleased] — Homepage Merchandising
 
 ### Added
