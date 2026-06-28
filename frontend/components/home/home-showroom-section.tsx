@@ -56,7 +56,7 @@ export async function HomeShowroomSection() {
                   href={mapsDirectionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-sm text-sm font-medium text-brand transition-colors hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                  className="inline-flex min-h-[44px] items-center rounded-sm text-sm font-medium text-brand transition-colors hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                 >
                   {t("showroom.directions_cta")} ↗
                 </a>

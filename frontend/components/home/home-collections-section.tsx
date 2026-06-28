@@ -44,6 +44,14 @@ export async function HomeCollectionsSection({
             </Link>
           </div>
           <CollectionGrid collections={collections.slice(0, 3)} locale={locale} />
+          {/* Mobile-visible "view all" (the header link is sm+ only) */}
+          <Link
+            href="/collections"
+            className="flex min-h-[44px] items-center justify-center gap-1 rounded-sm text-sm font-medium text-brand transition-colors hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:hidden"
+          >
+            {t("viewAll")}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
         </div>
       </Container>
     </Section>

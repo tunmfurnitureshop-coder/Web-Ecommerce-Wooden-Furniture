@@ -68,7 +68,7 @@ export function ProductRail({
           {viewAllHref && (
             <Link
               href={viewAllHref}
-              className="flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+              className="flex min-h-[44px] items-center gap-1 text-sm font-medium text-brand hover:text-brand-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
             >
               {viewAllLabel}
               <ArrowRight className="h-4 w-4" aria-hidden />
@@ -79,7 +79,7 @@ export function ProductRail({
             onClick={() => emblaApi?.scrollPrev()}
             disabled={!canPrev}
             aria-label={t("scrollPrev")}
-            className="p-2 rounded-full border border-border-default text-text-secondary hover:bg-surface-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border-default text-text-secondary hover:bg-surface-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
           </button>
@@ -88,7 +88,7 @@ export function ProductRail({
             onClick={() => emblaApi?.scrollNext()}
             disabled={!canNext}
             aria-label={t("scrollNext")}
-            className="p-2 rounded-full border border-border-default text-text-secondary hover:bg-surface-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border-default text-text-secondary hover:bg-surface-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <ChevronRight className="h-4 w-4" aria-hidden />
           </button>
