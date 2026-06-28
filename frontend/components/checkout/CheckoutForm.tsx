@@ -14,17 +14,19 @@ import type { CartQuoteResponse } from "@/features/promotion/promotion.types";
 import { upsertCartRecoverySession } from "@/features/cart-recovery/cartRecovery.api";
 import { PromotionSummary } from "@/design-system/commerce/PromotionSummary";
 import { CheckoutSubmitButton } from "@/design-system/conversion/CheckoutSubmitButton";
-import { Button } from "@/components/ui/button";
+import { StickyCtaBar } from "@/design-system/conversion/sticky-cta-bar";
+import { InlineFieldError } from "@/design-system/components/inline-field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/format-currency";
+import { cn } from "@/lib/utils";
 import { trackEvent } from "@/features/analytics/analytics.client";
 
 const PAYMENT_METHODS = ["COD", "BANK_TRANSFER", "PAYOS"] as const;
 
-export function CheckoutForm() {
+export function CheckoutForm({ className }: { className?: string }) {
   const t = useTranslations("checkout");
   const tPayment = useTranslations("payment");
   const router = useRouter();
@@ -106,10 +108,30 @@ export function CheckoutForm() {
     return errs;
   }
 
+  // The submit CTA is a fixed bottom bar on mobile, so a validation failure must
+  // bring the offending field (rendered up the page) into view + focus.
+  function focusFirstError(errs: Record<string, string>) {
+    const fieldIds: Record<string, string> = {
+      customerName: "name",
+      customerPhone: "phone",
+      customerEmail: "email",
+      shippingAddress: "address",
+    };
+    const key = Object.keys(fieldIds).find((k) => errs[k]);
+    if (!key) return;
+    const el = document.getElementById(fieldIds[key]);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.focus({ preventScroll: true });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      focusFirstError(errs);
+      return;
+    }
     setLoading(true);
     try {
       const res = await createOrder(
@@ -154,23 +176,23 @@ export function CheckoutForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className={cn("space-y-5", className)}>
       <div className="space-y-2">
         <Label htmlFor="name">{t("name")}</Label>
         <Input id="name" placeholder={t("namePlaceholder")} value={form.customerName} onChange={(e) => set("customerName", e.target.value)} />
-        {errors.customerName && <p className="text-destructive text-xs">{errors.customerName}</p>}
+        <InlineFieldError message={errors.customerName} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="phone">{t("phone")}</Label>
         <Input id="phone" placeholder={t("phonePlaceholder")} value={form.customerPhone} onChange={(e) => set("customerPhone", e.target.value)} />
-        {errors.customerPhone && <p className="text-destructive text-xs">{errors.customerPhone}</p>}
+        <InlineFieldError message={errors.customerPhone} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="email">{t("email")}</Label>
         <Input id="email" type="email" placeholder={t("emailPlaceholder")} value={form.customerEmail} onChange={(e) => set("customerEmail", e.target.value)} />
-        {errors.customerEmail && <p className="text-destructive text-xs">{errors.customerEmail}</p>}
+        <InlineFieldError message={errors.customerEmail} />
       </div>
 
       {/* Marketing consent — only visible when email is provided */}
@@ -192,7 +214,7 @@ export function CheckoutForm() {
       <div className="space-y-2">
         <Label htmlFor="address">{t("address")}</Label>
         <Textarea id="address" placeholder={t("addressPlaceholder")} value={form.shippingAddress} onChange={(e) => set("shippingAddress", e.target.value)} />
-        {errors.shippingAddress && <p className="text-destructive text-xs">{errors.shippingAddress}</p>}
+        <InlineFieldError message={errors.shippingAddress} />
       </div>
 
       <div className="space-y-2">
@@ -224,14 +246,26 @@ export function CheckoutForm() {
         />
       )}
 
-      {errors.cart && <p className="text-destructive text-sm">{errors.cart}</p>}
-      {errors.submit && <p className="text-destructive text-sm">{errors.submit}</p>}
+      <InlineFieldError message={errors.cart} className="text-sm" />
+      <InlineFieldError message={errors.submit} className="text-sm" />
 
-      <CheckoutSubmitButton
-        loading={loading}
-        label={t("submit")}
-        loadingLabel={t("submitting")}
-      />
+      {/* Desktop submit — mobile uses the sticky bar below */}
+      <div className="hidden lg:block">
+        <CheckoutSubmitButton
+          loading={loading}
+          label={t("submit")}
+          loadingLabel={t("submitting")}
+        />
+      </div>
+
+      {/* Mobile sticky submit — type=submit inside this form, so it submits natively */}
+      <StickyCtaBar>
+        <CheckoutSubmitButton
+          loading={loading}
+          label={t("submit")}
+          loadingLabel={t("submitting")}
+        />
+      </StickyCtaBar>
     </form>
   );
 }

@@ -1,20 +1,24 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 import { useCartStore } from "@/features/cart/cart.store";
 import { hydrateCart } from "@/features/cart/cart.api";
 import type { CartHydrateResponse } from "@/features/cart/cart.types";
 import { Skeleton } from "@/design-system/components/skeleton";
 import { Divider } from "@/design-system/primitives/divider";
 import { formatCurrency } from "@/lib/format-currency";
+import { cn } from "@/lib/utils";
 
-export function CheckoutOrderSummary() {
+export function CheckoutOrderSummary({ className }: { className?: string }) {
   const t = useTranslations("checkout");
   const tCart = useTranslations("cart");
   const { items } = useCartStore();
   const [hydrated, setHydrated] = useState<CartHydrateResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false); // mobile accordion — collapsed by default
+  const bodyId = useId();
 
   useEffect(() => {
     if (items.length === 0) { setHydrated(null); return; }
@@ -28,9 +32,29 @@ export function CheckoutOrderSummary() {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border-default bg-surface p-5 flex flex-col gap-4 h-fit lg:sticky lg:top-24">
-      <h2 className="text-base font-semibold text-text-primary">{t("orderSummary")}</h2>
-      <Divider />
+    <div className={cn("rounded-xl border border-border-default bg-surface flex flex-col h-fit lg:sticky lg:top-24", className)}>
+      {/* Mobile: collapsible toggle (shows total + chevron). Desktop: static heading
+          — separate elements so aria-expanded never lies and there's no phantom
+          focus stop on desktop (where the body is always visible). */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls={bodyId}
+        className="flex items-center justify-between gap-3 p-5 text-left lg:hidden"
+      >
+        <span className="text-base font-semibold text-text-primary">{t("orderSummary")}</span>
+        <span className="flex items-center gap-2">
+          {hydrated && (
+            <span className="text-base font-bold text-text-primary">{formatCurrency(hydrated.totalVnd)}</span>
+          )}
+          <ChevronDown className={cn("h-5 w-5 shrink-0 text-text-muted transition-transform", open && "rotate-180")} aria-hidden />
+        </span>
+      </button>
+      <h2 className="hidden px-5 pt-5 text-base font-semibold text-text-primary lg:block">{t("orderSummary")}</h2>
+
+      <div id={bodyId} className={cn("flex-col gap-4 px-5 pb-5", open ? "flex" : "hidden", "lg:flex")}>
+        <Divider />
 
       {loading ? (
         <div className="flex flex-col gap-3">
@@ -89,6 +113,7 @@ export function CheckoutOrderSummary() {
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
