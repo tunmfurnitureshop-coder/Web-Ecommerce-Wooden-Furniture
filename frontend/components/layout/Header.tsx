@@ -31,7 +31,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border-default bg-surface">
-        <div className="mx-auto flex h-[80px] max-w-container items-center justify-between gap-6 px-4 md:px-8 xl:px-12">
+        <div className="mx-auto flex h-header-mobile md:h-header-desktop max-w-container items-center justify-between gap-6 px-4 md:px-8 xl:px-12">
           {/* Logo */}
           <Link
             href="/"
@@ -70,7 +70,7 @@ export function Header() {
             {/* Wishlist */}
             <Link
               href="/account/wishlist"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               aria-label={t("wishlist")}
             >
               <Heart className="h-5 w-5 text-text-secondary" aria-hidden />
@@ -79,7 +79,7 @@ export function Header() {
             {/* Account */}
             <Link
               href={customer ? "/account/profile" : "/login"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               aria-label={customer ? t("account") : t("login")}
             >
               <User className="h-5 w-5 text-text-secondary" aria-hidden />
@@ -88,7 +88,7 @@ export function Header() {
             {/* Cart */}
             <Link
               href="/cart"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="relative hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               aria-label={`${t("cart")}${itemCount > 0 ? `, ${itemCount} items` : ""}`}
             >
               <ShoppingCart className="h-5 w-5 text-text-secondary" aria-hidden />

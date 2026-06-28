@@ -14,11 +14,11 @@ export async function HomeHeroStatic() {
     <section className="relative overflow-hidden bg-surface-muted min-h-[520px] flex items-center">
       <div className="mx-auto max-w-container px-4 md:px-8 xl:px-12 py-20 md:py-28">
         <div className="max-w-xl flex flex-col gap-6">
-          <h2 className="font-display text-5xl font-normal text-text-primary leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl font-normal text-text-primary leading-tight">
             {t("heroTitle")}
           </h2>
           <p className="text-lg text-text-secondary">{t("heroSubtitle")}</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <Link href="/products">
               <Button variant="primary" size="lg">
                 {t("heroCtaShop")}

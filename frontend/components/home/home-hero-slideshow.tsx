@@ -110,7 +110,7 @@ export function HomeHeroSlideshow({ slides }: HomeHeroSlideshowProps) {
             type="button"
             onClick={() => emblaApi?.scrollPrev()}
             aria-label={tc("scrollPrev")}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-surface text-text-primary hover:bg-surface-muted border border-border-default shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-surface text-text-primary hover:bg-surface-muted border border-border-default shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden />
           </button>
@@ -118,7 +118,7 @@ export function HomeHeroSlideshow({ slides }: HomeHeroSlideshowProps) {
             type="button"
             onClick={() => emblaApi?.scrollNext()}
             aria-label={tc("scrollNext")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-surface text-text-primary hover:bg-surface-muted border border-border-default shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-surface text-text-primary hover:bg-surface-muted border border-border-default shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
@@ -131,7 +131,7 @@ export function HomeHeroSlideshow({ slides }: HomeHeroSlideshowProps) {
                 aria-label={t("goToSlide", { index: i + 1 })}
                 aria-current={i === selected}
                 className={cn(
-                  "h-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus",
+                  "relative h-2 rounded-full transition-all before:absolute before:-inset-y-3 before:-inset-x-1 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus",
                   i === selected ? "w-6 bg-surface" : "w-2 bg-surface-muted hover:bg-surface"
                 )}
               />

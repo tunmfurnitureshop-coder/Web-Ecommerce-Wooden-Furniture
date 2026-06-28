@@ -14,6 +14,7 @@ import { Skeleton } from "@/design-system/components/skeleton";
 import { CouponInput } from "@/design-system/commerce/CouponInput";
 import { DiscountBreakdown } from "@/design-system/commerce/DiscountBreakdown";
 import { PromotionSummary } from "@/design-system/commerce/PromotionSummary";
+import { StickyCtaBar } from "@/design-system/conversion/sticky-cta-bar";
 import { ShoppingBag, ShieldCheck, RefreshCw, HeadphonesIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/format-currency";
 import { cartItemKey } from "@/features/cart/cart.types";
@@ -90,9 +91,10 @@ export default function CartPage() {
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const hasDiscount = (quote?.promotionDiscountVnd ?? 0) > 0;
+  const checkoutHref = { pathname: "/checkout" as const, query: couponCode ? { coupon: couponCode } : undefined };
 
   return (
-    <Container className="py-8 pb-16">
+    <Container className="py-8 pb-8 lg:pb-16">
       <h1 className="text-3xl font-bold text-text-primary mb-8">
         {t("title")} <span className="text-lg font-normal text-text-muted">({totalItems})</span>
       </h1>
@@ -213,17 +215,29 @@ export default function CartPage() {
             </div>
           </div>
 
-          <Link href={{ pathname: "/checkout", query: couponCode ? { coupon: couponCode } : undefined }}>
-            <Button variant="primary" size="lg" fullWidth disabled={loading || !hydrated}>
-              {t("checkout")}
-            </Button>
-          </Link>
+          {/* Desktop checkout button (mobile uses the sticky bar below) */}
+          <div className="hidden lg:block">
+            <Link href={checkoutHref}>
+              <Button variant="primary" size="lg" fullWidth disabled={loading || !hydrated}>
+                {t("checkout")}
+              </Button>
+            </Link>
+          </div>
 
           <Link href="/products" className="text-center text-sm text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm">
             {t("continueShopping")}
           </Link>
         </div>
       </div>
+
+      {/* Mobile sticky checkout CTA */}
+      <StickyCtaBar total={formatCurrency(quote?.totalVnd ?? hydrated?.totalVnd ?? 0)} totalLabel={t("total")}>
+        <Link href={checkoutHref}>
+          <Button variant="primary" size="lg" disabled={loading || !hydrated}>
+            {t("checkout")}
+          </Button>
+        </Link>
+      </StickyCtaBar>
     </Container>
   );
 }

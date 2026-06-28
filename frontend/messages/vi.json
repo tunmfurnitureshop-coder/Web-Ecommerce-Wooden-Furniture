@@ -8,17 +8,29 @@
     "home": "Trang chủ",
     "products": "Sản phẩm",
     "rooms": "Phòng nội thất",
+    "categories": "Danh mục",
     "cart": "Giỏ hàng",
     "wishlist": "Danh sách yêu thích",
     "account": "Tài khoản",
     "login": "Đăng nhập",
     "search": "Tìm kiếm",
     "switchLanguage": "Chuyển ngôn ngữ",
-    "mainNavLabel": "Điều hướng chính"
+    "mainNavLabel": "Điều hướng chính",
+    "bottomNavLabel": "Điều hướng dưới"
+  },
+  "mobileMenu": {
+    "title": "Danh mục",
+    "close": "Đóng",
+    "allProducts": "Tất cả sản phẩm",
+    "byRoom": "Theo phòng",
+    "collections": "Bộ sưu tập",
+    "guides": "Cẩm nang",
+    "contact": "Liên hệ"
   },
   "product": {
     "addToCart": "Thêm vào giỏ",
     "outOfStock": "Hết hàng",
+    "noImage": "Chưa có hình ảnh",
     "woodType": "Loại gỗ",
     "finish": "Bề mặt",
     "size": "Kích thước",
@@ -291,7 +303,12 @@
     "minPrice": "Giá tối thiểu",
     "maxPrice": "Giá tối đa",
     "apply": "Áp dụng",
-    "reset": "Đặt lại"
+    "reset": "Đặt lại",
+    "title": "Bộ lọc",
+    "button": "Lọc",
+    "close": "Đóng",
+    "viewResults": "Xem {count} kết quả",
+    "activeCount": "{count} bộ lọc đang áp dụng"
   },
   "common": {
     "loading": "Đang tải...",

@@ -8,17 +8,29 @@
     "home": "首页",
     "products": "产品",
     "rooms": "家居空间",
+    "categories": "分类",
     "cart": "购物车",
     "wishlist": "收藏夹",
     "account": "账户",
     "login": "登录",
     "search": "搜索",
     "switchLanguage": "切换语言",
-    "mainNavLabel": "主导航"
+    "mainNavLabel": "主导航",
+    "bottomNavLabel": "底部导航"
+  },
+  "mobileMenu": {
+    "title": "分类",
+    "close": "关闭",
+    "allProducts": "全部产品",
+    "byRoom": "按空间",
+    "collections": "系列",
+    "guides": "指南",
+    "contact": "联系我们"
   },
   "product": {
     "addToCart": "加入购物车",
     "outOfStock": "缺货",
+    "noImage": "暂无图片",
     "woodType": "木材类型",
     "finish": "表面处理",
     "size": "尺寸",
@@ -291,7 +303,12 @@
     "minPrice": "最低价格",
     "maxPrice": "最高价格",
     "apply": "应用",
-    "reset": "重置"
+    "reset": "重置",
+    "title": "筛选",
+    "button": "筛选",
+    "close": "关闭",
+    "viewResults": "查看 {count} 个结果",
+    "activeCount": "{count} 个筛选条件"
   },
   "common": {
     "loading": "加载中...",

@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import { useCartStore } from "@/features/cart/cart.store";
 import { getPricingQuote } from "@/features/product/product.api";
 import { ProductReviewsSection } from "@/components/review/ProductReviewsSection";
+import { ProductGallery } from "./product-gallery";
+import { ProductStickyCart } from "./product-sticky-cart";
 import { Button } from "@/design-system/components/button";
 import { QuantityStepper } from "@/design-system/components/quantity-stepper";
 import { RadioCard } from "@/design-system/components/radio-card";
@@ -49,6 +50,8 @@ export function ProductDetailClient({ product, locale }: Props) {
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [cartSuccess, setCartSuccess] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const buyBoxRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
 
   const hasAllOptions = woodType && finish && size;
 
@@ -76,6 +79,15 @@ export function ProductDetailClient({ product, locale }: Props) {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [woodType, finish, size, quantity, product.id]);
 
+  // Reveal the mobile sticky add-to-cart whenever the inline buy box is off-screen.
+  useEffect(() => {
+    const el = buyBoxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setShowSticky(!entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const handleFinishChange = useCallback((code: string) => {
     setFinish(code);
     const linked = product.images.find((img) => img.linkedFinishCode === code);
@@ -102,42 +114,14 @@ export function ProductDetailClient({ product, locale }: Props) {
 
       {/* Main 2-col */}
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr]">
-        {/* Left: Image gallery */}
-        <div className="flex flex-col gap-3">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-surface-muted">
-            {activeImage ? (
-              <Image
-                src={activeImage}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-sm text-text-muted">
-                {t("outOfStock")}
-              </div>
-            )}
-          </div>
-          {galleryImages.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {galleryImages.map((img) => (
-                <button
-                  key={img.id}
-                  type="button"
-                  onClick={() => setActiveImage(img.imageUrl)}
-                  aria-label={img.altText ?? product.name}
-                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
-                    activeImage === img.imageUrl ? "border-brand" : "border-border-default"
-                  }`}
-                >
-                  <Image src={img.imageUrl} alt={img.altText ?? product.name} fill className="object-cover" sizes="64px" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Left: Image gallery (mobile swipe / desktop thumbnails) */}
+        <ProductGallery
+          images={galleryImages}
+          activeImage={activeImage}
+          onActiveImageChange={setActiveImage}
+          productName={product.name}
+          emptyLabel={t("noImage")}
+        />
 
         {/* Right: Product info + options */}
         <Stack gap="6">
@@ -253,7 +237,7 @@ export function ProductDetailClient({ product, locale }: Props) {
               </p>
             )}
 
-            <div className="relative">
+            <div ref={buyBoxRef} className="relative">
               <Button
                 variant="primary"
                 size="lg"
@@ -343,6 +327,16 @@ export function ProductDetailClient({ product, locale }: Props) {
 
       {/* Reviews */}
       <ProductReviewsSection productId={product.id} locale={locale} />
+
+      {/* Mobile sticky add-to-cart — appears when the inline buy box scrolls away */}
+      <ProductStickyCart
+        visible={showSticky}
+        priceLabel={quote ? formatCurrency(quote.unitPriceVnd) : formatCurrency(product.basePriceVnd)}
+        addLabel={t("addToCart")}
+        onAddToCart={handleAddToCart}
+        disabled={!hasAllOptions || quoteLoading}
+        isLoading={quoteLoading}
+      />
     </div>
   );
 }

@@ -146,7 +146,9 @@ const config: Config = {
       spacing: {
         "header-desktop": "var(--header-height-desktop)",
         "header-mobile": "var(--header-height-mobile)",
+        "bottom-nav": "var(--bottom-nav-height)",
         "cart-drawer": "var(--cart-drawer-width)",
+        "safe-b": "env(safe-area-inset-bottom)",
       },
 
       maxWidth: {

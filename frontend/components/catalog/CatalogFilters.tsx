@@ -14,6 +14,8 @@ interface CatalogFiltersProps {
     sort?: string;
     q?: string;
   };
+  /** Hide the inline reset link when an embedding sheet provides its own. */
+  hideReset?: boolean;
 }
 
 function buildHref(base: Record<string, string | undefined>, overrides: Record<string, string | undefined>) {
@@ -26,7 +28,7 @@ function buildHref(base: Record<string, string | undefined>, overrides: Record<s
   return `/products?${params.toString()}`;
 }
 
-export function CatalogFilters({ currentFilters }: CatalogFiltersProps) {
+export function CatalogFilters({ currentFilters, hideReset = false }: CatalogFiltersProps) {
   const t = useTranslations("filters");
   const tHome = useTranslations("home");
   const base = {
@@ -102,15 +104,19 @@ export function CatalogFilters({ currentFilters }: CatalogFiltersProps) {
         </div>
       </div>
 
-      <Divider />
+      {!hideReset && (
+        <>
+          <Divider />
 
-      {/* Reset */}
-      <Link
-        href="/products"
-        className="text-xs text-text-muted hover:text-danger transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
-      >
-        {t("reset")}
-      </Link>
+          {/* Reset */}
+          <Link
+            href="/products"
+            className="text-xs text-text-muted hover:text-danger transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+          >
+            {t("reset")}
+          </Link>
+        </>
+      )}
     </div>
   );
 }
