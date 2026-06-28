@@ -4,7 +4,6 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MessagesSquare, X } from "lucide-react";
 import { usePathname } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 import { isFunnelRoute, isProductDetailRoute } from "@/lib/layout/chrome-routes";
 import { getContactChannels, type ContactChannelId } from "@/lib/contact/channels";
 import { ContactChannelButton } from "./contact-channel-button";
@@ -12,8 +11,6 @@ import { ContactChannelButton } from "./contact-channel-button";
 export function ContactFab() {
   const t = useTranslations("contact");
   const pathname = usePathname();
-  // On funnel routes the bottom nav is gone, so the FAB drops back to the base offset.
-  const onFunnel = isFunnelRoute(pathname);
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -48,18 +45,12 @@ export function ContactFab() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // PDP has its own inquiry CTA + sticky add-to-cart owning the bottom-right.
-  if (channels.length === 0 || isProductDetailRoute(pathname)) return null;
+  // Hidden where a sticky bottom CTA owns the bottom-right: PDP (add-to-cart) and
+  // the cart/checkout funnel (Thanh toán / Đặt hàng).
+  if (channels.length === 0 || isProductDetailRoute(pathname) || isFunnelRoute(pathname)) return null;
 
   return (
-    <div
-      className={cn(
-        "fixed right-4 z-40 flex flex-col items-end gap-3",
-        onFunnel
-          ? "bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]"
-          : "bottom-[calc(env(safe-area-inset-bottom,0px)+1rem+var(--bottom-nav-height))] md:bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]",
-      )}
-    >
+    <div className="fixed right-4 z-40 flex flex-col items-end gap-3 bottom-[calc(env(safe-area-inset-bottom,0px)+1rem+var(--bottom-nav-height))] md:bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
       {open && (
         <div
           ref={panelRef}

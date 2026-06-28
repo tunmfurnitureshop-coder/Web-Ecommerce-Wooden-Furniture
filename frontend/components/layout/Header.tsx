@@ -70,7 +70,7 @@ export function Header() {
             {/* Wishlist */}
             <Link
               href="/account/wishlist"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               aria-label={t("wishlist")}
             >
               <Heart className="h-5 w-5 text-text-secondary" aria-hidden />
@@ -79,7 +79,7 @@ export function Header() {
             {/* Account */}
             <Link
               href={customer ? "/account/profile" : "/login"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               aria-label={customer ? t("account") : t("login")}
             >
               <User className="h-5 w-5 text-text-secondary" aria-hidden />
@@ -88,7 +88,7 @@ export function Header() {
             {/* Cart */}
             <Link
               href="/cart"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="relative hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               aria-label={`${t("cart")}${itemCount > 0 ? `, ${itemCount} items` : ""}`}
             >
               <ShoppingCart className="h-5 w-5 text-text-secondary" aria-hidden />

@@ -43,7 +43,10 @@ export function ProductGallery({
             <div
               ref={scrollRef}
               onScroll={handleScroll}
-              className="flex snap-x snap-mandatory overflow-x-auto rounded-lg"
+              tabIndex={0}
+              role="group"
+              aria-label={productName}
+              className="flex snap-x snap-mandatory overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
               {images.map((img, i) => (
                 <div
